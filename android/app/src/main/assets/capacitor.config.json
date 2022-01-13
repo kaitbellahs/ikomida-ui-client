@@ -1,0 +1,7 @@
+{
+	"appId": "br.com.tialtonivel.projx",
+	"appName": "projx",
+	"webDir": "public",
+	"bundledWebRuntime": false,
+	"npmClient": "npm"
+}

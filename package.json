@@ -1,0 +1,49 @@
+{
+  "name": "svelte-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "start": "sirv public --no-clear",
+    "build:android": "run-s build:app cap-run:android",
+    "build:ios": "run-s build:app cap-run:ios",
+    "cap-run:android": "cap sync android && cap open android",
+    "cap-run:ios": "cap sync ios && cap run ios",
+    "dev:ios": "run-p build cap-run:ios",
+    "dev:android": "run-p dev:start cap-run:android"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.0.0",
+    "@roxi/routify": "^2.18.4",
+    "node-sass": "^7.0.1",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.4.5",
+    "postcss-load-config": "^3.1.1",
+    "rollup": "^2.3.4",
+    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-svelte": "^7.0.0",
+    "rollup-plugin-terser": "^7.0.0",
+    "svelte": "^3.0.0",
+    "svelte-as-markup-preprocessor": "^0.2.0",
+    "svelte-fa": "^2.4.0",
+    "svelte-preprocess": "^4.10.1",
+    "svelte-preprocess-cssmodules": "^2.1.2"
+  },
+  "dependencies": {
+    "@capacitor/android": "^3.3.4",
+    "@capacitor/app": "^1.0.7",
+    "@capacitor/cli": "^3.3.4",
+    "@capacitor/core": "^3.3.4",
+    "@capacitor/geolocation": "^1.3.0",
+    "@capacitor/ios": "^3.3.4",
+    "@capacitor/network": "^1.0.6",
+    "@capacitor/status-bar": "file:../../capacitor-plugins/status-bar",
+    "@capacitor/storage": "^1.2.3",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "sirv-cli": "^2.0.0",
+    "uuid": "^8.3.2"
+  }
+}

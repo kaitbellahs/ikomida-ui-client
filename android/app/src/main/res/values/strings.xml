@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">projx</string>
+    <string name="title_activity_main">projx</string>
+    <string name="package_name">br.com.tialtonivel.projx</string>
+    <string name="custom_url_scheme">projx</string>
+</resources>
