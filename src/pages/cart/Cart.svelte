@@ -1,11 +1,8 @@
 <script>
   import { Cart, Store } from "../../stores/Cart";
-  import CartItem from "../../components/CartItem.svelte";
   import { Title, Navigation, Router, Menu } from "../../stores/Navigation";
-  import { currency } from "../../Utils/Strings";
   import { faTrash } from "@fortawesome/free-solid-svg-icons";
-  import Alert from "../../components/Alert.svelte";
-  import Button from "../../components/Button.svelte";
+  import {Views, Utils} from "@tian/components";
   import { StatusBar } from "../../stores/Setup";
 
   let showAlert = false;
@@ -15,7 +12,6 @@
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: delivery = 0;
   $: total = subtotal + delivery;
-  $: styleBottomPadding = $StatusBar.bottomPadding + 45 + "px";
 
   function addMoreItems() {
     Navigation.pop(2);
@@ -39,30 +35,23 @@
 </script>
 
 {#if showAlert}
-  <Alert
+  <Views.Alert
     title="Alerta"
     message="Você tem certeza que quer remover todos produtos do carrinho de compras?"
     closeCallBack={toggleAlert}
     buttons={[
-      { name: "Não", callback: toggleAlert },
+      { name: "Não", callback: toggleAlert, principal: true },
       { name: "Sim", callback: resetCart },
     ]}
   />
 {/if}
 
-{#each $Store as { title, description, serves, price, oldPrice, src, weight, quantity }}
-  <CartItem
-    {title}
-    {description}
-    {serves}
-    {price}
-    {oldPrice}
-    {src}
-    {weight}
-    {quantity}
+{#each $Store as item}
+  <Views.CartItem
+    {...item}
   />
 {/each}
-<Button type="transparent" on:click={addMoreItems}>Addionar mais itens</Button>
+<Views.Button type="transparent" on:click={addMoreItems}>Addionar mais itens</Views.Button>
 <table>
   <thead>
     <tr>
@@ -72,37 +61,27 @@
   <tbody>
     <tr>
       <td class="resumeText">Subtotal</td>
-      <td class="resumeValue">{currency(subtotal)}</td>
+      <td class="resumeValue">{Utils.Strings.currency(subtotal)}</td>
     </tr>
     <tr>
       <td class="resumeText">Taxa de entrega</td>
       <td class="resumeValue"
-        ><span class:deliveryFree={delivery == 0}>{currency(delivery)}</span
+        ><span class:deliveryFree={delivery == 0}>{Utils.Strings.currency(delivery)}</span
         ></td
       >
     </tr>
     <tr>
       <td class="resumeText">Total</td>
-      <td class="resumeValue">{currency(total)}</td>
+      <td class="resumeValue">{Utils.Strings.currency(total)}</td>
     </tr>
   </tbody>
 </table>
-<Button
+<Views.Button
   isFloat={true}
-  on:click={forward}
-  style="--bottomPadding:{styleBottomPadding}"><span>Continuar</span></Button
+  on:click={forward}><span>Continuar</span></Views.Button
 >
 
 <style>
-  .forward {
-    position: fixed;
-    left: 2px;
-    right: 0;
-    bottom: var(--bottomPadding);
-  }
-  .addMore {
-    background: transparent;
-  }
   table {
     width: 100%;
     padding-bottom: 55px;

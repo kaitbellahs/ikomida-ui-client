@@ -1,9 +1,7 @@
 <script>
   import { login } from "../../stores/Auth";
   import * as Auth from "../../network/Auth";
-  import TextEdit from "../../components/TextEdit.svelte";
-  import Button from "../../components/Button.svelte";
-  import Loading from "../../components/Loading.svelte";
+  import { Views } from "@tian/components";
   import {Router, Navigation} from '../../stores/Navigation';
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
 
@@ -23,18 +21,18 @@
 </script>
 
 {#if isLoading}
-<Loading />
+<Views.Loading />
 {/if}
 <main>
   <h1>Login!</h1>
   <p>
-    Se você ainda não abriu sua conta <a href="#" on:click={doSubscribe}>clica aqui</a> e rápido e facil.
+    Se você ainda não abriu sua conta <Views.Button type="transparent" on:click={doSubscribe}>clica aqui</Views.Button> e rápido e facil.
   </p>
-  <TextEdit icon={faPhone} placeHolder="(55) 90000-0000" />
-  <TextEdit icon={faUnlock} placeHolder="Senha" />
+  <Views.TextEdit icon={faPhone} placeHolder="(55) 90000-0000" />
+  <Views.TextEdit icon={faUnlock} placeHolder="Senha" />
   <div></div>
-  <Button on:click={doLogin}>Entrar</Button>
-  <Button type="transparent" on:click={doSubscribe}>Criar conta</Button>
+  <Views.Button on:click={doLogin}>Entrar</Views.Button>
+  <Views.Button type="transparent" on:click={doSubscribe}>Criar conta</Views.Button>
 </main>
 
 <style>

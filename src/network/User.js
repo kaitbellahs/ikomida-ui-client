@@ -1,6 +1,4 @@
-import {
-    Random
-} from "../Utils/Numbers";
+import {Utils} from "@tian/components";
 
 const addresses = [{
     id: "11",
@@ -22,5 +20,5 @@ const addresses = [{
     active: false
 }];
 export async function GetAddress() {
-    return new Promise(resolve => setTimeout(resolve, Random(500, 5000), addresses));
+    return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), addresses));
 }

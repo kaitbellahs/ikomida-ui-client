@@ -1,20 +1,16 @@
 <script>
+  import {Views, Utils} from "@tian/components";
   import { Capacitor } from "@capacitor/core";
   import { login } from "../../stores/Auth";
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
   import { Store } from "../../stores/Cart";
-  import { Title, Navigation, Router } from "../../stores/Navigation";
-  import { currency } from "../../Utils/Strings";
-  import { GetAddress } from "../../network/User";
   import { GetPaymentMethods, DoPayment, PaymentType } from "../../network/Payment";
-  import LocalLoading from "../../components/LocalLoading.svelte";
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
-  import TextEdit from "../../components/TextEdit.svelte";
-  import Loading from "../../components/Loading.svelte";
-  import Button from "../../components/Button.svelte";
   import { StatusBar } from "../../stores/Setup";
+  import { GetAddress } from "../../network/User";
+  import { Title, Navigation, Router } from "../../stores/Navigation";
 
   let location;
   let coupon;
@@ -90,7 +86,7 @@
 </script>
 
 {#if isLoading}
-  <Loading />
+  <Views.Loading topPadding={$StatusBar.height} bottomPadding={$StatusBar.bottomPadding} />
 {/if}
 <table>
   <thead>
@@ -101,25 +97,25 @@
   <tbody>
     <tr>
       <td class="resumeText">Subtotal</td>
-      <td class="resumeValue">{currency(subtotal)}</td>
+      <td class="resumeValue">{Utils.Strings.currency(subtotal)}</td>
     </tr>
     <tr>
       <td class="resumeText">Taxa de entrega</td>
       <td class="resumeValue"
-        ><span class:deliveryFree={delivery == 0}>{currency(delivery)}</span
+        ><span class:deliveryFree={delivery == 0}>{Utils.Strings.currency(delivery)}</span
         ></td
       >
     </tr>
     <tr>
       <td class="resumeText">Total</td>
-      <td class="resumeValue">{currency(total)}</td>
+      <td class="resumeValue">{Utils.Strings.currency(total)}</td>
     </tr>
   </tbody>
 </table>
-<TextEdit bind:coupon placeHolder="Adicionar cupom" buttonName="Adicionar" />
-<Button type="transparent" on:click={addMoreItems}>Addionar mais itens</Button>
+<Views.TextEdit bind:coupon placeHolder="Adicionar cupom" buttonName="Adicionar" />
+<Views.Button type="transparent" on:click={addMoreItems}>Addionar mais itens</Views.Button>
 {#await GetAddress()}
-  <LocalLoading size="2" />
+  <Views.LocalLoading size="2" />
 {:then addresses}
   {#each addresses as { id, cep, address, complement, neighborhood, city, stat, active }}
     {#if active}
@@ -141,7 +137,7 @@
   {/each}
 {/await}
 {#await GetPaymentMethods()}
-  <LocalLoading size="2" />
+  <Views.LocalLoading size="2" />
 {:then paymentMethods}
   {#each paymentMethods as { id, type, brand, lastDigits, selected }}
     {#if selected}
@@ -161,18 +157,17 @@
     {/if}
   {/each}
 {/await}
-<Button isFloat={true} on:click={forward} style="--bottomPadding:{styleBottomPadding}">
+<Views.Button isFloat={true} on:click={forward}>
   <span
     >{#if $login}Confirmar o pagamento{:else}Faça login{/if}</span
-  ></Button>
-<style lang="scss" module>
+  ></Views.Button>
+<style>
   .future-is-bright {
     color: bright;
   }
 
   .margin-top {
     margin-top: 6px;
-    // whatever you want
   }
   .paymentCard {
     width: 100%;

@@ -1,6 +1,4 @@
-import {
-    Random
-} from "../Utils/Numbers";
+import {Utils} from "@tian/components";
 
 const paymentMethods = [{
     id: "1",
@@ -17,11 +15,11 @@ const paymentMethods = [{
 }];
 
 export async function GetPaymentMethods() {
-    return new Promise(resolve => setTimeout(resolve, Random(500, 5000), paymentMethods));
+    return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), paymentMethods));
 }
 
 export async function DoPayment() {
-    return new Promise(resolve => setTimeout(resolve, Random(500, 5000), {
+    return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), {
         success: true,
         message: "",
         payload: {

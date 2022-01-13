@@ -1,6 +1,4 @@
-import {
-    Random
-} from "../Utils/Numbers";
+import {Utils} from "@tian/components";
 
 const orders = [{
     id: "13",
@@ -106,7 +104,7 @@ const orders = [{
 }];
 
 export async function GetOrders() {
-    return new Promise(resolve => setTimeout(resolve, Random(500, 5000), orders));
+    return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), orders));
 }
 
 export function OrderStatus(status) {

@@ -1,10 +1,10 @@
 <script>
   import { Title, Navigation, Router } from "../../stores/Navigation";
   import { GetOrders, OrderStatus } from "../../network/Orders";
-  import { timestampToString } from "../../Utils/Strings";
-  import Loading from "../../components/Loading.svelte";
+  import {Views, Utils} from "@tian/components";
   import { onMount } from "svelte";
   import { PaymentType } from "../../network/Payment";
+  import { StatusBar } from "../../stores/Setup";
   
   let isLoading = false;
   let orders = [];
@@ -25,7 +25,7 @@
   Title.set("Pedidos");
 </script>
 {#if isLoading}
-<Loading />
+<Views.Loading topPadding={$StatusBar.height} bottomPadding={$StatusBar.bottomPadding} />
 {/if}
 <div>
   {#each orders as { id, status, stage, products, address, payment, created, finished, subtotal, coupon, delivery }}
@@ -39,7 +39,7 @@
       {/if}
       <div class="address">Entregue em: <b>{address.address}</b></div>
       <div class="paymentMethod">Forma de pagamento: <b>{PaymentType(payment.type)}</b></div>
-      <div class="time">{timestampToString(created)}</div>
+      <div class="time">{Utils.Strings.timestampToString(created)}</div>
     </div>
   {/each}
 </div>

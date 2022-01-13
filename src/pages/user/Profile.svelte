@@ -1,7 +1,7 @@
 <script>
     import { UserInfo } from "../../stores/Auth";
-    import { Title, Navigation, Router } from "../../stores/Navigation";
-  import Button from "../../components/Button.svelte";
+    import { Title } from "../../stores/Navigation";
+  import {Views} from "@tian/components";
     import Fa from "svelte-fa";
     import {
       faPlusSquare,
@@ -20,7 +20,7 @@
   <div class=profil>
     <img src={$UserInfo.avatar} alt={$UserInfo.name} />
     <h2>{$UserInfo.name}</h2>
-    <Button type="transparent" on:click={logout}>Logout</Button>
+    <Views.Button type="transparent" on:click={logout}>Logout</Views.Button>
   </div>
   
   <style>

@@ -1,22 +1,15 @@
 <script>
-    import { Title, Navigation, Router } from "../../stores/Navigation";
-    import NavigationBar from "../../components/NavigationBar.svelte";
-    import { StatusBar } from "@capacitor/status-bar";
-    import { onMount } from "svelte";
+    import { Title } from "../../stores/Navigation";
+    import {Views} from "@tian/components";
+    import { StatusBar } from "../../stores/Setup";
     
     Title.set("Perfil");
   
-    let statusBarInfo = { style: null, visible: true, height: 0 };
-  
-    $: styleHeight = statusBarInfo.height + 55 + "px";
-    onMount(async () => {
-      if (Capacitor.isNativePlatform()) {
-        statusBarInfo = await StatusBar.getInfo();
-      }
-    });
+    $: styleHeight = StatusBar.height + 55 + "px";
+
   </script>
   
-  <NavigationBar />
+  <Views.NavigationBar />
   <main style="padding: 20px; padding-top: {styleHeight}; overflow: hidden;max-width: 100%;">
     dsd
   </main>

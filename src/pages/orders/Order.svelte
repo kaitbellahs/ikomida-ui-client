@@ -1,8 +1,7 @@
 <script>
-  import { Title, Navigation, Router } from "../../stores/Navigation";
-  import { GetOrders, OrderStatus } from "../../network/Orders";
-  import { timestampToString, currency } from "../../Utils/Strings";
-  import Loading from "../../components/Loading.svelte";
+  import { Title, Router } from "../../stores/Navigation";
+  import { OrderStatus } from "../../network/Orders";
+  import {Utils} from "@tian/components";
   import { PaymentType } from "../../network/Payment";
 
   const order = $Router.options;
@@ -12,7 +11,7 @@
   Title.set("Detalhes do predido");
 </script>
 
-<span class="time">Feito {timestampToString(order.created)}</span>
+<span class="time">Feito {Utils.Strings.timestampToString(order.created)}</span>
 <h3>Pedido #{order.id}</h3>
 <span class="status">
   {#if order.status == "open"}
@@ -20,13 +19,13 @@
     <span>{order.stage}</span>
   {:else}
     {OrderStatus(order.status)} em
-    <span class="time">{timestampToString(order.finished)}</span>
+    <span class="time">{Utils.Strings.timestampToString(order.finished)}</span>
   {/if}
 </span>
 {#each order.products as { title, price, quantity }, index}
   <div class="product">
     <span class="quantity">{quantity}</span><span class="title">{title}</span
-    ><span class="price">{currency(quantity * price)}</span>
+    ><span class="price">{Utils.Strings.currency(quantity * price)}</span>
   </div>
 {/each}
 <div class="address">Entregue em: <b>{order.address.address}</b></div>
@@ -42,13 +41,13 @@
   <tbody>
     <tr>
       <td class="resumeText">Subtotal</td>
-      <td class="resumeValue">{currency(order.subtotal)}</td>
+      <td class="resumeValue">{Utils.Strings.currency(order.subtotal)}</td>
     </tr>
     {#if order.coupon > 0}
       <tr>
         <td class="resumeText">Taxa de entrega</td>
         <td class="resumeValue"
-          ><span class="deliveryFree">- {currency(order.coupon)}</span></td
+          ><span class="deliveryFree">- {Utils.Strings.currency(order.coupon)}</span></td
         >
       </tr>
     {/if}
@@ -56,13 +55,13 @@
       <td class="resumeText">Taxa de entrega</td>
       <td class="resumeValue"
         ><span class:deliveryFree={order.delivery == 0}
-          >{currency(order.delivery)}</span
+          >{Utils.Strings.currency(order.delivery)}</span
         ></td
       >
     </tr>
     <tr>
       <td class="resumeText"><b>Total</b></td>
-      <td class="resumeValue"><b>{currency(total)}</b></td>
+      <td class="resumeValue"><b>{Utils.Strings.currency(total)}</b></td>
     </tr>
   </tbody>
 </table>

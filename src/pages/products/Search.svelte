@@ -1,8 +1,7 @@
 <script>
   import { Title, Navigation, Router } from "../../stores/Navigation";
   import { search } from "../../network/Products";
-  import TextEdit from "../../components/TextEdit.svelte";
-  import ItemsList from "../../components/ItemsList.svelte";
+  import {Views} from "@tian/components";
   import { faSearch } from "@fortawesome/free-solid-svg-icons";
   
   let items = [];
@@ -30,9 +29,9 @@
 </script>
 
 <div>
-  <TextEdit icon={faSearch} bind:value placeHolder="Buscar no cardápio" />
+  <Views.TextEdit icon={faSearch} bind:value placeHolder="Buscar no cardápio" />
   {#if items.length > 0 && !error}
-    <ItemsList {items} />
+    <Views.ItemsList {items} productPage={Router.values.product} {Navigation} />
   {:else if error}
     <h2>Nenhum produto foi encontrado</h2>
     <h3>Tente usar outro termo para pequisar</h3>

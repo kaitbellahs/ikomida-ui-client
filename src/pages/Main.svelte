@@ -1,8 +1,7 @@
 <script>
   import { Cart as CartStore, Store } from "../stores/Cart";
-  import { Router, Navigation } from "../stores/Navigation";
-  import Tabs from "../components/Tabs.svelte";
-  import NavigationBar from "../components/NavigationBar.svelte";
+  import { Router, Navigation, Title, Menu } from "../stores/Navigation";
+  import {Views, Utils} from "@tian/components";
   import Home from "./products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
@@ -11,8 +10,6 @@
   import Product from "./products/Product.svelte";
   import Checkout from "./cart/Checkout.svelte";
   import Cart from "./cart/Cart.svelte";
-  import { currency } from "../Utils/Strings";
-  import Button from "../components/Button.svelte";
   import { StatusBar } from "../stores/Setup";
   import {
     faHome,
@@ -22,7 +19,7 @@
   } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
 
-  const tabRoutes = [
+  const tabs = [
     {
       name: "Home",
       route: Router.values.home,
@@ -70,7 +67,7 @@
   });
 </script>
 
-<NavigationBar />
+<Views.NavigationBar {Menu} {Title} paddingTop={$StatusBar.height} {Navigation} />
 <main
   style="padding: 20px; padding-top: {styleHeight}; padding-bottom: {showCart
     ? '100px'
@@ -96,11 +93,11 @@
     <Home />
   {/if}
   {#if showCart}
-    <Button isFloat=true on:click={goToCart}>Ver sacola {currency(total)}</Button
+    <Views.Button isFloat=true on:click={goToCart} bottomPadding={$StatusBar.bottomPadding}>Ver sacola {Utils.Strings.currency(total)}</Views.Button
     >
   {/if}
 </main>
-<Tabs tabs={tabRoutes} />
+<Views.Tabs {tabs} {Navigation} bottomPadding={$StatusBar.bottomPadding} />
 
 <style global>
   * {

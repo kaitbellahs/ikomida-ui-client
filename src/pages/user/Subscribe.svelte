@@ -1,8 +1,6 @@
 <script>
-  import { Title, Navigation, Router } from "../../stores/Navigation";
-  import NavigationBar from "../../components/NavigationBar.svelte";
-  import TextEdit from "../../components/TextEdit.svelte";
-  import Button from "../../components/Button.svelte";
+  import { Title, Navigation, Router, Menu } from "../../stores/Navigation";
+  import {Views} from "@tian/components";
   import { StatusBar } from "../../stores/Setup";
   import {
     faUser,
@@ -10,7 +8,6 @@
     faPhone,
     faUnlock,
   } from "@fortawesome/free-solid-svg-icons";
-  import Loading from "../../components/Loading.svelte";
 
   let isLoading = false;
 
@@ -23,20 +20,20 @@
   Title.set("Cadastro");
 </script>
 
-<NavigationBar />
+<Views.NavigationBar {Menu} {Title} paddingTop={$StatusBar.height} {Navigation}  />
 {#if isLoading}
-  <Loading />
+  <Views.Loading />
 {/if}
 <main
   style="padding: 20px; padding-top: {styleHeight}; overflow: hidden;max-width: 100%;"
 >
-<TextEdit icon={faUser} placeHolder="Nome" />
-<TextEdit icon={faUser} placeHolder="Sobre nome completo" />
-  <TextEdit icon={faIdCard} type="cpf" placeHolder="CPF" />
-  <TextEdit icon={faPhone} placeHolder="Email" />
-  <TextEdit icon={faUnlock} placeHolder="Senha" />
+<Views.TextEdit icon={faUser} placeHolder="Nome" />
+<Views.TextEdit icon={faUser} placeHolder="Sobre nome completo" />
+  <Views.TextEdit icon={faIdCard} type="cpf" placeHolder="CPF" />
+  <Views.TextEdit icon={faPhone} placeHolder="Email" />
+  <Views.TextEdit icon={faUnlock} placeHolder="Senha" />
   <div />
-  <Button on:click={doSubscribe}>Cadastrar</Button>
+  <Views.Button on:click={doSubscribe}>Cadastrar</Views.Button>
 </main>
 
 <style>

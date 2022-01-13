@@ -1,7 +1,6 @@
 <script>
   import { Cart } from "../../stores/Cart";
   import { Title, Navigation, Router } from "../../stores/Navigation";
-  import { currency, formatNumber } from "../../Utils/Strings";
   import Fa from "svelte-fa";
   import {
     faPlusSquare,
@@ -9,12 +8,12 @@
     faCartPlus,
   } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import Button from "../../components/Button.svelte";
+  import {Views, Utils} from "@tian/components";
 
   const item = $Router.options;
   let quantity = 1;
 
-  $: total = currency(quantity * item.price);
+  $: total = Utils.Strings.currency(quantity * item.price);
 
   function minos() {
     if (quantity > 1) {
@@ -41,23 +40,23 @@
   <img src={item.src} alt={item.title} />
   <h2>{item.title}</h2>
   <p>{item.description}</p>
-  <span class="serves">Aproximadamente {formatNumber(item.weight)} Kg</span>
+  <span class="serves">Aproximadamente {Utils.Strings.formatNumber(item.weight)} Kg</span>
 
   <div class="price">
     <span class:current={item.oldPrice != undefined && item.oldPrice != 0}
-      >{currency(item.price)}</span
+      >{Utils.Strings.currency(item.price)}</span
     >
     {#if item.oldPrice != undefined && item.oldPrice != 0}
-      <span class="oldPrice">{currency(item.oldPrice)}</span>
+      <span class="oldPrice">{Utils.Strings.currency(item.oldPrice)}</span>
     {/if}
   </div>
   <div class="quantity">
-    <button on:click={minos}> <Fa icon={faMinusSquare} /></button><span
+    <Views.Button type="transparent" size="none" on:click={minos}> <Fa icon={faMinusSquare} /></Views.Button><span
       >{quantity}</span
-    ><button on:click={plus}><Fa icon={faPlusSquare} /></button>
+    ><Views.Button type="transparent" size="none" on:click={plus}><Fa icon={faPlusSquare} /></Views.Button>
   </div>
-  <Button isFloat=true on:click={addProduct}><Fa icon={faCartPlus} /> <span>Adicionar</span>
-    <span>({total})</span></Button
+  <Views.Button isFloat=true on:click={addProduct} bottomPadding={$StatusBar.bottomPadding}><Fa icon={faCartPlus} /> <span>Adicionar</span>
+    <span>({total})</span></Views.Button
   >
 </div>
 
@@ -71,11 +70,12 @@
     font-size: 1.8em;
     text-align: center;
   }
-  .quantity > * {
+  .quantity > span {
     padding: 0;
     border: 0;
     background: transparent;
     margin-right: 10px;
+    margin-left: 10px;
   }
   .price {
     margin-top: 20px;

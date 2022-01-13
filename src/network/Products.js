@@ -1,4 +1,4 @@
-import {Random} from "../Utils/Numbers";
+import {Utils} from "@tian/components";
 
 const items = [{
         title: "Massas",
@@ -74,7 +74,7 @@ const items = [{
 ];
 
 export async function all() {
-    return new Promise(resolve => setTimeout(resolve, Random(500, 5000), items));
+    return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), items));
 }
 
 export function search(query) {

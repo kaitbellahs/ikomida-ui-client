@@ -43,6 +43,7 @@
     "@capacitor/status-bar": "file:../../capacitor-plugins/status-bar",
     "@capacitor/storage": "^1.2.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@tian/components": "file:../projx-components",
     "sirv-cli": "^2.0.0",
     "uuid": "^8.3.2"
   }
