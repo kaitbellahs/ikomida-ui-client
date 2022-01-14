@@ -1,7 +1,13 @@
 <script>
   import { Cart as CartStore, Store } from "../stores/Cart";
-  import { Router, Navigation, Title, Menu } from "../stores/Navigation";
-  import {Views, Utils} from "@tian/components";
+  import {
+    Router,
+    Navigation,
+    Title,
+    Menu,
+    Routes,
+  } from "../stores/Navigation";
+  import { Views, Utils } from "@tian/components";
   import Home from "./products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
@@ -22,22 +28,22 @@
   const tabs = [
     {
       name: "Home",
-      route: Router.values.home,
+      route: Routes.home,
       icon: faHome,
     },
     {
       name: "Busca",
-      route: Router.values.search,
+      route: Routes.search,
       icon: faSearch,
     },
     {
       name: "Pedidos",
-      route: Router.values.orders,
+      route: Routes.orders,
       icon: faList,
     },
     {
       name: "Perfil",
-      route: Router.values.profile,
+      route: Routes.profile,
       icon: faUser,
     },
   ];
@@ -51,49 +57,58 @@
   $: total = subtotal + delivery;
   $: showCart =
     $Store.length > 0 &&
-    route !== Router.values.cart &&
-    route !== Router.values.product &&
-    route !== Router.values.checkout &&
-    route !== Router.values.orders &&
-    route !== Router.values.order &&
-    route !== Router.values.profile;
+    route !== Routes.cart &&
+    route !== Routes.product &&
+    route !== Routes.checkout &&
+    route !== Routes.orders &&
+    route !== Routes.order &&
+    route !== Routes.profile;
 
   function goToCart() {
-    Navigation.goTo(Router.values.cart);
+    Navigation.goTo(Routes.cart);
   }
-  
+
   onMount(async () => {
     await CartStore.items();
   });
 </script>
 
-<Views.NavigationBar {Menu} {Title} paddingTop={$StatusBar.height} {Navigation} />
+<Views.NavigationBar
+  {Menu}
+  {Title}
+  paddingTop={$StatusBar.height}
+  {Navigation}
+/>
 <main
   style="padding: 20px; padding-top: {styleHeight}; padding-bottom: {showCart
     ? '100px'
     : '50px'}; overflow: hidden;max-width: 100%;"
 >
-  {#if route == Router.values.home}
+  {#if route == Routes.home}
     <Home />
-  {:else if route == Router.values.orders}
+  {:else if route == Routes.orders}
     <Orders />
-  {:else if route == Router.values.order}
+  {:else if route == Routes.order}
     <Order />
-  {:else if route == Router.values.search}
+  {:else if route == Routes.search}
     <Search />
-  {:else if route == Router.values.profile}
+  {:else if route == Routes.profile}
     <Profile />
-  {:else if route == Router.values.product}
+  {:else if route == Routes.product}
     <Product />
-  {:else if route == Router.values.cart}
+  {:else if route == Routes.cart}
     <Cart />
-  {:else if route == Router.values.checkout}
+  {:else if route == Routes.checkout}
     <Checkout />
   {:else}
     <Home />
   {/if}
   {#if showCart}
-    <Views.Button isFloat=true on:click={goToCart} bottomPadding={$StatusBar.bottomPadding}>Ver sacola {Utils.Strings.currency(total)}</Views.Button
+    <Views.Button
+      isFloat="true"
+      on:click={goToCart}
+      bottomPadding={$StatusBar.bottomPadding}
+      >Ver sacola {Utils.Strings.currency(total)}</Views.Button
     >
   {/if}
 </main>

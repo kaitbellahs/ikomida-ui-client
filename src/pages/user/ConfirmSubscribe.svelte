@@ -1,10 +1,8 @@
 <script>
-  import { Title, Navigation, Router, Menu } from "../../stores/Navigation";
-  import {Views} from "@tian/components";
+  import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
+  import { Views } from "@tian/components";
   import { StatusBar } from "../../stores/Setup";
   import {
-    faUser,
-    faIdCard,
     faPhone,
     faUnlock,
   } from "@fortawesome/free-solid-svg-icons";
@@ -23,14 +21,19 @@
   Title.set("Cadastro");
 </script>
 
-<Views.NavigationBar {Menu} {Title} paddingTop={$StatusBar.height} {Navigation} />
+<Views.NavigationBar
+  {Menu}
+  {Title}
+  paddingTop={$StatusBar.height}
+  {Navigation}
+/>
 {#if isLoading}
-  <Views.Loading  />
+  <Views.Loading />
 {/if}
 <main
   style="padding: 20px; padding-top: {styleHeight}; overflow: hidden;max-width: 100%;"
 >
-<p>Por favor confirme seu numero de telefone </p>
+  <p>Por favor confirme seu numero de telefone</p>
   <Views.TextEdit icon={faPhone} type="phone" buttonName="Enviar" />
   <Views.TextEdit icon={faUnlock} mask="X X X X" />
   <div />

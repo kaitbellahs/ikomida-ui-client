@@ -1,14 +1,17 @@
 <script>
-  import { Title, Navigation, Router } from "../../stores/Navigation";
+  import { Title, Navigation, Routes } from "../../stores/Navigation";
   import { all } from "../../network/Products";
-  import {Views} from "@tian/components";
+  import { Views } from "@tian/components";
   import { StatusBar } from "../../stores/Setup";
-  
+
   Title.set("Home");
 </script>
 
 {#await all()}
-  <Views.Loading topPadding={$StatusBar.height} bottomPadding={$StatusBar.bottomPadding} />
+  <Views.Loading
+    topPadding={$StatusBar.height}
+    bottomPadding={$StatusBar.bottomPadding}
+  />
 {:then items}
-  <Views.ItemsList {items} productPage={Router.values.product} {Navigation} />
+  <Views.ItemsList {items} productPage={Routes.product} {Navigation} />
 {/await}

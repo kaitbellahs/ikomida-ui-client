@@ -8,7 +8,7 @@
   import Tac from "./pages/user/Tac.svelte";
   import { Network } from "@capacitor/network";
   import { onMount } from "svelte";
-  import { Router } from "./stores/Navigation";
+  import { Router, Routes } from "./stores/Navigation";
   import { StatusBar as _StatusBar } from "./stores/Setup";
   import { StatusBar } from "@capacitor/status-bar";
 
@@ -52,13 +52,13 @@
 
 {#if $login}
   <Main />
-{:else if route == Router.values.login}
+{:else if route == Routes.login}
   <Login />
-{:else if route == Router.values.subscribe}
+{:else if route == Routes.subscribe}
   <Subscribe />
-{:else if route == Router.values.confirmSubscribe}
+{:else if route == Routes.confirmSubscribe}
   <ConfirmSubscribe />
-{:else if route == Router.values.tac}
+{:else if route == Routes.tac}
   <Tac />
 {:else}
   <Login />

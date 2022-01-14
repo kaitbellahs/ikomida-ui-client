@@ -1,16 +1,20 @@
 <script>
-  import {Views, Utils} from "@tian/components";
+  import { Views, Utils } from "@tian/components";
   import { Capacitor } from "@capacitor/core";
   import { login } from "../../stores/Auth";
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
   import { Store } from "../../stores/Cart";
-  import { GetPaymentMethods, DoPayment, PaymentType } from "../../network/Payment";
+  import {
+    GetPaymentMethods,
+    DoPayment,
+    PaymentType,
+  } from "../../network/Payment";
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
   import { GetAddress } from "../../network/User";
-  import { Title, Navigation, Router } from "../../stores/Navigation";
+  import { Title, Navigation, Routes } from "../../stores/Navigation";
 
   let location;
   let coupon;
@@ -21,7 +25,6 @@
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: delivery = 0;
   $: total = subtotal + delivery;
-  $: styleBottomPadding = ($StatusBar.bottomPadding + 45) + "px";
 
   function addMoreItems() {
     Navigation.pop(3);
@@ -75,10 +78,10 @@
       const response = await DoPayment();
       isLoading = false;
       if (response != undefined && response.success) {
-        Navigation.goTo(Router.values.order, response.payload);
+        Navigation.goTo(Routes.order, response.payload);
       }
     } else {
-      Navigation.reset(Router.values.login);
+      Navigation.reset(Routes.login);
     }
   }
 
@@ -86,7 +89,10 @@
 </script>
 
 {#if isLoading}
-  <Views.Loading topPadding={$StatusBar.height} bottomPadding={$StatusBar.bottomPadding} />
+  <Views.Loading
+    topPadding={$StatusBar.height}
+    bottomPadding={$StatusBar.bottomPadding}
+  />
 {/if}
 <table>
   <thead>
@@ -102,7 +108,8 @@
     <tr>
       <td class="resumeText">Taxa de entrega</td>
       <td class="resumeValue"
-        ><span class:deliveryFree={delivery == 0}>{Utils.Strings.currency(delivery)}</span
+        ><span class:deliveryFree={delivery == 0}
+          >{Utils.Strings.currency(delivery)}</span
         ></td
       >
     </tr>
@@ -112,8 +119,14 @@
     </tr>
   </tbody>
 </table>
-<Views.TextEdit bind:coupon placeHolder="Adicionar cupom" buttonName="Adicionar" />
-<Views.Button type="transparent" on:click={addMoreItems}>Addionar mais itens</Views.Button>
+<Views.TextEdit
+  bind:coupon
+  placeHolder="Adicionar cupom"
+  buttonName="Adicionar"
+/>
+<Views.Button type="transparent" on:click={addMoreItems}
+  >Addionar mais itens</Views.Button
+>
 {#await GetAddress()}
   <Views.LocalLoading size="2" />
 {:then addresses}
@@ -160,15 +173,10 @@
 <Views.Button isFloat={true} on:click={forward}>
   <span
     >{#if $login}Confirmar o pagamento{:else}Faça login{/if}</span
-  ></Views.Button>
-<style>
-  .future-is-bright {
-    color: bright;
-  }
+  ></Views.Button
+>
 
-  .margin-top {
-    margin-top: 6px;
-  }
+<style>
   .paymentCard {
     width: 100%;
     display: flex;
@@ -221,12 +229,6 @@
   .edit {
     flex-grow: 1;
     text-align: end;
-  }
-  .addMore {
-    width: 100%;
-    color: red;
-    background: transparent;
-    border: 0;
   }
   table {
     width: 100%;

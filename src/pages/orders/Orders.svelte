@@ -1,19 +1,19 @@
 <script>
-  import { Title, Navigation, Router } from "../../stores/Navigation";
+  import { Title, Navigation, Routes } from "../../stores/Navigation";
   import { GetOrders, OrderStatus } from "../../network/Orders";
-  import {Views, Utils} from "@tian/components";
+  import { Views, Utils } from "@tian/components";
   import { onMount } from "svelte";
   import { PaymentType } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
-  
+
   let isLoading = false;
   let orders = [];
-  
+
   function goToOrder(id) {
     const order = orders.find((order) => {
       return order.id === id;
     });
-    Navigation.goTo(Router.values.order, order);
+    Navigation.goTo(Routes.order, order);
   }
 
   onMount(async () => {
@@ -24,8 +24,12 @@
 
   Title.set("Pedidos");
 </script>
+
 {#if isLoading}
-<Views.Loading topPadding={$StatusBar.height} bottomPadding={$StatusBar.bottomPadding} />
+  <Views.Loading
+    topPadding={$StatusBar.height}
+    bottomPadding={$StatusBar.bottomPadding}
+  />
 {/if}
 <div>
   {#each orders as { id, status, stage, products, address, payment, created, finished, subtotal, coupon, delivery }}
@@ -35,10 +39,15 @@
         <div class="product">1. {products[0].title}</div>
       {/if}
       {#if products.length > 1}
-        <div class="product">e mais {products.length - 1} {products.length - 1 == 1 ? "item" : "itens"}</div>
+        <div class="product">
+          e mais {products.length - 1}
+          {products.length - 1 == 1 ? "item" : "itens"}
+        </div>
       {/if}
       <div class="address">Entregue em: <b>{address.address}</b></div>
-      <div class="paymentMethod">Forma de pagamento: <b>{PaymentType(payment.type)}</b></div>
+      <div class="paymentMethod">
+        Forma de pagamento: <b>{PaymentType(payment.type)}</b>
+      </div>
       <div class="time">{Utils.Strings.timestampToString(created)}</div>
     </div>
   {/each}

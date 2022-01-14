@@ -1,9 +1,8 @@
 <script>
   import { Cart, Store } from "../../stores/Cart";
-  import { Title, Navigation, Router, Menu } from "../../stores/Navigation";
+  import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
   import { faTrash } from "@fortawesome/free-solid-svg-icons";
-  import {Views, Utils} from "@tian/components";
-  import { StatusBar } from "../../stores/Setup";
+  import { Views, Utils } from "@tian/components";
 
   let showAlert = false;
 
@@ -19,7 +18,7 @@
 
   function resetCart() {
     Cart.reset();
-    Navigation.reset(Router.values.home);
+    Navigation.reset(Routes.home);
   }
 
   function toggleAlert() {
@@ -27,7 +26,7 @@
   }
 
   function forward() {
-    Navigation.goTo(Router.values.checkout);
+    Navigation.goTo(Routes.checkout);
   }
 
   Title.set("Sacola de compras");
@@ -47,11 +46,11 @@
 {/if}
 
 {#each $Store as item}
-  <Views.CartItem
-    {...item}
-  />
+  <Views.CartItem {...item} />
 {/each}
-<Views.Button type="transparent" on:click={addMoreItems}>Addionar mais itens</Views.Button>
+<Views.Button type="transparent" on:click={addMoreItems}
+  >Addionar mais itens</Views.Button
+>
 <table>
   <thead>
     <tr>
@@ -66,7 +65,8 @@
     <tr>
       <td class="resumeText">Taxa de entrega</td>
       <td class="resumeValue"
-        ><span class:deliveryFree={delivery == 0}>{Utils.Strings.currency(delivery)}</span
+        ><span class:deliveryFree={delivery == 0}
+          >{Utils.Strings.currency(delivery)}</span
         ></td
       >
     </tr>
@@ -76,9 +76,8 @@
     </tr>
   </tbody>
 </table>
-<Views.Button
-  isFloat={true}
-  on:click={forward}><span>Continuar</span></Views.Button
+<Views.Button isFloat={true} on:click={forward}
+  ><span>Continuar</span></Views.Button
 >
 
 <style>

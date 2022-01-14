@@ -1,6 +1,6 @@
 <script>
   import { Cart } from "../../stores/Cart";
-  import { Title, Navigation, Router } from "../../stores/Navigation";
+  import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
   import Fa from "svelte-fa";
   import {
     faPlusSquare,
@@ -30,7 +30,7 @@
  const addProduct = async () => {
     item.quantity = quantity;
     await Cart.addItem(item);
-    Navigation.goTo(Router.values.cart);
+    Navigation.goTo(Routes.cart);
   }
 
   Title.set(item.title);
