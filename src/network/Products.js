@@ -1,4 +1,7 @@
-import {Utils} from "@tian/components";
+import {
+    Utils,
+    Network
+} from "@tian/components";
 
 const items = [{
         title: "Massas",
@@ -74,7 +77,7 @@ const items = [{
 ];
 
 export async function all() {
-    return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), items));
+    return Network.get("http://localhost:1988/", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IktoYWxpZCIsImlhdCI6MTY0MjE5NTE1OSwiZXhwIjoxNjQyMTk2OTU5fQ.1Znple03Exmw6G2cxzmY9wmXnOFgGN36m8NTu8sjmVM");
 }
 
 export function search(query) {
