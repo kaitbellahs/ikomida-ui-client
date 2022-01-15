@@ -1,7 +1,7 @@
 <script>
   import { Views, Utils } from "@tian/components";
   import { Capacitor } from "@capacitor/core";
-  import { login } from "../../stores/Auth";
+  import { Auth } from "../../stores/Auth";
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
   import { Store } from "../../stores/Cart";
@@ -73,7 +73,7 @@
   });
 
   async function forward() {
-    if ($login) {
+    if ($Auth !== null && $Auth !== undefined) {
       isLoading = true;
       const response = await DoPayment();
       isLoading = false;

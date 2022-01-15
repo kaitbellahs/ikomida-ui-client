@@ -8,10 +8,10 @@
     faMinusSquare,
     faCartPlus,
   } from "@fortawesome/free-solid-svg-icons";
-  import { login } from "../../stores/Auth";
+  import { Auth } from "../../stores/Auth";
 
   function logout() {
-    login.setLogin(false);
+    Auth.setToken(null);
   }
 
   Title.set("Perfil");

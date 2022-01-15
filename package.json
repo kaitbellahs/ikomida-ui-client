@@ -2,6 +2,8 @@
   "name": "svelte-app",
   "version": "1.0.0",
   "private": true,
+  "author": "Khalid Ait Bellahs",
+  "license": "UNLICENSED",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",

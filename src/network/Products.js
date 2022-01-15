@@ -1,5 +1,4 @@
 import {
-    Utils,
     Network
 } from "@tian/components";
 
@@ -77,7 +76,7 @@ const items = [{
 ];
 
 export async function all() {
-    return Network.get("http://localhost:1988/", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IktoYWxpZCIsImlhdCI6MTY0MjE5NTE1OSwiZXhwIjoxNjQyMTk2OTU5fQ.1Znple03Exmw6G2cxzmY9wmXnOFgGN36m8NTu8sjmVM");
+    return Network.get("http://localhost:1988/products", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IktoYWxpZCIsImlhdCI6MTY0MjE5ODgwNywiZXhwIjoxNjQ0NzkwODA3fQ.8_qwD_J0YLRjcNcfPZXWcsJNov68XT80h7c7Uvaz0wo");
 }
 
 export function search(query) {

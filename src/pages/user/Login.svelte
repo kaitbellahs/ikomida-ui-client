@@ -1,11 +1,16 @@
 <script>
-  import { login } from "../../stores/Auth";
-  import * as Auth from "../../network/Auth";
+  import { Auth } from "../../stores/Auth";
+  import * as AuthNetwork from "../../network/Auth";
   import { Views } from "@tian/components";
   import { Routes, Navigation } from "../../stores/Navigation";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
 
   let isLoading = false;
+  let cell = "";
+  let password = "";
+  let showAlert = false;
+  let errorMessage = '';
+
 
   async function doSubscribe() {
     Navigation.goTo(Routes.subscribe);
@@ -13,16 +18,36 @@
 
   async function doLogin() {
     isLoading = true;
-    const auth = await Auth.doLogin();
-    if (auth) login.setLogin(true);
+    const response = await AuthNetwork.doLogin("55"+cell, password);
+    if (response.success) {
+      Auth.setToken(response.token);
+    }else{
+      errorMessage = response.message;
+      showAlert = true;
+    }
     isLoading = false;
   }
+
+function toggleAlert() {
+  showAlert = !showAlert;
+}
 </script>
 
 {#if isLoading}
   <Views.Loading />
 {/if}
 <main>
+
+{#if showAlert}
+  <Views.Alert
+    title="Alerta"
+    message={errorMessage}
+    closeCallBack={toggleAlert}
+    buttons={[
+      { name: "OK!", callback: toggleAlert, principal: true },
+    ]}
+  />
+{/if}
   <h1>Login!</h1>
   <p>
     Se você ainda não abriu sua conta <Views.Button
@@ -30,8 +55,8 @@
       on:click={doSubscribe}>clica aqui</Views.Button
     > e rápido e facil.
   </p>
-  <Views.TextEdit icon={faPhone} placeHolder="(55) 90000-0000" />
-  <Views.TextEdit icon={faUnlock} placeHolder="Senha" />
+  <Views.TextEdit bind:rawValue={cell} icon={faPhone} mask="(XX) XXXXX-XXXX" placeHolder="Numero de celular" />
+  <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Senha" />
   <div />
   <Views.Button on:click={doLogin}>Entrar</Views.Button>
   <Views.Button type="transparent" on:click={doSubscribe}

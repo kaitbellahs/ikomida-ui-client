@@ -1,6 +1,6 @@
 <script>
   import { App } from "@capacitor/app";
-  import { login } from "./stores/Auth";
+  import { Auth } from "./stores/Auth";
   import Login from "./pages/user/Login.svelte";
   import Main from "./pages/Main.svelte";
   import Subscribe from "./pages/user/Subscribe.svelte";
@@ -44,13 +44,16 @@
   App.addListener("appRestoredResult", (data) => {
     console.log("Restored state:", data);
   });
+  console.log("$Auth: "+JSON.stringify($Auth));
+
+  $: if($Auth)
+  console.log("$Auth: "+JSON.stringify($Auth));
 </script>
 
 {#if networkStatus == null || !networkStatus.connected}
   <div id="internetError">Esperando por conexão a internet...</div>
 {/if}
-
-{#if $login}
+{#if $Auth && $Auth !== "" && $Auth !== "null"}
   <Main />
 {:else if route == Routes.login}
   <Login />

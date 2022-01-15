@@ -1,4 +1,6 @@
-import {Utils} from "@tian/components";
+import {
+    Network
+} from "@tian/components";
 
 const orders = [{
     id: "13",
@@ -104,7 +106,7 @@ const orders = [{
 }];
 
 export async function GetOrders() {
-    return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), orders));
+    return Network.get("http://localhost:1988/orders", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IktoYWxpZCIsImlhdCI6MTY0MjE5ODgwNywiZXhwIjoxNjQ0NzkwODA3fQ.8_qwD_J0YLRjcNcfPZXWcsJNov68XT80h7c7Uvaz0wo");
 }
 
 export function OrderStatus(status) {
