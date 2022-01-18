@@ -4,13 +4,14 @@
   import { Views } from "@tian/components";
   import { Routes, Navigation } from "../../stores/Navigation";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
+  import { Utils } from "@tian/components";
 
   let isLoading = false;
-  let cell = "";
-  let password = "";
+  let cell = "11953635016";
+  let initialValue = "(11) 95363-5016";
+  let password = "123456";
   let showAlert = false;
-  let errorMessage = '';
-
+  let errorMessage = "";
 
   async function doSubscribe() {
     Navigation.goTo(Routes.subscribe);
@@ -18,36 +19,39 @@
 
   async function doLogin() {
     isLoading = true;
-    const response = await AuthNetwork.doLogin("55"+cell, password);
+    const response = await AuthNetwork.doLogin("55" + cell, password);
     if (response.success) {
-      Auth.setToken(response.token);
-    }else{
+      const token = await Utils.Jws.extractToken(response.token);
+      if (token !== null) {
+        Auth.setToken(response.token);
+      } else {
+        errorMessage = "Token não é valido";
+        showAlert = true;
+      }
+    } else {
       errorMessage = response.message;
       showAlert = true;
     }
     isLoading = false;
   }
 
-function toggleAlert() {
-  showAlert = !showAlert;
-}
+  function toggleAlert() {
+    showAlert = !showAlert;
+  }
 </script>
 
 {#if isLoading}
   <Views.Loading />
 {/if}
 <main>
-
-{#if showAlert}
-  <Views.Alert
-    title="Alerta"
-    message={errorMessage}
-    closeCallBack={toggleAlert}
-    buttons={[
-      { name: "OK!", callback: toggleAlert, principal: true },
-    ]}
-  />
-{/if}
+  {#if showAlert}
+    <Views.Alert
+      title="Alerta"
+      message={errorMessage}
+      closeCallBack={toggleAlert}
+      buttons={[{ name: "OK!", callback: toggleAlert, principal: true }]}
+    />
+  {/if}
   <h1>Login!</h1>
   <p>
     Se você ainda não abriu sua conta <Views.Button
@@ -55,7 +59,13 @@ function toggleAlert() {
       on:click={doSubscribe}>clica aqui</Views.Button
     > e rápido e facil.
   </p>
-  <Views.TextEdit bind:rawValue={cell} icon={faPhone} mask="(XX) XXXXX-XXXX" placeHolder="Numero de celular" />
+  <Views.TextEdit
+    bind:rawValue={cell}
+    bind:value={initialValue}
+    icon={faPhone}
+    mask="(XX) XXXXX-XXXX"
+    placeHolder="Numero de celular"
+  />
   <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Senha" />
   <div />
   <Views.Button on:click={doLogin}>Entrar</Views.Button>

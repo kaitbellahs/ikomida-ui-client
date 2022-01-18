@@ -5,11 +5,8 @@
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
   import { Store } from "../../stores/Cart";
-  import {
-    GetPaymentMethods,
-    DoPayment,
-    PaymentType,
-  } from "../../network/Payment";
+  import { GetPaymentMethods, PaymentType } from "../../network/Payment";
+  import { NewOrders } from "../../network/Orders";
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
@@ -19,6 +16,8 @@
   let location;
   let coupon;
   let isLoading = false;
+  let addresses = [];
+  let payments = [];
 
   $: subtotalArray = $Store.map((item) => item.quantity * item.price);
   $: subtotal =
@@ -48,6 +47,8 @@
   }
 
   onMount(async () => {
+    addresses = await GetAddress();
+    payments = await GetPaymentMethods();
     if (Capacitor.isNativePlatform()) {
       const checkpermissions = await Geolocation.checkPermissions();
       if (checkpermissions.location != "prompt") {
@@ -73,9 +74,16 @@
   });
 
   async function forward() {
-    if ($Auth !== null && $Auth !== undefined) {
+    if ($Auth !== null && $Auth !== undefined && $Auth !== "null") {
       isLoading = true;
-      const response = await DoPayment();
+      const payload = {
+        items: $Store,
+        address: addresses.filter((address) => address.active)[0],
+        payments: payments.filter((address) => address.selected)[0],
+        coupon,
+        location
+      };
+      const response = await NewOrders(payload);
       isLoading = false;
       if (response != undefined && response.success) {
         Navigation.goTo(Routes.order, response.payload);
@@ -85,7 +93,7 @@
     }
   }
 
-  Title.set("Resumo");
+  Title.set("Resumo e pagamento");
 </script>
 
 {#if isLoading}
@@ -127,9 +135,9 @@
 <Views.Button type="transparent" on:click={addMoreItems}
   >Addionar mais itens</Views.Button
 >
-{#await GetAddress()}
+{#if addresses.length == 0}
   <Views.LocalLoading size="2" />
-{:then addresses}
+{:else}
   {#each addresses as { id, cep, address, complement, neighborhood, city, stat, active }}
     {#if active}
       <div class="address">
@@ -148,11 +156,11 @@
       </div>
     {/if}
   {/each}
-{/await}
-{#await GetPaymentMethods()}
+{/if}
+{#if payments.length == 0}
   <Views.LocalLoading size="2" />
-{:then paymentMethods}
-  {#each paymentMethods as { id, type, brand, lastDigits, selected }}
+{:else}
+  {#each payments as { id, type, brand, lastDigits, selected }}
     {#if selected}
       <div class="paymentCard">
         <div class="content">
@@ -169,10 +177,11 @@
       </div>
     {/if}
   {/each}
-{/await}
+{/if}
 <Views.Button isFloat={true} on:click={forward}>
   <span
-    >{#if $login}Confirmar o pagamento{:else}Faça login{/if}</span
+    >{#if $Auth && $Auth !== "" && $Auth !== "null"}Confirmar o pagamento{:else}Faça
+      login{/if}</span
   ></Views.Button
 >
 

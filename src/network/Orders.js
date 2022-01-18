@@ -1,6 +1,12 @@
 import {
     Network
 } from "@tian/components";
+import {
+    get
+} from 'svelte/store';
+import {
+    Auth
+} from '../stores/Auth';
 
 const orders = [{
     id: "13",
@@ -106,7 +112,12 @@ const orders = [{
 }];
 
 export async function GetOrders() {
-    return Network.get("http://localhost:1988/orders", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IktoYWxpZCIsImlhdCI6MTY0MjE5ODgwNywiZXhwIjoxNjQ0NzkwODA3fQ.8_qwD_J0YLRjcNcfPZXWcsJNov68XT80h7c7Uvaz0wo");
+    return Network.get("http://localhost:1988/orders", get(Auth));
+}
+
+export async function NewOrders(paylaod) {
+    console.log(paylaod);
+    return Network.post("http://localhost:1988/orders", get(Auth), paylaod);
 }
 
 export function OrderStatus(status) {

@@ -11,10 +11,22 @@
   import { Router, Routes } from "./stores/Navigation";
   import { StatusBar as _StatusBar } from "./stores/Setup";
   import { StatusBar } from "@capacitor/status-bar";
+  import { Utils } from "@tian/components";
 
   let networkStatus = null;
 
+  let logedIn = false;
+
   $: route = $Router.route;
+
+  $: if ($Auth) {
+    logedIn = false;
+    Utils.Jws.extractToken($Auth).then((token) => {
+      logedIn = token !== null;
+    });
+  } else {
+    logedIn = false;
+  }
 
   const checkAppLaunchUrl = async () => {
     const { url } = await App.getLaunchUrl();
@@ -44,16 +56,12 @@
   App.addListener("appRestoredResult", (data) => {
     console.log("Restored state:", data);
   });
-  console.log("$Auth: "+JSON.stringify($Auth));
-
-  $: if($Auth)
-  console.log("$Auth: "+JSON.stringify($Auth));
 </script>
 
 {#if networkStatus == null || !networkStatus.connected}
   <div id="internetError">Esperando por conexão a internet...</div>
 {/if}
-{#if $Auth && $Auth !== "" && $Auth !== "null"}
+{#if logedIn}
   <Main />
 {:else if route == Routes.login}
   <Login />

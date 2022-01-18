@@ -10,9 +10,8 @@ const authToken = 'AuthToken';
 function createAuth() {
 	const {
 		subscribe,
-		set
+        set
 	} = writable(null, async (setter) => {
-
 		let token = null;
 		try {
 			const ret = await Storage.get({
@@ -21,24 +20,24 @@ function createAuth() {
 			token = ret.value;
 		} catch (error) {
 			token = null;
-			console.error(error);
+			console.error(error.message);
 		}
 		if(token === "" || token === null) token = null;
-		console.log(token);
-		set(token);
+		setter(token);
 	});
 
 	return {
 		subscribe,
 		setToken: async (payload) => {
-			set(payload);
 			try {
+				set(payload);
 				await Storage.set({
 					key: authToken,
 					value: payload
 				});
 			} catch (error) {
-				console.error(error);
+				console.log("error:");
+				console.error(error.message);
 			}
 		}
 	};
