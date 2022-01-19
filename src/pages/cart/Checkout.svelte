@@ -5,12 +5,20 @@
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
   import { Store } from "../../stores/Cart";
-  import { GetPaymentMethods, PaymentType } from "../../network/Payment";
+  import {
+    GetPaymentMethods,
+    PaymentType,
+    NewCard,
+  } from "../../network/Payment";
   import { NewOrders } from "../../network/Orders";
   import Fa from "svelte-fa";
-  import { faEdit } from "@fortawesome/free-solid-svg-icons";
+  import { faEdit, faSearch } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { GetAddress } from "../../network/User";
+  import {
+    GetAddresses,
+    GetAddressByCep,
+    NewAddress,
+  } from "../../network/User";
   import { Title, Navigation, Routes } from "../../stores/Navigation";
 
   let location;
@@ -18,12 +26,43 @@
   let isLoading = false;
   let addresses = [];
   let payments = [];
+  let showUpdateAddress = false;
+  let showNewAddress = false;
+  let newAddressObject = {
+    cep: null,
+  };
+  let currentCep = null;
+  let showNewCard = false;
+  let showUpdateCard = false;
+  let newCardObject = {
+    number: null,
+  };
+
+  $: if (
+    newAddressObject.cep != null &&
+    newAddressObject.cep.length === 8 &&
+    newAddressObject.cep != currentCep
+  ) {
+    isLoading = true;
+    GetAddressByCep(newAddressObject.cep).then((address) => {
+      currentCep = address.cep;
+      newAddressObject.id = address.id;
+      newAddressObject.address = address.address;
+      newAddressObject.number = address.number;
+      newAddressObject.complement = address.complement;
+      newAddressObject.neighborhood = address.neighborhood;
+      newAddressObject.city = address.city;
+      newAddressObject.stat = address.stat;
+      isLoading = false;
+    });
+  }
 
   $: subtotalArray = $Store.map((item) => item.quantity * item.price);
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: delivery = 0;
   $: total = subtotal + delivery;
+  $: validate = addresses.length > 0 && payments.length > 0;
 
   function addMoreItems() {
     Navigation.pop(3);
@@ -47,7 +86,7 @@
   }
 
   onMount(async () => {
-    addresses = await GetAddress();
+    addresses = await GetAddresses();
     payments = await GetPaymentMethods();
     if (Capacitor.isNativePlatform()) {
       const checkpermissions = await Geolocation.checkPermissions();
@@ -81,7 +120,7 @@
         address: addresses.filter((address) => address.active)[0],
         payments: payments.filter((address) => address.selected)[0],
         coupon,
-        location
+        location,
       };
       const response = await NewOrders(payload);
       isLoading = false;
@@ -93,6 +132,64 @@
     }
   }
 
+  // MARK: address
+  function toggleUpdateAddress() {
+    showUpdateAddress = !showUpdateAddress;
+  }
+
+  function toggleNewAddress() {
+    showUpdateAddress = false;
+    showNewAddress = !showNewAddress;
+  }
+
+  async function newAddress() {
+    isLoading = true;
+    addresses = await NewAddress(newAddressObject);
+    showNewAddress = !showNewAddress;
+    isLoading = false;
+  }
+
+  function updateAddress(id) {
+    addresses.forEach((item) => {
+      item.active = false;
+      if (item.id === id) {
+        console.log(item.id);
+        item.active = true;
+      }
+    });
+    addresses = [...addresses];
+    toggleUpdateAddress();
+  }
+
+  // MARK: cart
+  function toggleUpdateCard() {
+    showUpdateCard = !showUpdateCard;
+  }
+
+  function toggleNewCard() {
+    showUpdateCard = false;
+    showNewCard = !showNewCard;
+  }
+
+  async function newCard() {
+    isLoading = true;
+    payments = await NewCard(newCardObject);
+    showNewCard = !showNewCard;
+    isLoading = false;
+  }
+
+  function updateCard(id) {
+    payments.forEach((item) => {
+      item.selected = false;
+      if (item.id === id) {
+        console.log(item.id);
+        item.selected = true;
+      }
+    });
+    payments = [...payments];
+    toggleUpdateCard();
+  }
+
   Title.set("Resumo e pagamento");
 </script>
 
@@ -102,6 +199,138 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {/if}
+
+<!-- MARK: address -->
+{#if showNewAddress}
+  <Views.Alert
+    type="big"
+    title="Novo endereço!"
+    closeCallBack={toggleNewAddress}
+    buttons={[
+      { name: "Cancelar", callback: toggleNewAddress, principal: true },
+      { name: "Adicionar", callback: newAddress },
+    ]}
+  >
+    <Views.TextEdit
+      mask="_____-___"
+      maskKey="_"
+      icon={faSearch}
+      bind:rawValue={newAddressObject.cep}
+      placeHolder="CEP"
+    />
+    <Views.TextEdit
+      placeHolder="ENdereço"
+      bind:value={newAddressObject.address}
+    />
+    <Views.TextEdit placeHolder="Numero" bind:value={newAddressObject.number} />
+    <Views.TextEdit
+      placeHolder="Complemento"
+      bind:value={newAddressObject.complement}
+    />
+    <Views.TextEdit
+      placeHolder="Bairro"
+      bind:value={newAddressObject.neighborhood}
+    />
+    <Views.TextEdit placeHolder="Cidade" bind:value={newAddressObject.city} />
+    <Views.TextEdit placeHolder="UF" bind:value={newAddressObject.stat} />
+  </Views.Alert>
+{/if}
+
+{#if showUpdateAddress}
+  <Views.Alert
+    title="Escolha um endereço!"
+    closeCallBack={toggleUpdateAddress}
+    buttons={[
+      { name: "OK", callback: toggleUpdateAddress, principal: true },
+      { name: "Novo", callback: toggleNewAddress },
+    ]}
+  >
+    {#each addresses as { id, cep, address, number, complement, neighborhood, city, stat, active }}
+      <div class="address">
+        <div class="content">
+          <span class="delivery">Entregar em</span>
+          <span>{address}, {number}</span>
+          <span class="neighborhood">{neighborhood} | {complement}</span>
+          <span class="city">{city}/{stat} CEP: {cep}</span>
+        </div>
+        <div class="edit" on:click={updateAddress(id)}>
+          <input type="checkbox" bind:checked={active} />
+        </div>
+      </div>
+    {/each}
+  </Views.Alert>
+{/if}
+<!-- MARK: end address-->
+
+<!-- MARK: Card -->
+{#if showNewCard}
+  <Views.Alert
+    title="Novo cartão!"
+    closeCallBack={toggleNewCard}
+    buttons={[
+      { name: "Cancelar", callback: toggleNewCard, principal: true },
+      { name: "Adicionar", callback: newCard },
+    ]}
+  >
+    <Views.TextEdit
+      mask="____ ____ ____ ____"
+      maskKey="_"
+      bind:rawValue={newCardObject.number}
+      placeHolder="Numero do cartão"
+    />
+    <Views.TextEdit placeHolder="Nome" bind:value={newCardObject.name} />
+    <Views.TextEdit
+      mask="__/__"
+      maskKey="_"
+      placeHolder="Validade"
+      bind:value={newCardObject.valid}
+    />
+    <Views.TextEdit
+      mask="___"
+      maskKey="_"
+      placeHolder="CVV"
+      bind:value={newCardObject.cvv}
+    />
+    <Views.TextEdit
+      mask="___.___.___-__"
+      maskKey="_"
+      placeHolder="CPF"
+      bind:value={newCardObject.cpf}
+    />
+  </Views.Alert>
+{/if}
+
+{#if showUpdateCard}
+  <Views.Alert
+    title="Escolha um cartão!"
+    closeCallBack={toggleUpdateCard}
+    buttons={[
+      { name: "OK", callback: toggleUpdateCard, principal: true },
+      { name: "Novo", callback: toggleNewCard },
+    ]}
+  >
+    {#each payments as { id, type, brand, lastDigits, selected }}
+      <div class="paymentCard">
+        <div class="content">
+          <span class="payWith">Pagar com</span>
+          <span>{PaymentType(type)}</span>
+          <span class="brand">
+            {#if type !== "Cash"}
+              {brand} **** **** **** {lastDigits}
+            {:else}
+              Pagar na entrega
+            {/if}
+          </span>
+        </div>
+        <div class="edit" on:click={updateCard(id)}>
+          <input type="checkbox" bind:checked={selected} />
+        </div>
+      </div>
+    {/each}
+  </Views.Alert>
+{/if}
+<!-- MARK: end Card-->
+
 <table>
   <thead>
     <tr>
@@ -138,7 +367,7 @@
 {#if addresses.length == 0}
   <Views.LocalLoading size="2" />
 {:else}
-  {#each addresses as { id, cep, address, complement, neighborhood, city, stat, active }}
+  {#each addresses as { cep, address, complement, neighborhood, city, stat, active }}
     {#if active}
       <div class="address">
         <div class="content">
@@ -147,7 +376,7 @@
           <span class="neighborhood">{neighborhood} | {complement}</span>
           <span class="city">{city}/{stat} CEP: {cep}</span>
         </div>
-        <div class="edit">
+        <div class="edit" on:click={toggleUpdateAddress}>
           <Fa
             style="font-size: 1.5em; color: black; padding-left: 10px;"
             icon={faEdit}
@@ -166,9 +395,15 @@
         <div class="content">
           <span class="payWith">Pagar com</span>
           <span>{PaymentType(type)}</span>
-          <span class="brand">{brand} **** **** **** {lastDigits}</span>
+          <span class="brand">
+            {#if type !== "Cash"}
+              {brand} **** **** **** {lastDigits}
+            {:else}
+              Pagar na entrega
+            {/if}
+          </span>
         </div>
-        <div class="edit">
+        <div class="edit" on:click={toggleUpdateCard}>
           <Fa
             style="font-size: 1.5em; color: black; padding-left: 10px;"
             icon={faEdit}
@@ -178,7 +413,7 @@
     {/if}
   {/each}
 {/if}
-<Views.Button isFloat={true} on:click={forward}>
+<Views.Button disabled={!validate} isFloat={true} on:click={forward}>
   <span
     >{#if $Auth && $Auth !== "" && $Auth !== "null"}Confirmar o pagamento{:else}Faça
       login{/if}</span
@@ -186,6 +421,40 @@
 >
 
 <style>
+  input[type="checkbox"] {
+    appearance: none;
+    background-color: #fff;
+    margin: 0;
+    font: inherit;
+    width: 2.2em;
+    height: 2.2em;
+    border: 0.05em solid #000;
+    border-radius: 0.35em;
+    transform: translateY(0.375em);
+    display: grid;
+    place-content: center;
+  }
+  input[type="checkbox"]::before {
+    content: "";
+    width: 1.15em;
+    height: 1.15em;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em #ccc;
+    transform-origin: bottom left;
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  }
+
+  input[type="checkbox"]:checked::before {
+    transform: scale(1);
+  }
+
+  input[type="checkbox"]:disabled {
+    --form-control-color: #ccc;
+
+    color: #ccc;
+    cursor: not-allowed;
+  }
   .paymentCard {
     width: 100%;
     display: flex;

@@ -20,11 +20,7 @@
     }
   }
 
-  function goToOrders() {
-    Navigation.goTo(Routes.orders);
-  }
-
-  Title.set("Home");
+  Title.set("Pesquisar produtos");
 </script>
 
 <div>

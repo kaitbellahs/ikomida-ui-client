@@ -16,10 +16,10 @@
 <span class="status">
   {#if order.status == "open"}
     Seu pedido está
-    <span>{order.stage}</span>
+    <span class=open>{order.stage}</span>
   {:else}
     {OrderStatus(order.status)} em
-    <span class="time">{Utils.Strings.timestampToString(order.finished)}</span>
+    <span class=open>{Utils.Strings.timestampToString(order.finished)}</span>
   {/if}
 </span>
 {#each order.products as { title, price, quantity }, index}
@@ -76,6 +76,11 @@
   }
   .status {
     margin-bottom: 10px;
+  }
+  .status > .open {
+    font-size: 1.2em;
+    font-family: 'RobotoBold';
+    color: green;
   }
   .product {
     font-family: RobotoLight;
