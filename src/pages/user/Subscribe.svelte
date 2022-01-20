@@ -17,14 +17,17 @@
     email: null,
     password: null,
   };
+  let isValidCPF = false;
+  let isValidEmail = false;
+  let isValidPassword = false;
 
   $: styleHeight = $StatusBar.height + 55 + "px";
   $: canContinue =
     subscribeObject.name &&
     subscribeObject.lastName &&
-    subscribeObject.cpf &&
-    subscribeObject.name &&
-    subscribeObject.password;
+    isValidCPF &&
+    isValidEmail &&
+    isValidPassword;
 
   async function doSubscribe() {
     Navigation.goTo(Routes.confirmSubscribe, subscribeObject);
@@ -62,17 +65,22 @@
     bind:rawValue={subscribeObject.cpf}
     type="cpf"
     placeHolder="CPF"
+    bind:isValid={isValidCPF}
   />
   <Views.TextEdit
+    type="email"
     icon={faPhone}
     bind:value={subscribeObject.email}
     placeHolder="E-mail"
+    bind:isValid={isValidEmail}
   />
   <Views.TextEdit
+    type="password"
     icon={faUnlock}
     bind:value={subscribeObject.password}
     placeHolder="Senha"
     secret={true}
+    bind:isValid={isValidPassword}
   />
   <Views.Divider />
   <Views.Button disabled={!canContinue} on:click={doSubscribe}

@@ -12,6 +12,10 @@
   let password = "123456";
   let showAlert = false;
   let errorMessage = "";
+  let validPhone = false;
+  let validPassword = false;
+
+  $: canLogin = validPhone && validPassword;
 
   async function doSubscribe() {
     Navigation.goTo(Routes.subscribe);
@@ -65,15 +69,18 @@
     icon={faPhone}
     type="phone"
     placeHolder="Numero de celular"
+    bind:isValid={validPhone}
   />
   <Views.TextEdit
     bind:value={password}
     icon={faUnlock}
     placeHolder="Senha"
     secret={true}
+    bind:isValid={validPassword}
+    type="password"
   />
   <div />
-  <Views.Button on:click={doLogin}>Entrar</Views.Button>
+  <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
   <Views.Button type="transparent" on:click={doSubscribe}
     >Criar conta</Views.Button
   >

@@ -4,7 +4,7 @@
   import { Auth } from "../../stores/Auth";
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
-  import { Store } from "../../stores/Cart";
+  import { Store, Cart } from "../../stores/Cart";
   import {
     GetPaymentMethods,
     PaymentType,
@@ -136,8 +136,8 @@
       };
       const response = await NewOrders(payload);
       isLoading = false;
-      if (response != undefined && response.success) {
-        debugger;
+      if (response && response.success) {
+        Cart.reset();
         Navigation.goTo(Routes.order, response.data);
       }
     } else {

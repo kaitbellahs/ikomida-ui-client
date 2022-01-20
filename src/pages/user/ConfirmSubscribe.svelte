@@ -9,33 +9,51 @@
   import { Views, Utils } from "@tian/components";
   import { StatusBar } from "../../stores/Setup";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
+  import * as AuthNetwork from "../../network/Auth";
 
   let isLoading = false;
   let subscribeObject = {
     ...Utils.Objects.copy($Router.options),
-    ...{ phone: null, phoneCodeValidation: null, validationSignature: null },
+    ...{ phone: null, phoneValidationCode: null, signature: null },
   };
-  let isValid = true;
+  let canDigitValidationCode = false;
+  let canSubscribe = false;
+  let canRequestCode = false;
+  let isValidationValid = false;
 
   $: styleHeight = $StatusBar.height + 55 + "px";
-  $: canRequestCode =
-    subscribeObject.phone && subscribeObject.phone.length == 11;
-  $: canValidateCode =
-    subscribeObject.phoneCodeValidation &&
-    subscribeObject.phoneCodeValidation.length == 4;
 
-  async function doSubscribe() {
-    console.log(JSON.stringify(subscribeObject));
-    console.log(subscribeObject.phone.length);
-    // isLoading = true;
-    // const auth = await Auth.doLogin();
-    // if (auth) login.setLogin(true);
-    // isLoading = false;
+  function validateValidationValid(validationValid){
+    return validationValid.length == 4;
   }
 
-  async function requestPhoneValidation() {}
+  async function doSubscribe() {
+    isLoading = true;
+    const response = await AuthNetwork.subscribe(subscribeObject);
+    if(response.success){
+      Navigation.reset(Routes.login);
+    }
+    isLoading = false;
+  }
 
-  async function ValidatePhoneCode() {}
+  async function requestPhoneValidation() {
+    isLoading = true;
+    const response = await AuthNetwork.requestPhoneValidation(subscribeObject);
+    if(response.success){
+      subscribeObject = {...subscribeObject, ...response.data};
+      canDigitValidationCode = true;
+    }
+    isLoading = false;
+  }
+
+  async function ValidatePhoneCode() {
+    isLoading = true;
+    const response = await AuthNetwork.ValidatePhoneValidationCode(subscribeObject);
+    if(response.success){
+      canSubscribe = true;
+    }
+    isLoading = false;
+  }
 
   Title.set("Cadastro");
 </script>
@@ -60,18 +78,22 @@
     buttonName="Enviar"
     callback={requestPhoneValidation}
     buttonDisabled={!canRequestCode}
+    bind:isValid={canRequestCode}
   />
   <Views.TextEdit
     type="number"
-    bind:rawValue={subscribeObject.phoneCodeValidation}
+    bind:rawValue={subscribeObject.phoneValidationCode}
     icon={faUnlock}
     mask="_ _ _ _"
     buttonName="Confirmar"
     callback={ValidatePhoneCode}
-    buttonDisabled={!canValidateCode}
+    buttonDisabled={!isValidationValid}
+    disabled={!canDigitValidationCode}
+    bind:isValid={isValidationValid}
+    validation={validateValidationValid}
   />
   <Views.Divider />
-  <Views.Button disabled={!isValid} on:click={doSubscribe}
+  <Views.Button on:click={doSubscribe} disabled={!canSubscribe}
     >Confirmar</Views.Button
   >
 </main>

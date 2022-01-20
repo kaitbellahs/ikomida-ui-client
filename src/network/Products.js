@@ -11,7 +11,6 @@ import {
 let items;
 
 export async function all() {
-    // debugger;
     if (!items) {
         const response = await Network.get("/products", get(Auth));
         if (response.success) {
