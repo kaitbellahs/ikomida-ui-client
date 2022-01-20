@@ -8,21 +8,35 @@ import {
     Network
 } from "@tian/components";
 
+let items;
+
 export async function all() {
-    return Network.get("/products", get(Auth));
+    // debugger;
+    if (!items) {
+        const response = await Network.get("/products", get(Auth));
+        if (response.success) {
+            items = response.data;
+        }
+    }
+    return items;
 }
 
-export function search(query) {
-    return items.map(section => {
-        return {
-            title: section.title,
-            items: section.items.filter(item => {
-                if (typeof item == "object") {
-                    return item.title.toLowerCase().includes(query.toLowerCase()) || item.description.toLowerCase().includes(query.toLowerCase());
-                } else {
-                    return true;
-                }
-            })
-        };
-    }).filter(item => item.items.length > 0);
+export async function search(query) {
+    await all();
+    if (items) {
+        return items.map(section => {
+            return {
+                title: section.title,
+                items: section.items.filter(item => {
+                    if (typeof item == "object") {
+                        return item.title.toLowerCase().includes(query.toLowerCase()) || item.description.toLowerCase().includes(query.toLowerCase());
+                    } else {
+                        return true;
+                    }
+                })
+            };
+        }).filter(item => item.items.length > 0);
+    } else {
+        return [];
+    }
 }

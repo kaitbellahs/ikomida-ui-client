@@ -16,6 +16,10 @@ export async function NewCard(method) {
     return Network.post(`/payment`, get(Auth), method);
 }
 
+export async function AddCoupon(coupon) {
+    return Network.post(`/coupon`, get(Auth), {coupon});
+}
+
 export function PaymentType(type) {
     switch (type) {
         case "creditCard":

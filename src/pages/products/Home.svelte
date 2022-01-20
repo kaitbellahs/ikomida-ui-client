@@ -13,5 +13,10 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {:then items}
-  <Views.ItemsList {items} productPage={Routes.product} {Navigation} />
+  <Views.Divider />
+  {#if items.length > 0}
+    <Views.ItemsList {items} productPage={Routes.product} {Navigation} />
+  {:else}
+    Não há produtos para exibir!
+  {/if}
 {/await}

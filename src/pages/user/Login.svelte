@@ -21,9 +21,9 @@
     isLoading = true;
     const response = await AuthNetwork.doLogin("55" + cell, password);
     if (response.success) {
-      const token = await Utils.Jws.extractToken(response.token);
+      const token = await Utils.Jws.extractToken(response.data);
       if (token !== null) {
-        Auth.setToken(response.token);
+        Auth.setToken(response.data);
       } else {
         errorMessage = "Token não é valido";
         showAlert = true;
@@ -63,10 +63,15 @@
     bind:rawValue={cell}
     bind:value={initialValue}
     icon={faPhone}
-    mask="(XX) XXXXX-XXXX"
+    type="phone"
     placeHolder="Numero de celular"
   />
-  <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Senha" />
+  <Views.TextEdit
+    bind:value={password}
+    icon={faUnlock}
+    placeHolder="Senha"
+    secret={true}
+  />
   <div />
   <Views.Button on:click={doLogin}>Entrar</Views.Button>
   <Views.Button type="transparent" on:click={doSubscribe}

@@ -9,6 +9,7 @@
     GetPaymentMethods,
     PaymentType,
     NewCard,
+    AddCoupon,
   } from "../../network/Payment";
   import { NewOrders } from "../../network/Orders";
   import Fa from "svelte-fa";
@@ -23,6 +24,7 @@
 
   let location;
   let coupon;
+  let couponObject = null;
   let isLoading = false;
   let addresses = [];
   let payments = [];
@@ -39,20 +41,24 @@
   };
 
   $: if (
-    newAddressObject.cep != null &&
+    newAddressObject &&
+    newAddressObject.cep &&
     newAddressObject.cep.length === 8 &&
     newAddressObject.cep != currentCep
   ) {
     isLoading = true;
-    GetAddressByCep(newAddressObject.cep).then((address) => {
-      currentCep = address.cep;
-      newAddressObject.id = address.id;
-      newAddressObject.address = address.address;
-      newAddressObject.number = address.number;
-      newAddressObject.complement = address.complement;
-      newAddressObject.neighborhood = address.neighborhood;
-      newAddressObject.city = address.city;
-      newAddressObject.stat = address.stat;
+    GetAddressByCep(newAddressObject.cep).then((response) => {
+      if (response.success) {
+        const address = response.data;
+        currentCep = address.cep;
+        newAddressObject.id = address.id;
+        newAddressObject.address = address.address;
+        newAddressObject.number = address.number;
+        newAddressObject.complement = address.complement;
+        newAddressObject.neighborhood = address.neighborhood;
+        newAddressObject.city = address.city;
+        newAddressObject.stat = address.stat;
+      }
       isLoading = false;
     });
   }
@@ -61,7 +67,7 @@
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: delivery = 0;
-  $: total = subtotal + delivery;
+  $: total = subtotal + delivery - (couponObject ? couponObject.value : 0);
   $: validate = addresses.length > 0 && payments.length > 0;
 
   function addMoreItems() {
@@ -86,8 +92,14 @@
   }
 
   onMount(async () => {
-    addresses = await GetAddresses();
-    payments = await GetPaymentMethods();
+    let response = await GetAddresses();
+    if (response.success) {
+      addresses = response.data;
+    }
+    response = await GetPaymentMethods();
+    if (response.success) {
+      payments = response.data;
+    }
     if (Capacitor.isNativePlatform()) {
       const checkpermissions = await Geolocation.checkPermissions();
       if (checkpermissions.location != "prompt") {
@@ -119,13 +131,14 @@
         items: $Store,
         address: addresses.filter((address) => address.active)[0],
         payments: payments.filter((address) => address.selected)[0],
-        coupon,
+        coupon: couponObject,
         location,
       };
       const response = await NewOrders(payload);
       isLoading = false;
       if (response != undefined && response.success) {
-        Navigation.goTo(Routes.order, response.payload);
+        debugger;
+        Navigation.goTo(Routes.order, response.data);
       }
     } else {
       Navigation.reset(Routes.login);
@@ -144,7 +157,10 @@
 
   async function newAddress() {
     isLoading = true;
-    addresses = await NewAddress(newAddressObject);
+    const response = await NewAddress(newAddressObject);
+    if (response.success) {
+      addresses = response.data;
+    }
     showNewAddress = !showNewAddress;
     isLoading = false;
   }
@@ -173,7 +189,10 @@
 
   async function newCard() {
     isLoading = true;
-    payments = await NewCard(newCardObject);
+    const response = await NewCard(newCardObject);
+    if (response.success) {
+      payments = response.data;
+    }
     showNewCard = !showNewCard;
     isLoading = false;
   }
@@ -188,6 +207,22 @@
     });
     payments = [...payments];
     toggleUpdateCard();
+  }
+
+  async function addCoupon() {
+    if (coupon && coupon.length > 3) {
+      isLoading = true;
+      const response = await AddCoupon(coupon);
+      if (response.success) {
+        couponObject = response.data;
+      }
+      isLoading = false;
+    }
+  }
+
+  function removeCoupon() {
+    couponObject = null;
+    coupon = null;
   }
 
   Title.set("Resumo e pagamento");
@@ -342,6 +377,16 @@
       <td class="resumeText">Subtotal</td>
       <td class="resumeValue">{Utils.Strings.currency(subtotal)}</td>
     </tr>
+    {#if couponObject}
+      <tr>
+        <td class="resumeText">cupom</td>
+        <td class="resumeValue"
+          ><span class="deliveryFree"
+            >- {Utils.Strings.currency(couponObject.value)}</span
+          ></td
+        >
+      </tr>
+    {/if}
     <tr>
       <td class="resumeText">Taxa de entrega</td>
       <td class="resumeValue"
@@ -356,11 +401,18 @@
     </tr>
   </tbody>
 </table>
-<Views.TextEdit
-  bind:coupon
-  placeHolder="Adicionar cupom"
-  buttonName="Adicionar"
-/>
+{#if couponObject}
+  <Views.Button type="transparent" on:click={removeCoupon}
+    >Remover o cupom</Views.Button
+  >
+{:else}
+  <Views.TextEdit
+    bind:value={coupon}
+    placeHolder="Adicionar cupom"
+    buttonName="Adicionar"
+    callback={addCoupon}
+  />
+{/if}
 <Views.Button type="transparent" on:click={addMoreItems}
   >Addionar mais itens</Views.Button
 >

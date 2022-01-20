@@ -51,7 +51,11 @@ function createUserInfo() {
 		set
 	} = writable({
 		avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAArHbV6gqS70hTQBiPnvI-mRMZw85ItexDw&usqp=CAU",
-		name: "Folano de Santos e Diabos"
+		name: "Folano",
+		lastName: "de Santos e Diabos",
+		cpf: 23762177848,
+		phone: 11953635016,
+		email: "ladrao@fralde.br"
 	});
 
 	return {
