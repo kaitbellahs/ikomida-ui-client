@@ -7,7 +7,7 @@
   import { Utils } from "@tian/components";
 
   let isLoading = false;
-  let cell = "11953635016";
+  let phone = "11953635016";
   let initialValue = "(11) 95363-5016";
   let password = "123456";
   let showAlert = false;
@@ -23,7 +23,7 @@
 
   async function doLogin() {
     isLoading = true;
-    const response = await AuthNetwork.doLogin("55" + cell, password);
+    const response = await AuthNetwork.doLogin(55, phone, password);
     if (response.success) {
       const token = await Utils.Jws.extractToken(response.data);
       if (token !== null) {
@@ -64,7 +64,7 @@
     > e rápido e facil.
   </p>
   <Views.TextEdit
-    bind:rawValue={cell}
+    bind:rawValue={phone}
     bind:value={initialValue}
     icon={faPhone}
     type="phone"

@@ -15,6 +15,7 @@
   let subscribeObject = {
     ...Utils.Objects.copy($Router.options),
     ...{ phone: null, phoneValidationCode: null, signature: null },
+    areaCode: 55,
   };
   let canDigitValidationCode = false;
   let canSubscribe = false;
@@ -23,14 +24,14 @@
 
   $: styleHeight = $StatusBar.height + 55 + "px";
 
-  function validateValidationValid(validationValid){
+  function validateValidationCode(validationValid) {
     return validationValid.length == 4;
   }
 
   async function doSubscribe() {
     isLoading = true;
     const response = await AuthNetwork.subscribe(subscribeObject);
-    if(response.success){
+    if (response.success) {
       Navigation.reset(Routes.login);
     }
     isLoading = false;
@@ -38,9 +39,10 @@
 
   async function requestPhoneValidation() {
     isLoading = true;
+    subscribeObject.phone = "55" + subscribeObject.phone;
     const response = await AuthNetwork.requestPhoneValidation(subscribeObject);
-    if(response.success){
-      subscribeObject = {...subscribeObject, ...response.data};
+    if (response.success) {
+      subscribeObject = { ...subscribeObject, ...response.data };
       canDigitValidationCode = true;
     }
     isLoading = false;
@@ -48,8 +50,10 @@
 
   async function ValidatePhoneCode() {
     isLoading = true;
-    const response = await AuthNetwork.ValidatePhoneValidationCode(subscribeObject);
-    if(response.success){
+    const response = await AuthNetwork.ValidatePhoneValidationCode(
+      subscribeObject
+    );
+    if (response.success) {
       canSubscribe = true;
     }
     isLoading = false;
@@ -90,7 +94,7 @@
     buttonDisabled={!isValidationValid}
     disabled={!canDigitValidationCode}
     bind:isValid={isValidationValid}
-    validation={validateValidationValid}
+    validation={validateValidationCode}
   />
   <Views.Divider />
   <Views.Button on:click={doSubscribe} disabled={!canSubscribe}

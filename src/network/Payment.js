@@ -9,15 +9,15 @@ import {
 } from '../stores/Auth';
 
 export async function GetPaymentMethods() {
-    return Network.instant.get("/payments", get(Auth));
+    return Network.instance.get("/payments", get(Auth));
 }
 
 export async function NewCard(method) {
-    return Network.instant.post(`/payment`, get(Auth), method);
+    return Network.instance.post(`/payment`, get(Auth), method);
 }
 
 export async function AddCoupon(coupon) {
-    return Network.instant.post(`/coupon`, get(Auth), {coupon});
+    return Network.instance.post(`/coupon`, get(Auth), {coupon});
 }
 
 export function PaymentType(type) {

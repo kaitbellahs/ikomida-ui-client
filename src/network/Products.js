@@ -12,7 +12,7 @@ let items;
 
 export async function all() {
     if (!items) {
-        const response = await Network.instant.get("/products", get(Auth));
+        const response = await Network.instance.get("/products", get(Auth));
         if (response.success) {
             items = response.data;
         }
