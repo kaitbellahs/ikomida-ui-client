@@ -9,13 +9,13 @@ import {
 } from "@tian/components";
 
 export async function GetAddresses() {
-    return Network.get("/addresses", get(Auth));
+    return Network.instant.get("/addresses", get(Auth));
 }
 
 export async function GetAddressByCep(cep) {
-    return Network.get(`/cep/${cep}`, get(Auth));
+    return Network.instant.get(`/cep/${cep}`, get(Auth));
 }
 
 export async function NewAddress(address) {
-    return Network.post(`/address`, get(Auth), address);
+    return Network.instant.post(`/address`, get(Auth), address);
 }

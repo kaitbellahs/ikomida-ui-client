@@ -9,11 +9,11 @@ import {
 } from '../stores/Auth';
 
 export async function GetOrders() {
-    return Network.get("/orders", get(Auth));
+    return Network.instant.get("/orders", get(Auth));
 }
 
 export async function NewOrders(paylaod) {
-    return Network.post("/order", get(Auth), paylaod);
+    return Network.instant.post("/order", get(Auth), paylaod);
 }
 
 export function OrderStatus(status) {

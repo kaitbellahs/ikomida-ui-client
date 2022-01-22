@@ -35,6 +35,7 @@
     "svelte-preprocess-cssmodules": "^2.1.2"
   },
   "dependencies": {
+    "@capacitor-community/http": "^1.4.1",
     "@capacitor/android": "^3.3.4",
     "@capacitor/app": "^1.0.7",
     "@capacitor/cli": "^3.3.4",
