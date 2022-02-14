@@ -10,12 +10,19 @@
   } from "@fortawesome/free-solid-svg-icons";
 
   let isLoading = false;
+  // let subscribeObject = {
+  //   name: null,
+  //   lastName: null,
+  //   cpf: null,
+  //   email: null,
+  //   password: null,
+  // };
   let subscribeObject = {
-    name: null,
-    lastName: null,
+    name: "khalid",
+    lastName: "Ait Bellahs",
     cpf: null,
-    email: null,
-    password: null,
+    email: "aitbellahs@gmail.com",
+    password: "123456",
   };
   let isValidCPF = false;
   let isValidEmail = false;

@@ -6,7 +6,7 @@
 
   const order = $Router.options;
 
-  $: total = order.subtotal + order.delivery - order.coupon;
+  $: total = order.subtotal + order.delivery - (order.coupon ? order.coupon.value : 0);
   
   Title.set("Detalhes do predido");
 </script>
@@ -43,11 +43,11 @@
       <td class="resumeText">Subtotal</td>
       <td class="resumeValue">{Utils.Strings.currency(order.subtotal)}</td>
     </tr>
-    {#if order.coupon > 0}
+    {#if order.coupon}
       <tr>
-        <td class="resumeText">Taxa de entrega</td>
+        <td class="resumeText">Desconto</td>
         <td class="resumeValue"
-          ><span class="deliveryFree">- {Utils.Strings.currency(order.coupon)}</span></td
+          ><span class="deliveryFree">- {Utils.Strings.currency(order.coupon.value)}</span></td
         >
       </tr>
     {/if}

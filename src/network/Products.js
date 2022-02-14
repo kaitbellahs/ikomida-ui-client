@@ -26,7 +26,7 @@ export async function search(query) {
         return items.map(section => {
             return {
                 title: section.title,
-                items: section.items.filter(item => {
+                products: section.products.filter(item => {
                     if (typeof item == "object") {
                         return item.title.toLowerCase().includes(query.toLowerCase()) || item.description.toLowerCase().includes(query.toLowerCase());
                     } else {
@@ -34,7 +34,7 @@ export async function search(query) {
                     }
                 })
             };
-        }).filter(item => item.items.length > 0);
+        }).filter(item => item.products.length > 0);
     } else {
         return [];
     }

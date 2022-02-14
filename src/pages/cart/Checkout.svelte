@@ -26,8 +26,8 @@
   let coupon;
   let couponObject = null;
   let isLoading = false;
-  let addresses = [];
-  let payments = [];
+  let addresses = null;
+  let payments = null;
   let showUpdateAddress = false;
   let showNewAddress = false;
   let newAddressObject = {
@@ -68,7 +68,7 @@
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: delivery = 0;
   $: total = subtotal + delivery - (couponObject ? couponObject.value : 0);
-  $: validate = addresses.length > 0 && payments.length > 0;
+  $: validate = addresses && addresses.length > 0 && payments && payments.length > 0;
 
   function addMoreItems() {
     Navigation.pop(3);
@@ -130,7 +130,7 @@
       const payload = {
         items: $Store,
         address: addresses.filter((address) => address.active)[0],
-        payments: payments.filter((address) => address.selected)[0],
+        payment: payments.filter((address) => address.selected)[0],
         coupon: couponObject,
         location,
       };
@@ -318,7 +318,7 @@
       mask="__/__"
       maskKey="_"
       placeHolder="Validade"
-      bind:value={newCardObject.valid}
+      bind:value={newCardObject.validate}
     />
     <Views.TextEdit
       mask="___"
@@ -416,8 +416,10 @@
 <Views.Button type="transparent" on:click={addMoreItems}
   >Addionar mais itens</Views.Button
 >
-{#if addresses.length == 0}
+{#if !addresses}
   <Views.LocalLoading size="2" />
+{:else if addresses.length == 0}
+  <Views.Button on:click={toggleNewAddress}>novo endereço</Views.Button>
 {:else}
   {#each addresses as { cep, address, complement, neighborhood, city, stat, active }}
     {#if active}
@@ -438,8 +440,10 @@
     {/if}
   {/each}
 {/if}
-{#if payments.length == 0}
+{#if !payments}
   <Views.LocalLoading size="2" />
+{:else if payments.length == 0  }
+<Views.Button on:click={toggleNewCard}>novo cartão</Views.Button>
 {:else}
   {#each payments as { id, type, brand, lastDigits, selected }}
     {#if selected}
