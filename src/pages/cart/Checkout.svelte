@@ -327,8 +327,7 @@
       bind:value={newCardObject.cvv}
     />
     <Views.TextEdit
-      mask="___.___.___-__"
-      maskKey="_"
+      type="cpf"
       placeHolder="CPF"
       bind:value={newCardObject.cpf}
     />

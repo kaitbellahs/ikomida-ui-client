@@ -8,7 +8,7 @@
     faCartPlus,
   } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import {Views, Utils} from "@tian/components";
+  import {Views, Utils, Network} from "@tian/components";
 
   const item = $Router.options;
   let quantity = 1;
@@ -37,7 +37,7 @@
 </script>
 
 <div class="product">
-  <img src={item.src} alt={item.title} />
+  <img src={`${Network.instance.devApiServer}/image/${item.image}`} alt={item.title} />
   <h2>{item.title}</h2>
   <p>{item.description}</p>
   <span class="serves">Aproximadamente {Utils.Strings.formatNumber(item.weight)} Kg</span>
