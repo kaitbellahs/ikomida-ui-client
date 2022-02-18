@@ -1,6 +1,6 @@
 <script>
   import { Title, Router } from "../../stores/Navigation";
-  import { OrderStatus } from "../../network/Orders";
+  import { OrderStatus, OrderStage } from "../../network/Orders";
   import {Utils} from "@tian/components";
   import { PaymentType } from "../../network/Payment";
 
@@ -11,15 +11,15 @@
   Title.set("Detalhes do predido");
 </script>
 
-<span class="time">Feito {Utils.Strings.timestampToString(order.created)}</span>
+<span class="time">Feito {Utils.Strings.dateToString(order.created)}</span>
 <h3>Pedido #{order.id}</h3>
 <span class="status">
-  {#if order.status == "open"}
+  {#if ["open", "accepted", "waitingDelivery", "delivery"].includes(order.status)}
     Seu pedido está
-    <span class=open>{order.stage}</span>
+    <span class=open>{OrderStage(order.status)}</span>
   {:else}
     {OrderStatus(order.status)} em
-    <span class=open>{Utils.Strings.timestampToString(order.finished)}</span>
+    <span class=open>{Utils.Strings.dateToString(order.finished)}</span>
   {/if}
 </span>
 {#each order.products as { title, price, quantity }, index}
