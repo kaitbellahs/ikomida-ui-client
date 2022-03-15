@@ -36,7 +36,7 @@ function createAuth() {
 					value: payload
 				});
 			} catch (error) {
-				console.log("error:");
+				console.error("error:");
 				console.error(error.message);
 			}
 		}
@@ -44,24 +44,3 @@ function createAuth() {
 }
 
 export const Auth = createAuth();
-
-function createUserInfo() {
-	const {
-		subscribe,
-		set
-	} = writable({
-		avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAArHbV6gqS70hTQBiPnvI-mRMZw85ItexDw&usqp=CAU",
-		name: "Folano",
-		lastName: "de Santos e Diabos",
-		cpf: 23762177848,
-		phone: 11953635016,
-		email: "ladrao@fralde.br"
-	});
-
-	return {
-		subscribe,
-		setUserInfo: (info) => set(info)
-	};
-}
-
-export const UserInfo = createUserInfo();

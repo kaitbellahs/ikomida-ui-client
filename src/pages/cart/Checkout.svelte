@@ -1,11 +1,12 @@
 <script>
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils, PagSeguro } from "@tian/components";
   import { Capacitor } from "@capacitor/core";
   import { Auth } from "../../stores/Auth";
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
   import { Store, Cart } from "../../stores/Cart";
   import {
+    GetPubKey,
     GetPaymentMethods,
     PaymentType,
     NewCard,
@@ -39,6 +40,7 @@
   let newCardObject = {
     number: null,
   };
+  let publicKey;
 
   $: if (
     newAddressObject &&
@@ -68,7 +70,8 @@
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: delivery = 0;
   $: total = subtotal + delivery - (couponObject ? couponObject.value : 0);
-  $: validate = addresses && addresses.length > 0 && payments && payments.length > 0;
+  $: validate =
+    addresses && addresses.length > 0 && payments && payments.length > 0;
 
   function addMoreItems() {
     Navigation.pop(3);
@@ -130,7 +133,7 @@
       const payload = {
         items: $Store,
         address: addresses.filter((address) => address.active)[0],
-        payment: payments.filter((address) => address.selected)[0],
+        payment: payments.filter((payment) => payment.selected)[0],
         coupon: couponObject,
         location,
       };
@@ -169,7 +172,6 @@
     addresses.forEach((item) => {
       item.active = false;
       if (item.id === id) {
-        console.log(item.id);
         item.active = true;
       }
     });
@@ -189,9 +191,30 @@
 
   async function newCard() {
     isLoading = true;
-    const response = await NewCard(newCardObject);
-    if (response.success) {
-      payments = response.data;
+    if (!publicKey) {
+      publicKey = await GetPubKey();
+    }
+    var card = PagSeguro.encryptCard({
+      publicKey: publicKey,
+      holder: newCardObject.name,
+      number: newCardObject.number,
+      expMonth: newCardObject.validate.substring(0, 2),
+      expYear: `20${newCardObject.validate.substring(3, 5)}`,
+      securityCode: newCardObject.cvv,
+    });
+    if (card.encryptedCard) {
+      const newCard = {
+        first6Digits: newCardObject.number.substring(0, 6),
+        last4Digits: newCardObject.number.substring(
+          newCardObject.number.length - 4,
+          newCardObject.number.length
+        ),
+        encryptedCard: card.encryptedCard,
+      };
+      const response = await NewCard(newCard);
+      if (response.success) {
+        payments = response.data;
+      }
     }
     showNewCard = !showNewCard;
     isLoading = false;
@@ -201,7 +224,6 @@
     payments.forEach((item) => {
       item.selected = false;
       if (item.id === id) {
-        console.log(item.id);
         item.selected = true;
       }
     });
@@ -254,7 +276,7 @@
       placeHolder="CEP"
     />
     <Views.TextEdit
-      placeHolder="ENdereço"
+      placeHolder="Endereço"
       bind:value={newAddressObject.address}
     />
     <Views.TextEdit placeHolder="Numero" bind:value={newAddressObject.number} />
@@ -343,14 +365,14 @@
       { name: "Novo", callback: toggleNewCard },
     ]}
   >
-    {#each payments as { id, type, brand, lastDigits, selected }}
+    {#each payments as { id, type, brand, last4Digits, selected }}
       <div class="paymentCard">
         <div class="content">
           <span class="payWith">Pagar com</span>
           <span>{PaymentType(type)}</span>
           <span class="brand">
             {#if type !== "Cash"}
-              {brand} **** **** **** {lastDigits}
+              {brand} **** **** **** {last4Digits}
             {:else}
               Pagar na entrega
             {/if}
@@ -441,8 +463,8 @@
 {/if}
 {#if !payments}
   <Views.LocalLoading size="2" />
-{:else if payments.length == 0  }
-<Views.Button on:click={toggleNewCard}>novo cartão</Views.Button>
+{:else if payments.length == 0}
+  <Views.Button on:click={toggleNewCard}>novo cartão</Views.Button>
 {:else}
   {#each payments as { id, type, brand, lastDigits, selected }}
     {#if selected}

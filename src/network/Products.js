@@ -9,12 +9,15 @@ import {
 } from "@tian/components";
 
 let items;
+let updateTime;
 
 export async function all() {
-    if (!items) {
+    debugger;
+    if (!items || updateTime < new Date(new Date().setMinutes(new Date().getMinutes() + 2)).getTime()) {
         const response = await Network.instance.get("/products", get(Auth));
         if (response.success) {
-            items = response.data;
+            items = response.data.filter(item => item.products.length > 0);
+            updateTime = new Date().getTime();
         }
     }
     return items;

@@ -8,16 +8,16 @@
   import Tac from "./pages/user/Tac.svelte";
   import { Network } from "@capacitor/network";
   import { onMount } from "svelte";
-  import { Router, Routes } from "./stores/Navigation";
   import { StatusBar as _StatusBar } from "./stores/Setup";
+  import { Router, Routes } from "./stores/Navigation";
   import { StatusBar } from "@capacitor/status-bar";
   import { Utils } from "@tian/components";
 
   let networkStatus = null;
 
-  let logedIn = false;
-
   $: route = $Router.route;
+
+  let logedIn = false;
 
   $: if ($Auth) {
     logedIn = false;

@@ -12,6 +12,10 @@ export async function GetPaymentMethods() {
     return Network.instance.get("/payments", get(Auth));
 }
 
+export async function GetPubKey() {
+    return Network.instance.get(`/pubKey`, get(Auth));
+}
+
 export async function NewCard(method) {
     return Network.instance.post(`/payment`, get(Auth), method);
 }
