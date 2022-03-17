@@ -38,6 +38,10 @@
   let showNewCard = false;
   let showUpdateCard = false;
   let newCardObject = {
+    name: null,
+    validity: null,
+    cpf: null,
+    ccv: null,
     number: null,
   };
   let publicKey;
@@ -191,32 +195,18 @@
 
   async function newCard() {
     isLoading = true;
-    if (!publicKey) {
-      publicKey = await GetPubKey();
-    }
-    var card = PagSeguro.encryptCard({
-      publicKey: publicKey,
+    const newCard = {
       holder: newCardObject.name,
       number: newCardObject.number,
-      expMonth: newCardObject.validate.substring(0, 2),
-      expYear: `20${newCardObject.validate.substring(3, 5)}`,
-      securityCode: newCardObject.cvv,
-    });
-    if (card.encryptedCard) {
-      const newCard = {
-        first6Digits: newCardObject.number.substring(0, 6),
-        last4Digits: newCardObject.number.substring(
-          newCardObject.number.length - 4,
-          newCardObject.number.length
-        ),
-        encryptedCard: card.encryptedCard,
-      };
-      const response = await NewCard(newCard);
-      if (response.success) {
-        payments = response.data;
-      }
+      expMonth: newCardObject.validity.substring(0, 2),
+      expYear: `20${newCardObject.validity.substring(3, 5)}`,
+      cvv: newCardObject.cvv,
+    };
+    const response = await NewCard(newCard);
+    if (response.success) {
+      payments = response.data;
+      showNewCard = !showNewCard;
     }
-    showNewCard = !showNewCard;
     isLoading = false;
   }
 
@@ -340,7 +330,7 @@
       mask="__/__"
       maskKey="_"
       placeHolder="Validade"
-      bind:value={newCardObject.validate}
+      bind:value={newCardObject.validity}
     />
     <Views.TextEdit
       mask="___"
@@ -466,7 +456,7 @@
 {:else if payments.length == 0}
   <Views.Button on:click={toggleNewCard}>novo cartão</Views.Button>
 {:else}
-  {#each payments as { id, type, brand, lastDigits, selected }}
+  {#each payments as { id, type, brand, last4Digits, selected }}
     {#if selected}
       <div class="paymentCard">
         <div class="content">
@@ -474,7 +464,7 @@
           <span>{PaymentType(type)}</span>
           <span class="brand">
             {#if type !== "Cash"}
-              {brand} **** **** **** {lastDigits}
+              {brand} **** **** **** {last4Digits}
             {:else}
               Pagar na entrega
             {/if}

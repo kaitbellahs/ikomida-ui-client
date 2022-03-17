@@ -39,7 +39,7 @@
 
   async function requestPhoneValidation() {
     isLoading = true;
-    subscribeObject.phone = "55" + subscribeObject.phone;
+    subscribeObject.phone = subscribeObject.phone;
     const response = await AuthNetwork.requestPhoneValidation(subscribeObject);
     if (response.success) {
       subscribeObject = { ...subscribeObject, ...response.data };
