@@ -11,7 +11,7 @@
   Title.set("Detalhes do predido");
 </script>
 
-<span class="time">Feito {Utils.Strings.dateToString(order.created)}</span>
+<span class="time">Feito {Utils.Strings.dateToString(order.createdAt)}</span>
 <h3>Pedido #{order.id}</h3>
 <span class="status">
   {#if ["open", "accepted", "waitingDelivery", "delivery"].includes(order.status)}
@@ -19,7 +19,7 @@
     <span class=open>{OrderStage(order.status)}</span>
   {:else}
     {OrderStatus(order.status)} em
-    <span class=open>{Utils.Strings.dateToString(order.finished)}</span>
+    <span class=open>{Utils.Strings.dateToString(order.finishedAt)}</span>
   {/if}
 </span>
 {#each order.products as { title, price, quantity }, index}
@@ -28,7 +28,7 @@
     ><span class="price">{Utils.Strings.currency(quantity * price)}</span>
   </div>
 {/each}
-<div class="address">Entregue em: <b>{order.address.address}</b></div>
+<div class="address">Entregue em: <b>{order.address.street}</b></div>
 <div class="paymentMethod">
   Forma de pagamento: <b>{PaymentType(order.payment.type)}</b>
 </div>

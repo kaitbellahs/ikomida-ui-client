@@ -1,4 +1,5 @@
 <script>
+  import {CAPNativeLog} from 'capacitor-native-log';
   import { App } from "@capacitor/app";
   import { Auth } from "./stores/Auth";
   import Login from "./pages/user/Login.svelte";
@@ -11,7 +12,7 @@
   import { StatusBar as _StatusBar } from "./stores/Setup";
   import { Router, Routes } from "./stores/Navigation";
   import { StatusBar } from "@capacitor/status-bar";
-  import { Utils } from "@tian/components";
+  import { Utils, PushNotification } from "@tian/components";
 
   let networkStatus = null;
 
@@ -33,6 +34,24 @@
 
     alert("App opened with URL: " + url);
   };
+
+  function hasRegisteredCallBack(token, platform){
+    console.log(platform, token);
+    CAPNativeLog.log({ level: 'info', message: JSON.stringify(token) });
+  }
+
+  function pushNotificationReceivedCallBack(notification){
+    CAPNativeLog.log({ level: 'info', message: JSON.stringify(notification) });
+    console.log(notification);
+  }
+
+  function pushNotificationActionPerformedCallBack(notification){
+    CAPNativeLog.log({ level: 'info', message: JSON.stringify(notification) });
+    console.log(notification);
+  }
+  
+  let pushNotification = new PushNotification(hasRegisteredCallBack, pushNotificationReceivedCallBack, pushNotificationActionPerformedCallBack);
+  pushNotification.init();
 
   onMount(async () => {
     networkStatus = await Network.getStatus();

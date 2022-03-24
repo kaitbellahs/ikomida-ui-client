@@ -47,7 +47,7 @@
           {products.length - 1 == 1 ? "item" : "itens"}
         </div>
       {/if}
-      <div class="address">Entregue em: <b>{address.address}</b></div>
+      <div class="address">Entregue em: <b>{address.street}</b></div>
       <div class="paymentMethod">
         Forma de pagamento: <b>{PaymentType(payment.type)}</b>
       </div>

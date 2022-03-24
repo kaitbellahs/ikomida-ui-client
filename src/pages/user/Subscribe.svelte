@@ -13,7 +13,7 @@
   let subscribeObject = {
     name: null,
     lastName: null,
-    cpf: null,
+    identity: null,
     email: null,
     password: null,
   };
@@ -69,7 +69,7 @@
   />
   <Views.TextEdit
     icon={faIdCard}
-    bind:rawValue={subscribeObject.cpf}
+    bind:rawValue={subscribeObject.identity}
     type="cpf"
     placeHolder="CPF"
     bind:isValid={isValidCPF}

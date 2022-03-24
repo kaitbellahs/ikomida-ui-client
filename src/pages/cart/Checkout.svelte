@@ -32,9 +32,9 @@
   let showUpdateAddress = false;
   let showNewAddress = false;
   let newAddressObject = {
-    cep: null,
+    postalCode: null,
   };
-  let currentCep = null;
+  let currentPostalCode = null;
   let showNewCard = false;
   let showUpdateCard = false;
   let newCardObject = {
@@ -48,17 +48,17 @@
 
   $: if (
     newAddressObject &&
-    newAddressObject.cep &&
-    newAddressObject.cep.length === 8 &&
-    newAddressObject.cep != currentCep
+    newAddressObject.postalCode &&
+    newAddressObject.postalCode.length === 8 &&
+    newAddressObject.postalCode != currentPostalCode
   ) {
     isLoading = true;
-    GetAddressByCep(newAddressObject.cep).then((response) => {
+    GetAddressByCep(newAddressObject.postalCode).then((response) => {
       if (response.success) {
         const address = response.data;
-        currentCep = address.cep;
+        currentPostalCode = address.postalCode;
         newAddressObject.id = address.id;
-        newAddressObject.address = address.address;
+        newAddressObject.street = address.street;
         newAddressObject.number = address.number;
         newAddressObject.complement = address.complement;
         newAddressObject.neighborhood = address.neighborhood;
@@ -136,7 +136,7 @@
       isLoading = true;
       const payload = {
         items: $Store,
-        address: addresses.filter((address) => address.active)[0],
+        address: addresses.filter((address) => address.selected)[0],
         payment: payments.filter((payment) => payment.selected)[0],
         coupon: couponObject,
         location,
@@ -174,9 +174,9 @@
 
   function updateAddress(id) {
     addresses.forEach((item) => {
-      item.active = false;
+      item.selected = false;
       if (item.id === id) {
-        item.active = true;
+        item.selected = true;
       }
     });
     addresses = [...addresses];
@@ -262,12 +262,12 @@
       mask="_____-___"
       maskKey="_"
       icon={faSearch}
-      bind:rawValue={newAddressObject.cep}
+      bind:rawValue={newAddressObject.postalCode}
       placeHolder="CEP"
     />
     <Views.TextEdit
       placeHolder="Endereço"
-      bind:value={newAddressObject.address}
+      bind:value={newAddressObject.street}
     />
     <Views.TextEdit placeHolder="Numero" bind:value={newAddressObject.number} />
     <Views.TextEdit
@@ -292,16 +292,16 @@
       { name: "Novo", callback: toggleNewAddress },
     ]}
   >
-    {#each addresses as { id, cep, address, number, complement, neighborhood, city, stat, active }}
+    {#each addresses as { id, postalCode, street, number, complement, neighborhood, city, stat, selected }}
       <div class="address">
         <div class="content">
           <span class="delivery">Entregar em</span>
-          <span>{address}, {number}</span>
+          <span>{street}, {number}</span>
           <span class="neighborhood">{neighborhood} | {complement}</span>
-          <span class="city">{city}/{stat} CEP: {cep}</span>
+          <span class="city">{city}/{stat} CEP: {postalCode}</span>
         </div>
         <div class="edit" on:click={updateAddress(id)}>
-          <input type="checkbox" bind:checked={active} />
+          <input type="checkbox" bind:checked={selected} />
         </div>
       </div>
     {/each}
@@ -432,14 +432,14 @@
 {:else if addresses.length == 0}
   <Views.Button on:click={toggleNewAddress}>novo endereço</Views.Button>
 {:else}
-  {#each addresses as { cep, address, complement, neighborhood, city, stat, active }}
-    {#if active}
+  {#each addresses as { postalCode, street, complement, neighborhood, city, stat, selected }}
+    {#if selected}
       <div class="address">
         <div class="content">
           <span class="delivery">Entregar em</span>
-          <span>{address}</span>
+          <span>{street}</span>
           <span class="neighborhood">{neighborhood} | {complement}</span>
-          <span class="city">{city}/{stat} CEP: {cep}</span>
+          <span class="city">{city}/{stat} CEP: {postalCode}</span>
         </div>
         <div class="edit" on:click={toggleUpdateAddress}>
           <Fa
