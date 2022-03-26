@@ -13,6 +13,7 @@
   import { Router, Routes } from "./stores/Navigation";
   import { StatusBar } from "@capacitor/status-bar";
   import { Utils, PushNotification } from "@tian/components";
+  import {registerPushNotificationToken} from "./network/PushNotification";
 
   let networkStatus = null;
 
@@ -35,9 +36,10 @@
     alert("App opened with URL: " + url);
   };
 
-  function hasRegisteredCallBack(token, platform){
+  async function hasRegisteredCallBack(token, platform){
     console.log(platform, token);
     CAPNativeLog.log({ level: 'info', message: JSON.stringify(token) });
+    await registerPushNotificationToken({platform, token});
   }
 
   function pushNotificationReceivedCallBack(notification){

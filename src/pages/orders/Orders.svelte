@@ -35,7 +35,7 @@
   />
 {/if}
 <div>
-  {#each orders as { id, status, stage, products, address, payment, created, finished, subtotal, coupon, delivery }}
+  {#each orders as { id, status, stage, products, address, payment, createdAt, finishedAt, subtotal, coupon, delivery }}
     <div class="leftShadow orderContainer" on:click={goToOrder(id)}>
       <h3>#{id}: pedido {OrderStatus(status)}</h3>
       {#if products.length > 0}
@@ -51,7 +51,7 @@
       <div class="paymentMethod">
         Forma de pagamento: <b>{PaymentType(payment.type)}</b>
       </div>
-      <div class="time">{Utils.Strings.timestampToString(created)}</div>
+      <div class="time">{Utils.Strings.timestampToString(createdAt)}</div>
     </div>
   {/each}
 </div>
