@@ -1,10 +1,11 @@
 <script>
-  import { Auth } from "../../stores/Auth";
+  import { Auth, PushNotificationToken } from "../../stores/Auth";
   import * as AuthNetwork from "../../network/Auth";
   import { Views } from "@tian/components";
   import { Routes, Navigation } from "../../stores/Navigation";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
   import { Utils } from "@tian/components";
+  import {registerPushNotificationToken} from "../../network/PushNotification";
 
   let isLoading = false;
   let phone = "11953635016";
@@ -28,6 +29,9 @@
       const token = await Utils.Jws.extractToken(response.data);
       if (token !== null) {
         Auth.setToken(response.data);
+        if($PushNotificationToken && $PushNotificationToken !== {}){
+          await registerPushNotificationToken($PushNotificationToken);
+        }
       } else {
         errorMessage = "Token não é valido";
         showAlert = true;

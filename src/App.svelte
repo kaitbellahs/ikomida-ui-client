@@ -1,7 +1,7 @@
 <script>
   import {CAPNativeLog} from 'capacitor-native-log';
   import { App } from "@capacitor/app";
-  import { Auth } from "./stores/Auth";
+  import { Auth, PushNotificationToken } from "./stores/Auth";
   import Login from "./pages/user/Login.svelte";
   import Main from "./pages/Main.svelte";
   import Subscribe from "./pages/user/Subscribe.svelte";
@@ -39,7 +39,9 @@
   async function hasRegisteredCallBack(token, platform){
     console.log(platform, token);
     CAPNativeLog.log({ level: 'info', message: JSON.stringify(token) });
-    await registerPushNotificationToken({platform, token});
+  const tokenObject = {platform, token}
+  PushNotificationToken.setToken(tokenObject);
+  await registerPushNotificationToken(tokenObject);
   }
 
   function pushNotificationReceivedCallBack(notification){

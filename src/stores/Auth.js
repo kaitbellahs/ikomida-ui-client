@@ -44,3 +44,17 @@ function createAuth() {
 }
 
 export const Auth = createAuth();
+
+function createPushNotificationToken() {
+	const {
+		subscribe,
+		set
+	} = writable();
+
+	return {
+		subscribe,
+		setToken: (token) => set(token)
+	};
+}
+
+export const PushNotificationToken = createPushNotificationToken();
