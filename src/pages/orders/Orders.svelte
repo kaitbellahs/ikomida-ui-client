@@ -19,8 +19,8 @@
   onMount(async () => {
     isLoading = true;
     const response = await GetOrders();
-    if (response.success) {
-      orders = response.data;
+    if (response?.success) {
+      orders = response?.data;
     }
     isLoading = false;
   });

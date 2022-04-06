@@ -1,12 +1,11 @@
 <script>
-  import { Views, Utils, PagSeguro } from "@tian/components";
+  import { Views, Utils } from "@tian/components";
   import { Capacitor } from "@capacitor/core";
   import { Auth } from "../../stores/Auth";
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
   import { Store, Cart } from "../../stores/Cart";
   import {
-    GetPubKey,
     GetPaymentMethods,
     PaymentType,
     NewCard,
@@ -44,7 +43,14 @@
     ccv: null,
     number: null,
   };
-  let publicKey;
+
+  let errorAlert;
+  let showAlert = false;
+
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
 
   $: if (
     newAddressObject &&
@@ -52,21 +58,7 @@
     newAddressObject.postalCode.length === 8 &&
     newAddressObject.postalCode != currentPostalCode
   ) {
-    isLoading = true;
-    GetAddressByCep(newAddressObject.postalCode).then((response) => {
-      if (response.success) {
-        const address = response.data;
-        currentPostalCode = address.postalCode;
-        newAddressObject.id = address.id;
-        newAddressObject.street = address.street;
-        newAddressObject.number = address.number;
-        newAddressObject.complement = address.complement;
-        newAddressObject.neighborhood = address.neighborhood;
-        newAddressObject.city = address.city;
-        newAddressObject.stat = address.stat;
-      }
-      isLoading = false;
-    });
+    findAddress();
   }
 
   $: subtotalArray = $Store.map((item) => item.quantity * item.price);
@@ -76,6 +68,31 @@
   $: total = subtotal + delivery - (couponObject ? couponObject.value : 0);
   $: validate =
     addresses && addresses.length > 0 && payments && payments.length > 0;
+
+  function findAddress() {
+    isLoading = true;
+    currentPostalCode = newAddressObject.postalCode;
+    GetAddressByCep(newAddressObject.postalCode)
+      .then((response) => {
+        if (response?.success) {
+          const address = response?.data;
+          currentPostalCode = address.postalCode;
+          newAddressObject.id = address.id;
+          newAddressObject.street = address.street;
+          newAddressObject.number = address.number;
+          newAddressObject.complement = address.complement;
+          newAddressObject.neighborhood = address.neighborhood;
+          newAddressObject.city = address.city;
+          newAddressObject.stat = address.stat;
+        } else {
+          toggleErrorAlert(response?.data);
+        }
+        isLoading = false;
+      })
+      .catch((exception) => {
+        toggleErrorAlert(exception);
+      });
+  }
 
   function addMoreItems() {
     Navigation.pop(3);
@@ -100,12 +117,12 @@
 
   onMount(async () => {
     let response = await GetAddresses();
-    if (response.success) {
-      addresses = response.data;
+    if (response?.success) {
+      addresses = response?.data;
     }
     response = await GetPaymentMethods();
-    if (response.success) {
-      payments = response.data;
+    if (response?.success) {
+      payments = response?.data;
     }
     if (Capacitor.isNativePlatform()) {
       const checkpermissions = await Geolocation.checkPermissions();
@@ -143,9 +160,9 @@
       };
       const response = await NewOrders(payload);
       isLoading = false;
-      if (response && response.success) {
+      if (response && response?.success) {
         Cart.reset();
-        Navigation.goTo(Routes.order, response.data);
+        Navigation.goTo(Routes.order, response?.data);
       }
     } else {
       Navigation.reset(Routes.login);
@@ -165,8 +182,8 @@
   async function newAddress() {
     isLoading = true;
     const response = await NewAddress(newAddressObject);
-    if (response.success) {
-      addresses = response.data;
+    if (response?.success) {
+      addresses = response?.data;
     }
     showNewAddress = !showNewAddress;
     isLoading = false;
@@ -203,8 +220,8 @@
       cvv: newCardObject.cvv,
     };
     const response = await NewCard(newCard);
-    if (response.success) {
-      payments = response.data;
+    if (response?.success) {
+      payments = response?.data;
       showNewCard = !showNewCard;
     }
     isLoading = false;
@@ -225,8 +242,8 @@
     if (coupon && coupon.length > 3) {
       isLoading = true;
       const response = await AddCoupon(coupon);
-      if (response.success) {
-        couponObject = response.data;
+      if (response?.success) {
+        couponObject = response?.data;
       }
       isLoading = false;
     }
@@ -261,21 +278,26 @@
     <Views.TextEdit
       mask="_____-___"
       maskKey="_"
-      icon={faSearch}
+      type="number"
+      callback={findAddress}
+      buttonIcon={faSearch}
       bind:rawValue={newAddressObject.postalCode}
       placeHolder="CEP"
     />
     <Views.TextEdit
       placeHolder="Endereço"
+      type="spacedAlphanumeric"
       bind:value={newAddressObject.street}
     />
     <Views.TextEdit placeHolder="Numero" bind:value={newAddressObject.number} />
     <Views.TextEdit
       placeHolder="Complemento"
+      type="spacedAlphanumeric"
       bind:value={newAddressObject.complement}
     />
     <Views.TextEdit
       placeHolder="Bairro"
+      type="spacedAlphanumeric"
       bind:value={newAddressObject.neighborhood}
     />
     <Views.TextEdit placeHolder="Cidade" bind:value={newAddressObject.city} />
@@ -486,6 +508,7 @@
       login{/if}</span
   ></Views.Button
 >
+<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   input[type="checkbox"] {

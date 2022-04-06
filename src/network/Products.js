@@ -14,8 +14,8 @@ let updateTime;
 export async function all() {
     if (!items || updateTime < new Date(new Date().setMinutes(new Date().getMinutes() + 2)).getTime()) {
         const response = await Network.instance.get("/products", get(Auth));
-        if (response.success) {
-            items = response.data.filter(item => item.products.length > 0);
+        if (response?.success) {
+            items = response?.data.filter(item => item.products.length > 0);
             updateTime = new Date().getTime();
         }
     }

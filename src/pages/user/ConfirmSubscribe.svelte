@@ -21,6 +21,12 @@
   let canSubscribe = false;
   let canRequestCode = false;
   let isValidationValid = false;
+  let errorAlert;
+  let showAlert = false;
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
 
   $: styleHeight = $StatusBar.height + 55 + "px";
 
@@ -31,8 +37,10 @@
   async function doSubscribe() {
     isLoading = true;
     const response = await AuthNetwork.subscribe(subscribeObject);
-    if (response.success) {
+    if (response?.success) {
       Navigation.reset(Routes.login);
+    }else{
+      toggleErrorAlert(response?.data);
     }
     isLoading = false;
   }
@@ -41,9 +49,11 @@
     isLoading = true;
     subscribeObject.phone = subscribeObject.phone;
     const response = await AuthNetwork.requestPhoneValidation(subscribeObject);
-    if (response.success) {
-      subscribeObject = { ...subscribeObject, ...response.data };
+    if (response?.success) {
+      subscribeObject = { ...subscribeObject, ...response?.data };
       canDigitValidationCode = true;
+    }else{
+      toggleErrorAlert(response?.data);
     }
     isLoading = false;
   }
@@ -53,8 +63,10 @@
     const response = await AuthNetwork.ValidatePhoneValidationCode(
       subscribeObject
     );
-    if (response.success) {
+    if (response?.success) {
       canSubscribe = true;
+    }else{
+      toggleErrorAlert(response?.data);
     }
     isLoading = false;
   }
@@ -100,6 +112,7 @@
   <Views.Button on:click={doSubscribe} disabled={!canSubscribe}
     >Confirmar</Views.Button
   >
+  <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 </main>
 
 <style>

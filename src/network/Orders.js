@@ -12,8 +12,8 @@ export async function GetOrders() {
     return Network.instance.get("/orders", get(Auth));
 }
 
-export async function NewOrders(paylaod) {
-    return Network.instance.post("/order", get(Auth), paylaod);
+export async function NewOrders(payload) {
+    return Network.instance.post("/order", get(Auth), payload);
 }
 
 export function OrderStatus(status) {
