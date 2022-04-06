@@ -38,7 +38,7 @@ const items = async () => {
         _items = JSON.parse(ret.value);
     } catch (error) {
         _items = [];
-        console.error(error);
+        //TODO: -- report errors
     }
     _items = _items != null ? _items : [];
     Store.updateItems(_items);
@@ -50,7 +50,7 @@ const addItem = async (item) => {
     try {
         oldItems = await items();
     } catch (error) {
-        console.error(error);
+        //TODO: -- report errors
     }
     Store.updateItems(oldItems == null ? [item] : [...oldItems, item]);
     await Storage.set({
@@ -63,7 +63,7 @@ const subtotal = async () => {
     try {
         oldItems = await items();
     } catch (error) {
-        console.error(error);
+        //TODO: -- report errors
     }
     const _subtotal = oldItems.map((item) => item.quantity * item.price).reduce((a, b) => a + b);
     return _subtotal;

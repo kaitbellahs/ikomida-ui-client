@@ -37,7 +37,6 @@
   };
 
   async function hasRegisteredCallBack(token, platform){
-    console.log(platform, token);
     CAPNativeLog.log({ level: 'info', message: JSON.stringify(token) });
   const tokenObject = {platform, token}
   PushNotificationToken.setToken(tokenObject);
@@ -46,12 +45,10 @@
 
   function pushNotificationReceivedCallBack(notification){
     CAPNativeLog.log({ level: 'info', message: JSON.stringify(notification) });
-    console.log(notification);
   }
 
   function pushNotificationActionPerformedCallBack(notification){
     CAPNativeLog.log({ level: 'info', message: JSON.stringify(notification) });
-    console.log(notification);
   }
   
   let pushNotification = new PushNotification(hasRegisteredCallBack, pushNotificationReceivedCallBack, pushNotificationActionPerformedCallBack);
@@ -66,19 +63,18 @@
 
   Network.addListener("networkStatusChange", (status) => {
     networkStatus = status;
-    console.log("Network status changed", status);
   });
-  App.addListener("appStateChange", ({ isActive }) => {
-    console.log("App state changed. Is active?", isActive);
-  });
+  // App.addListener("appStateChange", ({ isActive }) => {
+  //   console.log("App state changed. Is active?", isActive);
+  // });
 
-  App.addListener("appUrlOpen", (data) => {
-    console.log("App opened with URL:", data);
-  });
+  // App.addListener("appUrlOpen", (data) => {
+  //   console.log("App opened with URL:", data);
+  // });
 
-  App.addListener("appRestoredResult", (data) => {
-    console.log("Restored state:", data);
-  });
+  // App.addListener("appRestoredResult", (data) => {
+  //   console.log("Restored state:", data);
+  // });
 </script>
 
 {#if networkStatus == null || !networkStatus.connected}

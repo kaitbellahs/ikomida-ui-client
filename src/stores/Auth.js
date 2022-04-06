@@ -20,7 +20,7 @@ function createAuth() {
 			token = ret.value;
 		} catch (error) {
 			token = null;
-			console.error(error.message);
+			//TODO: -- report errors
 		}
 		if(token === "" || token === null) token = null;
 		setter(token);
@@ -36,8 +36,7 @@ function createAuth() {
 					value: payload
 				});
 			} catch (error) {
-				console.error("error:");
-				console.error(error.message);
+				//TODO: -- report errors
 			}
 		}
 	};
