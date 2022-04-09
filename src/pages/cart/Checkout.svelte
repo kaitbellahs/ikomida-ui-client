@@ -40,7 +40,7 @@
     name: null,
     validity: null,
     cpf: null,
-    ccv: null,
+    cvc: null,
     number: null,
   };
 
@@ -217,7 +217,7 @@
       number: newCardObject.number,
       expMonth: newCardObject.validity.substring(0, 2),
       expYear: `20${newCardObject.validity.substring(3, 5)}`,
-      cvv: newCardObject.cvv,
+      cvc: newCardObject.cvc,
     };
     const response = await NewCard(newCard);
     if (response?.success) {
@@ -358,7 +358,7 @@
       mask="___"
       maskKey="_"
       placeHolder="CVV"
-      bind:value={newCardObject.cvv}
+      bind:value={newCardObject.cvc}
     />
     <Views.TextEdit
       type="cpf"

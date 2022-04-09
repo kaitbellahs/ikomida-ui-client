@@ -50,7 +50,7 @@
     subscribeObject.phone = subscribeObject.phone;
     const response = await AuthNetwork.requestPhoneValidation(subscribeObject);
     if (response?.success) {
-      subscribeObject = { ...subscribeObject, ...response?.data };
+      subscribeObject = { ...subscribeObject, signature: response?.data };
       canDigitValidationCode = true;
     }else{
       toggleErrorAlert(response?.data);
