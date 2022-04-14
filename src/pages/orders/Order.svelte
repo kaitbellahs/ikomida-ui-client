@@ -6,7 +6,7 @@
 
   const order = $Router.options;
 
-  $: total = order.subtotal + order.delivery - (order.coupon ? order.coupon.value : 0);
+  $: total = order.subtotal + order.delivery - order.discount;
   
   Title.set("Detalhes do predido");
 </script>
@@ -22,10 +22,10 @@
     <span class=open>{Utils.Strings.dateToString(order.finishedAt)}</span>
   {/if}
 </span>
-{#each order.products as { title, price, quantity }, index}
+{#each order.products as { title, price, discount, discountType, quantity }, index}
   <div class="product">
     <span class="quantity">{quantity}</span><span class="title">{title}</span
-    ><span class="price">{Utils.Strings.currency(quantity * price)}</span>
+    ><span class="price">{Utils.Strings.currency(quantity * Utils.Numbers.calcDiscount(price, discount, discountType))}</span>
   </div>
 {/each}
 <div class="address">Entregue em: <b>{order.address.street}</b></div>
@@ -47,7 +47,7 @@
       <tr>
         <td class="resumeText">Desconto</td>
         <td class="resumeValue"
-          ><span class="deliveryFree">- {Utils.Strings.currency(order.coupon.value)}</span></td
+          ><span class="deliveryFree">- {Utils.Strings.currency(order.discount)}</span></td
         >
       </tr>
     {/if}

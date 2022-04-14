@@ -61,11 +61,19 @@
     findAddress();
   }
 
-  $: subtotalArray = $Store.map((item) => item.quantity * item.price);
+  $: subtotalArray = $Store.map((item) => item.quantity * Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType));
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: delivery = 0;
-  $: total = subtotal + delivery - (couponObject ? couponObject.value : 0);
+  $: netTotal = subtotal + delivery;
+  $: discount = couponObject
+    ? subtotal - Utils.Numbers.calcDiscount(
+        subtotal,
+        couponObject.value,
+        couponObject.valueType
+      )
+    : 0;
+  $: total = netTotal - discount;
   $: validate =
     addresses && addresses.length > 0 && payments && payments.length > 0;
 
@@ -239,7 +247,7 @@
   }
 
   async function addCoupon() {
-    if (coupon && coupon.length > 3) {
+    if (coupon && coupon.length >= 3) {
       isLoading = true;
       const response = await AddCoupon(coupon);
       if (response?.success) {
@@ -410,12 +418,12 @@
       <td class="resumeText">Subtotal</td>
       <td class="resumeValue">{Utils.Strings.currency(subtotal)}</td>
     </tr>
-    {#if couponObject}
+    {#if discount !== 0}
       <tr>
         <td class="resumeText">cupom</td>
         <td class="resumeValue"
           ><span class="deliveryFree"
-            >- {Utils.Strings.currency(couponObject.value)}</span
+            >- {Utils.Strings.currency(discount)}</span
           ></td
         >
       </tr>

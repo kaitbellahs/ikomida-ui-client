@@ -8,12 +8,12 @@
     faCartPlus,
   } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils, Network } from "@tian/components";
+  import { Views, Utils, Network, Types } from "@tian/components";
 
   const item = $Router.options;
   let quantity = 1;
 
-  $: total = Utils.Strings.currency(quantity * item.price);
+  $: total = Utils.Strings.currency(quantity * Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType));
 
   function minos() {
     if (quantity > 1) {
@@ -50,12 +50,14 @@
   >
 
   <div class="price">
-    <span class:current={item.oldPrice != undefined && item.oldPrice != 0}
-      >{Utils.Strings.currency(item.price)}</span
-    >
-    {#if item.oldPrice != undefined && item.oldPrice != 0}
-      <span class="oldPrice">{Utils.Strings.currency(item.oldPrice)}</span>
+    {#if [Types.DiscountTypes.PERCENT, Types.DiscountTypes.VALUE].includes(Types.DiscountTypes[item.discountType])}
+      <span class="oldPrice">{Utils.Strings.currency(item.price)}</span>
     {/if}
+    <span class="current"
+      >{Utils.Strings.currency(
+        Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+      )}</span
+    >
   </div>
   <div class="quantity">
     <Views.Button type="transparent" size="none" on:click={minos}>

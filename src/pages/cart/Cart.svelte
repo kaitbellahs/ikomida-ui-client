@@ -6,7 +6,7 @@
 
   let showAlert = false;
 
-  $: subtotalArray = $Store.map((item) => item.quantity * item.price);
+  $: subtotalArray = $Store.map((item) => item.quantity * Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType));
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: delivery = 0;
