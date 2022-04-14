@@ -39,7 +39,7 @@
 <div class="product">
   {#if item.image}
     <img
-      src={`${Network.instance.devApiServer}/image/${item.image}`}
+      src={item.image}
       alt={item.title}
     />
   {/if}
@@ -123,5 +123,6 @@
   img {
     width: 100%;
     max-width: 100%;
+    object-fit: cover;
   }
 </style>

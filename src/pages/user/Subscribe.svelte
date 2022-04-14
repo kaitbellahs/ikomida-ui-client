@@ -28,7 +28,7 @@
   let isValidEmail = false;
   let isValidPassword = false;
 
-  $: styleHeight = $StatusBar.height + 55 + "px";
+  $: styleHeight = `${(Number($StatusBar.height) + 50)}px`;
   $: canContinue =
     subscribeObject.name &&
     subscribeObject.lastName &&
@@ -53,7 +53,7 @@
   <Views.Loading />
 {/if}
 <main
-  style="padding: 20px; padding-top: {styleHeight}; overflow: hidden;max-width: 100%;"
+  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;"
 >
   <Views.TextEdit
     icon={faUser}

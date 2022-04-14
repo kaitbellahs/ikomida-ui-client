@@ -49,6 +49,7 @@ function createMenu() {
 }
 
 export const Menu = createMenu();
+export const MenuHamburger = createMenu();
 
 function createNavigation() {
     const {

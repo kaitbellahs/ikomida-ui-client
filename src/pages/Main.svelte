@@ -6,6 +6,7 @@
     Title,
     Menu,
     Routes,
+    MenuHamburger
   } from "../stores/Navigation";
   import { Views, Utils } from "@tian/components";
   import Home from "./products/Home.svelte";
@@ -22,6 +23,8 @@
     faList,
     faUser,
     faSearch,
+    faSlidersH,
+    faIdCard
   } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
 
@@ -41,14 +44,9 @@
       route: Routes.orders,
       icon: faList,
     },
-    {
-      name: "Perfil",
-      route: Routes.profile,
-      icon: faUser,
-    },
   ];
 
-  $: styleHeight = $StatusBar.height + 55 + "px";
+  $: styleHeight = `${(Number($StatusBar.height) + 50)}px`;
   $: route = $Router.route;
   $: subtotalArray = $Store.map((item) => item.quantity * Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType));
   $: subtotal =
@@ -63,6 +61,29 @@
     route !== Routes.orders &&
     route !== Routes.order &&
     route !== Routes.profile;
+  const menuHamburgerItems = [
+    {
+      name: "Home",
+      callback: () => Navigation.goTo(Routes.home),
+      icon: faHome,
+    },
+    {
+      name: "Perfil",
+      callback: () => Navigation.goTo(Routes.profile),
+      icon: faUser,
+    },
+    {
+      name: "Configurações",
+      callback: () => Navigation.goTo(Routes.settings),
+      icon: faSlidersH,
+    },
+    {
+      name: "Sobre",
+      callback: () => Navigation.goTo(Routes.about),
+      icon: faIdCard,
+    },
+  ];
+  menuHamburgerItems.forEach((page) => MenuHamburger.addItem(page));
 
   function goToCart() {
     Navigation.goTo(Routes.cart);
@@ -73,14 +94,8 @@
   });
 </script>
 
-<Views.NavigationBar
-  {Menu}
-  {Title}
-  paddingTop={$StatusBar.height}
-  {Navigation}
-/>
 <main
-  style="padding: 20px; padding-top: {styleHeight}; padding-bottom: {showCart
+  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; margin-bottom: {showCart
     ? '100px'
     : '50px'}; overflow: hidden;max-width: 100%;"
 >
@@ -112,6 +127,13 @@
     >
   {/if}
 </main>
+<Views.NavigationBar
+  {MenuHamburger}
+  {Menu}
+  {Title}
+  paddingTop={$StatusBar.height}
+  {Navigation}
+/>
 <Views.Tabs {tabs} {Navigation} bottomPadding={$StatusBar.bottomPadding} />
 
 <style global>
