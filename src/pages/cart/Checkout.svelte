@@ -5,6 +5,7 @@
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
   import { Store, Cart } from "../../stores/Cart";
+  import { Layout, Settings } from "../../stores/Setup";
   import {
     GetPaymentMethods,
     PaymentType,
@@ -61,13 +62,27 @@
     findAddress();
   }
 
-  $: subtotalArray = $Store.map((item) => item.quantity * Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType));
+  $: subtotalArray = $Store.map(
+    (item) =>
+      item.quantity *
+      Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+  );
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
-  $: delivery = 0;
+  $: calcDelivery = addresses
+    ? ((addresses?.filter((address) => address.selected)[0]?.distance || 0) /
+        1000) *
+      ($Settings?.delivery?.value || 0)
+    : 0;
+  $: delivery = $Settings?.delivery?.free
+    ? 0
+    : calcDelivery < $Settings?.delivery?.min
+    ? $Settings?.delivery?.min
+    : calcDelivery;
   $: netTotal = subtotal + delivery;
   $: discount = couponObject
-    ? subtotal - Utils.Numbers.calcDiscount(
+    ? subtotal -
+      Utils.Numbers.calcDiscount(
         subtotal,
         couponObject.value,
         couponObject.valueType
@@ -76,6 +91,7 @@
   $: total = netTotal - discount;
   $: validate =
     addresses && addresses.length > 0 && payments && payments.length > 0;
+  $: businessTime = Utils.Numbers.isBusinessTime($Settings.business);
 
   function findAddress() {
     isLoading = true;
@@ -275,6 +291,7 @@
 <!-- MARK: address -->
 {#if showNewAddress}
   <Views.Alert
+    {Layout}
     type="big"
     title="Novo endereço!"
     closeCallBack={toggleNewAddress}
@@ -315,6 +332,7 @@
 
 {#if showUpdateAddress}
   <Views.Alert
+    {Layout}
     title="Escolha um endereço!"
     closeCallBack={toggleUpdateAddress}
     buttons={[
@@ -342,6 +360,7 @@
 <!-- MARK: Card -->
 {#if showNewCard}
   <Views.Alert
+    {Layout}
     title="Novo cartão!"
     closeCallBack={toggleNewCard}
     buttons={[
@@ -378,6 +397,7 @@
 
 {#if showUpdateCard}
   <Views.Alert
+    {Layout}
     title="Escolha um cartão!"
     closeCallBack={toggleUpdateCard}
     buttons={[
@@ -422,8 +442,7 @@
       <tr>
         <td class="resumeText">cupom</td>
         <td class="resumeValue"
-          ><span class="deliveryFree"
-            >- {Utils.Strings.currency(discount)}</span
+          ><span class="deliveryFree">- {Utils.Strings.currency(discount)}</span
           ></td
         >
       </tr>
@@ -443,7 +462,7 @@
   </tbody>
 </table>
 {#if couponObject}
-  <Views.Button type="transparent" on:click={removeCoupon}
+  <Views.Button {Layout} type="transparent" on:click={removeCoupon}
     >Remover o cupom</Views.Button
   >
 {:else}
@@ -454,13 +473,14 @@
     callback={addCoupon}
   />
 {/if}
-<Views.Button type="transparent" on:click={addMoreItems}
+<Views.Button {Layout} type="transparent" on:click={addMoreItems}
   >Addionar mais itens</Views.Button
 >
 {#if !addresses}
   <Views.LocalLoading size="2" />
 {:else if addresses.length == 0}
-  <Views.Button on:click={toggleNewAddress}>novo endereço</Views.Button>
+  <Views.Button {Layout} on:click={toggleNewAddress}>novo endereço</Views.Button
+  >
 {:else}
   {#each addresses as { postalCode, street, complement, neighborhood, city, stat, selected }}
     {#if selected}
@@ -484,7 +504,7 @@
 {#if !payments}
   <Views.LocalLoading size="2" />
 {:else if payments.length == 0}
-  <Views.Button on:click={toggleNewCard}>novo cartão</Views.Button>
+  <Views.Button {Layout} on:click={toggleNewCard}>novo cartão</Views.Button>
 {:else}
   {#each payments as { id, type, brand, last4Digits, selected }}
     {#if selected}
@@ -510,13 +530,19 @@
     {/if}
   {/each}
 {/if}
-<Views.Button disabled={!validate} isFloat={true} on:click={forward}>
-  <span
-    >{#if $Auth && $Auth !== "" && $Auth !== "null"}Confirmar o pagamento{:else}Faça
-      login{/if}</span
-  ></Views.Button
->
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
+{#if businessTime}
+  <Views.Button {Layout} disabled={!validate} isFloat={true} on:click={forward}>
+    <span
+      >{#if $Auth && $Auth !== "" && $Auth !== "null"}Confirmar o pagamento{:else}Faça
+        login{/if}</span
+    ></Views.Button
+  >
+{:else}
+  <h2 class="businessHoursError">
+    Estámos fora do horario do funcionamento, confire os nossos horarios
+  </h2>
+{/if}
+<Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 
 <style>
   input[type="checkbox"] {
@@ -625,5 +651,10 @@
   }
   .deliveryFree {
     color: green;
+  }
+  .businessHoursError {
+    text-align: center;
+    color: red;
+    margin-top: 20px;
   }
 </style>

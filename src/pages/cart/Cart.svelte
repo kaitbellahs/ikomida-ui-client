@@ -3,10 +3,15 @@
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
   import { faTrash } from "@fortawesome/free-solid-svg-icons";
   import { Views, Utils } from "@tian/components";
+  import { Layout } from "../../stores/Setup";
 
   let showAlert = false;
 
-  $: subtotalArray = $Store.map((item) => item.quantity * Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType));
+  $: subtotalArray = $Store.map(
+    (item) =>
+      item.quantity *
+      Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+  );
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: delivery = 0;
@@ -35,6 +40,7 @@
 
 {#if showAlert}
   <Views.Alert
+    {Layout}
     title="Alerta"
     message="Você tem certeza que quer remover todos produtos do carrinho de compras?"
     closeCallBack={toggleAlert}
@@ -46,9 +52,9 @@
 {/if}
 
 {#each $Store as item}
-  <Views.CartItem {...item} />
+  <Views.CartItem {Layout} {...item} />
 {/each}
-<Views.Button type="transparent" on:click={addMoreItems}
+<Views.Button {Layout} type="transparent" on:click={addMoreItems}
   >Addionar mais itens</Views.Button
 >
 <table>
@@ -59,24 +65,12 @@
   </thead>
   <tbody>
     <tr>
-      <td class="resumeText">Subtotal</td>
-      <td class="resumeValue">{Utils.Strings.currency(subtotal)}</td>
-    </tr>
-    <tr>
-      <td class="resumeText">Taxa de entrega</td>
-      <td class="resumeValue"
-        ><span class:deliveryFree={delivery == 0}
-          >{Utils.Strings.currency(delivery)}</span
-        ></td
-      >
-    </tr>
-    <tr>
       <td class="resumeText">Total</td>
       <td class="resumeValue">{Utils.Strings.currency(total)}</td>
     </tr>
   </tbody>
 </table>
-<Views.Button isFloat={true} on:click={forward}
+<Views.Button {Layout} isFloat={true} on:click={forward}
   ><span>Continuar</span></Views.Button
 >
 

@@ -49,7 +49,6 @@
       {/if}
       <div class="address">Entregue em: <b>{address.street}</b></div>
       <div class="paymentMethod">
-        {console.log(payment)}
         Forma de pagamento: <b>{PaymentType(payment.type)}</b>
       </div>
       <div class="time">{Utils.Strings.timestampToString(createdAt)}</div>

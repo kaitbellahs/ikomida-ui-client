@@ -19,3 +19,7 @@ export async function GetAddressByCep(cep) {
 export async function NewAddress(address) {
     return Network.instance.post(`/address`, get(Auth), address);
 }
+
+export async function GetSettings() {
+    return Network.instance.get(`/settings`, get(Auth));
+}

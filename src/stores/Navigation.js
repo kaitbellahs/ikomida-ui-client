@@ -17,7 +17,10 @@ export const Routes = {
     checkout: Symbol("/checkout"),
     confirmSubscribe: Symbol("/confirmSubscribe"),
     subscribe: Symbol("/subscribe"),
-    tac: Symbol("/tac")
+    tac: Symbol("/tac"),
+    addresses: Symbol("/addresses"),
+    payments: Symbol("/payments"),
+    businessHours: Symbol("/businessHours")
 };
 
 function createTitle() {

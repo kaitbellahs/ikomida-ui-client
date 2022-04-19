@@ -3,7 +3,7 @@
   import { Title } from "../../stores/Navigation";
   import { Views, Utils } from "@tian/components";
   import { onMount } from "svelte";
-  import { StatusBar } from "../../stores/Setup";
+  import { StatusBar, Layout } from "../../stores/Setup";
 
   let userInfo;
 
@@ -31,16 +31,29 @@
       <h2>{userInfo.name} {userInfo.lastName}</h2>
     </div>
     <div class="data">
-      <Views.TextValue text="CPF:" value={userInfo.cpf} fontSize="1.5em" />
       <Views.TextValue
+        {Layout}
+        text="CPF:"
+        value={userInfo.cpf}
+        fontSize="1.5em"
+      />
+      <Views.TextValue
+        {Layout}
         text="Telefone:"
         value={userInfo.phone}
         fontSize="1.5em"
       />
-      <Views.TextValue text="mail:" value={userInfo.email} fontSize="1.5em" />
+      <Views.TextValue
+        {Layout}
+        text="mail:"
+        value={userInfo.email}
+        fontSize="1.5em"
+      />
     </div>
     <!-- <Views.Button type="transparent" on:click={logout}>Atualizar</Views.Button> -->
-    <Views.Button type="transparent" on:click={logout}>Logout</Views.Button>
+    <Views.Button {Layout} type="transparent" on:click={logout}
+      >Logout</Views.Button
+    >
   </div>
 {:else}
   <Views.Loading

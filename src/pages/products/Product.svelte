@@ -9,11 +9,15 @@
   } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
   import { Views, Utils, Network, Types } from "@tian/components";
+  import { Layout } from "../../stores/Setup";
 
   const item = $Router.options;
   let quantity = 1;
 
-  $: total = Utils.Strings.currency(quantity * Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType));
+  $: total = Utils.Strings.currency(
+    quantity *
+      Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+  );
 
   function minos() {
     if (quantity > 1) {
@@ -38,10 +42,7 @@
 
 <div class="product">
   {#if item.image}
-    <img
-      src={item.image}
-      alt={item.title}
-    />
+    <img src={item.image} alt={item.title} />
   {/if}
   <h2>{item.title}</h2>
   <p>{item.description}</p>
@@ -60,15 +61,17 @@
     >
   </div>
   <div class="quantity">
-    <Views.Button type="transparent" size="none" on:click={minos}>
+    <Views.Button {Layout} type="transparent" size="none" on:click={minos}>
       <Fa icon={faMinusSquare} /></Views.Button
     ><span>{quantity}</span><Views.Button
+      {Layout}
       type="transparent"
       size="none"
       on:click={plus}><Fa icon={faPlusSquare} /></Views.Button
     >
   </div>
   <Views.Button
+    {Layout}
     isFloat="true"
     on:click={addProduct}
     bottomPadding={$StatusBar.bottomPadding}

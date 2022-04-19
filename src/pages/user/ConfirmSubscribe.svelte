@@ -10,6 +10,7 @@
   import { StatusBar } from "../../stores/Setup";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
   import * as AuthNetwork from "../../network/Auth";
+  import { Layout } from "../../stores/Setup";
 
   let isLoading = false;
   let subscribeObject = {
@@ -28,7 +29,7 @@
     showAlert = true;
   }
 
-  $: styleHeight = `${(Number($StatusBar.height) + 50)}px`;
+  $: styleHeight = `${Number($StatusBar.height) + 50}px`;
 
   function validateValidationCode(validationValid) {
     return validationValid.length == 4;
@@ -39,7 +40,7 @@
     const response = await AuthNetwork.subscribe(subscribeObject);
     if (response?.success) {
       Navigation.reset(Routes.login);
-    }else{
+    } else {
       toggleErrorAlert(response?.data);
     }
     isLoading = false;
@@ -52,7 +53,7 @@
     if (response?.success) {
       subscribeObject = { ...subscribeObject, signature: response?.data };
       canDigitValidationCode = true;
-    }else{
+    } else {
       toggleErrorAlert(response?.data);
     }
     isLoading = false;
@@ -65,7 +66,7 @@
     );
     if (response?.success) {
       canSubscribe = true;
-    }else{
+    } else {
       toggleErrorAlert(response?.data);
     }
     isLoading = false;
@@ -75,6 +76,7 @@
 </script>
 
 <Views.NavigationBar
+  {Layout}
   {Menu}
   {Title}
   paddingTop={$StatusBar.height}
@@ -84,7 +86,7 @@
   <Views.Loading />
 {/if}
 <main
-  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;"
+  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%; background: {$Layout.background};height: 100%;"
 >
   <p>Por favor confirme seu numero de telefone</p>
   <Views.TextEdit
@@ -109,10 +111,10 @@
     validation={validateValidationCode}
   />
   <Views.Divider />
-  <Views.Button on:click={doSubscribe} disabled={!canSubscribe}
+  <Views.Button {Layout} on:click={doSubscribe} disabled={!canSubscribe}
     >Confirmar</Views.Button
   >
-  <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
+  <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 </main>
 
 <style>

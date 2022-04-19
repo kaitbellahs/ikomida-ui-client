@@ -1,5 +1,5 @@
 <script>
-  import {CAPNativeLog} from 'capacitor-native-log';
+  import { CAPNativeLog } from "capacitor-native-log";
   import { App } from "@capacitor/app";
   import { Auth, PushNotificationToken } from "./stores/Auth";
   import Login from "./pages/user/Login.svelte";
@@ -9,11 +9,12 @@
   import Tac from "./pages/user/Tac.svelte";
   import { Network } from "@capacitor/network";
   import { onMount } from "svelte";
-  import { StatusBar as _StatusBar } from "./stores/Setup";
+  import { StatusBar as _StatusBar, Layout } from "./stores/Setup";
   import { Router, Routes } from "./stores/Navigation";
   import { StatusBar } from "@capacitor/status-bar";
   import { Utils, PushNotification } from "@tian/components";
-  import {registerPushNotificationToken} from "./network/PushNotification";
+  import { registerPushNotificationToken } from "./network/PushNotification";
+  import { getLayout } from "./network/Layout";
 
   let networkStatus = null;
 
@@ -36,27 +37,35 @@
     alert("App opened with URL: " + url);
   };
 
-  async function hasRegisteredCallBack(token, platform){
-    CAPNativeLog.log({ level: 'info', message: JSON.stringify(token) });
-  const tokenObject = {platform, token}
-  PushNotificationToken.setToken(tokenObject);
-  await registerPushNotificationToken(tokenObject);
+  async function hasRegisteredCallBack(token, platform) {
+    CAPNativeLog.log({ level: "info", message: JSON.stringify(token) });
+    const tokenObject = { platform, token };
+    PushNotificationToken.setToken(tokenObject);
+    await registerPushNotificationToken(tokenObject);
   }
 
-  function pushNotificationReceivedCallBack(notification){
-    CAPNativeLog.log({ level: 'info', message: JSON.stringify(notification) });
+  function pushNotificationReceivedCallBack(notification) {
+    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
   }
 
-  function pushNotificationActionPerformedCallBack(notification){
-    CAPNativeLog.log({ level: 'info', message: JSON.stringify(notification) });
+  function pushNotificationActionPerformedCallBack(notification) {
+    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
   }
-  
-  let pushNotification = new PushNotification(hasRegisteredCallBack, pushNotificationReceivedCallBack, pushNotificationActionPerformedCallBack);
-  pushNotification.init();
+
+  let pushNotification = new PushNotification(
+    hasRegisteredCallBack,
+    pushNotificationReceivedCallBack,
+    pushNotificationActionPerformedCallBack
+  );
 
   onMount(async () => {
+    const response = await getLayout();
+    if (response?.success && response?.data) {
+      Layout.set(response?.data);
+    }
     networkStatus = await Network.getStatus();
     if (Capacitor.isNativePlatform()) {
+      pushNotification.init();
       _StatusBar.setStatusBar(await StatusBar.getInfo());
     }
   });

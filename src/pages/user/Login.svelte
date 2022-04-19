@@ -6,6 +6,7 @@
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
   import { Utils } from "@tian/components";
   import { registerPushNotificationToken } from "../../network/PushNotification";
+  import { Layout } from "../../stores/Setup";
 
   let isLoading = false;
   let phone = "11953635016";
@@ -50,7 +51,7 @@
 {#if isLoading}
   <Views.Loading />
 {/if}
-<main>
+<main style="background: {$Layout.background};height: 100%;">
   <h1>Login!</h1>
   <p>
     Se você ainda não abriu sua conta <Views.Button
@@ -75,11 +76,13 @@
     type="password"
   />
   <div />
-  <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
-  <Views.Button type="transparent" on:click={doSubscribe}
+  <Views.Button {Layout} on:click={doLogin} disabled={!canLogin}
+    >Entrar</Views.Button
+  >
+  <Views.Button {Layout} type="transparent" on:click={doSubscribe}
     >Criar conta</Views.Button
   >
-  <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
+  <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 </main>
 
 <style>

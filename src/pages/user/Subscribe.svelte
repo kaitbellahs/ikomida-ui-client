@@ -1,7 +1,7 @@
 <script>
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
   import { Views } from "@tian/components";
-  import { StatusBar } from "../../stores/Setup";
+  import { StatusBar, Layout } from "../../stores/Setup";
   import {
     faUser,
     faIdCard,
@@ -28,7 +28,7 @@
   let isValidEmail = false;
   let isValidPassword = false;
 
-  $: styleHeight = `${(Number($StatusBar.height) + 50)}px`;
+  $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   $: canContinue =
     subscribeObject.name &&
     subscribeObject.lastName &&
@@ -44,6 +44,7 @@
 </script>
 
 <Views.NavigationBar
+  {Layout}
   {Menu}
   {Title}
   paddingTop={$StatusBar.height}
@@ -53,7 +54,7 @@
   <Views.Loading />
 {/if}
 <main
-  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;"
+  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;background: {$Layout.background};height: 100%;"
 >
   <Views.TextEdit
     icon={faUser}
@@ -90,7 +91,7 @@
     bind:isValid={isValidPassword}
   />
   <Views.Divider />
-  <Views.Button disabled={!canContinue} on:click={doSubscribe}
+  <Views.Button {Layout} disabled={!canContinue} on:click={doSubscribe}
     >Cadastrar</Views.Button
   >
 </main>
