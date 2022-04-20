@@ -21,3 +21,7 @@ export async function ValidatePhoneValidationCode(object) {
 export async function subscribe(object) {
     return Network.instance.post("/subscribe", null, object);
 }
+
+export async function updatePassword(object) {
+    return Network.instance.post("/password", get(Auth), object);
+}

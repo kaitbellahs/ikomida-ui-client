@@ -20,6 +20,14 @@ export async function NewAddress(address) {
     return Network.instance.post(`/address`, get(Auth), address);
 }
 
+export async function UpdateAddress(id) {
+    return Network.instance.put(`/address/${id}`, get(Auth));
+}
+
+export async function DeleteAddress(id) {
+    return Network.instance.remove(`/address/${id}`, get(Auth));
+}
+
 export async function GetSettings() {
     return Network.instance.get(`/settings`, get(Auth));
 }

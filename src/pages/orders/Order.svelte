@@ -6,19 +6,18 @@
 
   const order = $Router.options;
 
-  $: total = order.subtotal + order.delivery - order.discount;
+  $: total = Number(order.subtotal) + Number(order.delivery) - Number(order.discount);
   
   Title.set("Detalhes do predido");
 </script>
 
 <span class="time">Feito {Utils.Strings.dateToString(order.createdAt)}</span>
-<h3>Pedido #{order.id}</h3>
 <span class="status">
   {#if ["open", "accepted", "waitingDelivery", "delivery"].includes(order.status)}
     Seu pedido está
     <span class=open>{OrderStage(order.status)}</span>
   {:else}
-    {OrderStatus(order.status)} em
+    Pedido {OrderStatus(order.status)} em
     <span class=open>{Utils.Strings.dateToString(order.finishedAt)}</span>
   {/if}
 </span>

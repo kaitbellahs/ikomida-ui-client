@@ -34,6 +34,42 @@
     Navigation.goTo(Routes.checkout);
   }
 
+  async function onRemoveClick(uuid) {
+    await Cart.update($Store.filter((item) => item?.uuid !== uuid));
+  }
+
+  async function onPlusClick(uuid) {
+    let update = false;
+    const items = $Store;
+    for (const item of items) {
+      if (item?.uuid === uuid && item?.quantity < item?.leftQuantity) {
+        item.quantity++;
+        update = true;
+      }
+    }
+    if (update) {
+      await Cart.update(items);
+    }
+  }
+
+  async function onMinosClick(uuid) {
+    let update = false;
+    const items = $Store;
+    for (const item of items) {
+      if (item?.uuid === uuid) {
+        if (item?.quantity > 1) {
+          item.quantity--;
+          update = true;
+        } else {
+          await onRemoveClick(uuid);
+        }
+      }
+    }
+    if (update) {
+      await Cart.update(items);
+    }
+  }
+
   Title.set("Sacola de compras");
   Menu.addItem({ name: "Limpar", icon: faTrash, callback: toggleAlert });
 </script>
@@ -52,7 +88,13 @@
 {/if}
 
 {#each $Store as item}
-  <Views.CartItem {Layout} {...item} />
+  <Views.CartItem
+    {Layout}
+    {onRemoveClick}
+    {onPlusClick}
+    {onMinosClick}
+    {...item}
+  />
 {/each}
 <Views.Button {Layout} type="transparent" on:click={addMoreItems}
   >Addionar mais itens</Views.Button

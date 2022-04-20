@@ -66,9 +66,20 @@
     networkStatus = await Network.getStatus();
     if (Capacitor.isNativePlatform()) {
       pushNotification.init();
-      _StatusBar.setStatusBar(await StatusBar.getInfo());
+      const statusBar = await StatusBar.getInfo();
+      statusBar.topMargin = statusBar?.topMargin || 0;
+      _StatusBar.setStatusBar();
     }
   });
+  $: if (networkStatus == null || !networkStatus.connected) {
+    const statusBar = $_StatusBar;
+    statusBar.topMargin = 20;
+    _StatusBar.setStatusBar(statusBar);
+  } else {
+    const statusBar = $_StatusBar;
+    statusBar.topMargin = 0;
+    _StatusBar.setStatusBar(statusBar);
+  }
 
   Network.addListener("networkStatusChange", (status) => {
     networkStatus = status;
@@ -86,9 +97,6 @@
   // });
 </script>
 
-{#if networkStatus == null || !networkStatus.connected}
-  <div id="internetError">Esperando por conexão a internet...</div>
-{/if}
 {#if logedIn}
   <Main />
 {:else if route == Routes.login}
@@ -102,10 +110,19 @@
 {:else}
   <Login />
 {/if}
+{#if networkStatus == null || !networkStatus.connected}
+  <div id="internetError">Esperando por conexão a internet...</div>
+{/if}
 
 <style>
   #internetError {
     background-color: red;
     color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 </style>

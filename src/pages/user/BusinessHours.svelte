@@ -4,13 +4,13 @@
   import { Layout, Settings } from "../../stores/Setup";
 
   const days = [
+    { name: "Domingo", checked: false },
     { name: "Segunda-feira", checked: false },
     { name: "Terça-feira", checked: false },
     { name: "Quarta-feira", checked: false },
     { name: "Quinta-feira", checked: false },
     { name: "Sexta-feira", checked: false },
     { name: "Sabado", checked: false },
-    { name: "Domingo", checked: false },
   ];
 
   Title.set("Horario de funcionamento");
@@ -20,25 +20,43 @@
   <Views.LocalLoading size="2" />
 {:else}
   <div class="days">
-      <h3>Abrimos nestes dias:</h3><br />
+    <h3>Abrimos nestes dias:</h3>
+    <br />
     {#each $Settings?.business?.days as day}
-      <span>{days?.[day]?.name || '-'}, </span>
+      <span>{days?.[day]?.name || "-"}, </span>
     {/each}
   </div>
   <Views.Divider />
   <div class="busninessHours">
-    <h3>E nestes horarios:</h3><br />
+    <h3>E nestes horarios:</h3>
+    <br />
     {#each $Settings?.business?.hours as businessHour}
-      <Views.TextValue
-        text={`Abertura: ${businessHour.start}`}
-        value={`Fechamento: ${businessHour.start}`}
-      />
+      <div class="TextValue">
+        <div class="text">{`de ${businessHour?.start}`}</div>
+        <div class="value">{`até ${businessHour?.end}`}</div>
+      </div>
     {/each}
   </div>
 {/if}
 
 <style>
-  .days, .busninessHours {
+  .TextValue {
+    width: 100%;
+    display: flex;
+    font-size: 1em;
+  }
+  .TextValue > .text {
+    width: 50%;
+    font-family: Roboto;
+    text-align: right;
+  }
+  .TextValue > .value {
+    margin-left: 10px;
+    font-family: Roboto;
+    width: 50%;
+  }
+  .days,
+  .busninessHours {
     width: 100%;
     border-bottom: 1px solid #ccc;
     padding: 20px;

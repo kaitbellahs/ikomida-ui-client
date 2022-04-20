@@ -1,7 +1,8 @@
 <script>
-  import { Cart } from "../../stores/Cart";
+  import { Cart, Store } from "../../stores/Cart";
   import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
   import Fa from "svelte-fa";
+  import { v4 as uuidV4 } from "uuid";
   import {
     faPlusSquare,
     faMinusSquare,
@@ -32,8 +33,22 @@
   }
 
   const addProduct = async () => {
-    item.quantity = quantity;
-    await Cart.addItem(item);
+    let update = false;
+    const cardItems = $Store;
+    for (const cardItem of cardItems) {
+      if (item?.id === cardItem.id && (cardItem?.quantity + quantity) <= item?.quantity) {
+        cardItem.quantity += quantity;
+        update = true;
+      }
+    }
+    if (update) {
+      await Cart.update(cardItems);
+    } else {
+      item.leftQuantity = item.quantity;
+      item.quantity = quantity;
+      item.uuid = uuidV4();
+      await Cart.addItem(item);
+    }
     Navigation.goTo(Routes.cart);
   };
 
@@ -108,7 +123,7 @@
   .oldPrice {
     text-decoration: line-through;
     color: #717171;
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
   .current {
     color: green;
@@ -116,12 +131,12 @@
     margin-top: 10px;
   }
   p {
-    font-size: 0.8rem;
+    font-size: 1.1rem;
     font-weight: lighter;
     margin: 10px 0;
   }
   .serves {
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
   img {
     width: 100%;

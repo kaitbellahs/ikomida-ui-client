@@ -20,6 +20,14 @@ export async function NewCard(method) {
     return Network.instance.post(`/payment`, get(Auth), method);
 }
 
+export async function UpdateCard(id) {
+    return Network.instance.put(`/payment/${id}`, get(Auth));
+}
+
+export async function DeleteCard(id) {
+    return Network.instance.remove(`/payment/${id}`, get(Auth));
+}
+
 export async function AddCoupon(coupon) {
     return Network.instance.post(`/coupon`, get(Auth), {coupon});
 }

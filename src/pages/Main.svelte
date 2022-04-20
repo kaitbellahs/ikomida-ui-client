@@ -118,9 +118,9 @@
 </script>
 
 <main
-  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; margin-bottom: {showCart
-    ? '100px'
-    : '50px'}; overflow: hidden;max-width: 100%;background: {$Layout.background};height: 100%;"
+  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; padding-bottom: {showCart
+    ? '115px'
+    : '50px'}; overflow: scroll;max-width: 100%;background: {$Layout.background};height: 100%;"
 >
   {#if route == Routes.home}
     <Home />
@@ -163,6 +163,7 @@
   {Menu}
   {Title}
   paddingTop={$StatusBar.height}
+  topMargin={$StatusBar.topMargin}
   {Navigation}
 />
 <Views.Tabs
@@ -173,7 +174,9 @@
 />
 
 <style global>
-  * {
+  *,
+  *:before,
+  *:after {
     margin: 0;
     padding: 0;
     font-weight: normal;

@@ -2,35 +2,47 @@
     font-family: Roboto;
     src: url('./fonts/Roboto/Roboto-Regular.ttf');
 }
+
 @font-face {
     font-family: RobotoBold;
     src: url('./fonts/Roboto/Roboto-Bold.ttf');
 }
+
 @font-face {
     font-family: RobotoMedium;
     src: url('./fonts/Roboto/Roboto-Medium.ttf');
 }
+
 @font-face {
     font-family: RobotoLight;
     src: url('./fonts/Roboto/Roboto-Light.ttf');
 }
+
 @font-face {
     font-family: RobotoBlack;
     src: url('./fonts/Roboto/Roboto-Black.ttf');
 }
+
 @font-face {
     font-family: RobotoThin;
     src: url('./fonts/Roboto/Roboto-Thin.ttf');
 }
 
-* {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-   -khtml-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-          box-sizing: border-box;
+:root {
+    --form-control-color: rebeccapurple;
+    --form-control-disabled: #959495;
+}
+
+*,
+*:before,
+*:after {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    box-sizing: border-box;
 }
 
 .shadow {
@@ -114,9 +126,16 @@ button:not(:disabled):active {
 button:focus {
     border-color: #666;
 }
-h1, h2, h3, h4, h5, b {
+
+h1,
+h2,
+h3,
+h4,
+h5,
+b {
     font-family: RobotoMedium;
 }
+
 img {
-	object-fit: cover;
+    object-fit: cover;
 }

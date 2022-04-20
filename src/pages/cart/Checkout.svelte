@@ -9,41 +9,19 @@
   import {
     GetPaymentMethods,
     PaymentType,
-    NewCard,
     AddCoupon,
   } from "../../network/Payment";
   import { NewOrders } from "../../network/Orders";
-  import Fa from "svelte-fa";
-  import { faEdit, faSearch } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import {
-    GetAddresses,
-    GetAddressByCep,
-    NewAddress,
-  } from "../../network/User";
+  import { GetAddresses } from "../../network/User";
   import { Title, Navigation, Routes } from "../../stores/Navigation";
 
   let location;
   let coupon;
   let couponObject = null;
   let isLoading = false;
-  let addresses = null;
-  let payments = null;
-  let showUpdateAddress = false;
-  let showNewAddress = false;
-  let newAddressObject = {
-    postalCode: null,
-  };
-  let currentPostalCode = null;
-  let showNewCard = false;
-  let showUpdateCard = false;
-  let newCardObject = {
-    name: null,
-    validity: null,
-    cpf: null,
-    cvc: null,
-    number: null,
-  };
+  let address;
+  let payment;
 
   let errorAlert;
   let showAlert = false;
@@ -53,15 +31,6 @@
     showAlert = true;
   }
 
-  $: if (
-    newAddressObject &&
-    newAddressObject.postalCode &&
-    newAddressObject.postalCode.length === 8 &&
-    newAddressObject.postalCode != currentPostalCode
-  ) {
-    findAddress();
-  }
-
   $: subtotalArray = $Store.map(
     (item) =>
       item.quantity *
@@ -69,10 +38,8 @@
   );
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
-  $: calcDelivery = addresses
-    ? ((addresses?.filter((address) => address.selected)[0]?.distance || 0) /
-        1000) *
-      ($Settings?.delivery?.value || 0)
+  $: calcDelivery = address
+    ? ((address?.distance || 0) / 1000) * ($Settings?.delivery?.value || 0)
     : 0;
   $: delivery = $Settings?.delivery?.free
     ? 0
@@ -89,34 +56,8 @@
       )
     : 0;
   $: total = netTotal - discount;
-  $: validate =
-    addresses && addresses.length > 0 && payments && payments.length > 0;
+  $: validate = address && payment;
   $: businessTime = Utils.Numbers.isBusinessTime($Settings.business);
-
-  function findAddress() {
-    isLoading = true;
-    currentPostalCode = newAddressObject.postalCode;
-    GetAddressByCep(newAddressObject.postalCode)
-      .then((response) => {
-        if (response?.success) {
-          const address = response?.data;
-          currentPostalCode = address.postalCode;
-          newAddressObject.id = address.id;
-          newAddressObject.street = address.street;
-          newAddressObject.number = address.number;
-          newAddressObject.complement = address.complement;
-          newAddressObject.neighborhood = address.neighborhood;
-          newAddressObject.city = address.city;
-          newAddressObject.stat = address.stat;
-        } else {
-          toggleErrorAlert(response?.data);
-        }
-        isLoading = false;
-      })
-      .catch((exception) => {
-        toggleErrorAlert(exception);
-      });
-  }
 
   function addMoreItems() {
     Navigation.pop(3);
@@ -139,14 +80,62 @@
     }
   }
 
+  async function forward() {
+    if ($Auth !== null && $Auth !== undefined && $Auth !== "null") {
+      isLoading = true;
+      const payload = {
+        items: $Store,
+        address,
+        payment,
+        delivery,
+        coupon: couponObject,
+        location,
+      };
+      const response = await NewOrders(payload);
+      isLoading = false;
+      if (response && response?.success) {
+        Cart.reset();
+        Navigation.goTo(Routes.order, response?.data);
+      }
+    } else {
+      Navigation.reset(Routes.login);
+    }
+  }
+
+  async function addCoupon() {
+    if (coupon && coupon.length >= 3) {
+      isLoading = true;
+      const response = await AddCoupon(coupon);
+      if (response?.success) {
+        couponObject = response?.data;
+      }
+      isLoading = false;
+    }
+  }
+
+  function removeCoupon() {
+    couponObject = null;
+    coupon = null;
+  }
+
+  function manageCard() {
+    Navigation.goTo(Routes.payments);
+  }
+
+  function manageAddress() {
+    Navigation.goTo(Routes.addresses);
+  }
+
   onMount(async () => {
     let response = await GetAddresses();
     if (response?.success) {
-      addresses = response?.data;
+      const addresses = response?.data?.filter((item) => item.selected);
+      address = addresses?.length === 1 ? addresses[0] : null;
     }
     response = await GetPaymentMethods();
     if (response?.success) {
-      payments = response?.data;
+      const payments = response?.data?.filter((item) => item.selected);
+      payment = payments?.length === 1 ? payments[0] : null;
     }
     if (Capacitor.isNativePlatform()) {
       const checkpermissions = await Geolocation.checkPermissions();
@@ -172,260 +161,8 @@
     }
   });
 
-  async function forward() {
-    if ($Auth !== null && $Auth !== undefined && $Auth !== "null") {
-      isLoading = true;
-      const payload = {
-        items: $Store,
-        address: addresses.filter((address) => address.selected)[0],
-        payment: payments.filter((payment) => payment.selected)[0],
-        coupon: couponObject,
-        location,
-      };
-      const response = await NewOrders(payload);
-      isLoading = false;
-      if (response && response?.success) {
-        Cart.reset();
-        Navigation.goTo(Routes.order, response?.data);
-      }
-    } else {
-      Navigation.reset(Routes.login);
-    }
-  }
-
-  // MARK: address
-  function toggleUpdateAddress() {
-    showUpdateAddress = !showUpdateAddress;
-  }
-
-  function toggleNewAddress() {
-    showUpdateAddress = false;
-    showNewAddress = !showNewAddress;
-  }
-
-  async function newAddress() {
-    isLoading = true;
-    const response = await NewAddress(newAddressObject);
-    if (response?.success) {
-      addresses = response?.data;
-    }
-    showNewAddress = !showNewAddress;
-    isLoading = false;
-  }
-
-  function updateAddress(id) {
-    addresses.forEach((item) => {
-      item.selected = false;
-      if (item.id === id) {
-        item.selected = true;
-      }
-    });
-    addresses = [...addresses];
-    toggleUpdateAddress();
-  }
-
-  // MARK: cart
-  function toggleUpdateCard() {
-    showUpdateCard = !showUpdateCard;
-  }
-
-  function toggleNewCard() {
-    showUpdateCard = false;
-    showNewCard = !showNewCard;
-  }
-
-  async function newCard() {
-    isLoading = true;
-    const newCard = {
-      holder: newCardObject.name,
-      number: newCardObject.number,
-      expMonth: newCardObject.validity.substring(0, 2),
-      expYear: `20${newCardObject.validity.substring(3, 5)}`,
-      cvc: newCardObject.cvc,
-    };
-    const response = await NewCard(newCard);
-    if (response?.success) {
-      payments = response?.data;
-      showNewCard = !showNewCard;
-    }
-    isLoading = false;
-  }
-
-  function updateCard(id) {
-    payments.forEach((item) => {
-      item.selected = false;
-      if (item.id === id) {
-        item.selected = true;
-      }
-    });
-    payments = [...payments];
-    toggleUpdateCard();
-  }
-
-  async function addCoupon() {
-    if (coupon && coupon.length >= 3) {
-      isLoading = true;
-      const response = await AddCoupon(coupon);
-      if (response?.success) {
-        couponObject = response?.data;
-      }
-      isLoading = false;
-    }
-  }
-
-  function removeCoupon() {
-    couponObject = null;
-    coupon = null;
-  }
-
   Title.set("Resumo e pagamento");
 </script>
-
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
-
-<!-- MARK: address -->
-{#if showNewAddress}
-  <Views.Alert
-    {Layout}
-    type="big"
-    title="Novo endereço!"
-    closeCallBack={toggleNewAddress}
-    buttons={[
-      { name: "Cancelar", callback: toggleNewAddress, principal: true },
-      { name: "Adicionar", callback: newAddress },
-    ]}
-  >
-    <Views.TextEdit
-      mask="_____-___"
-      maskKey="_"
-      type="number"
-      callback={findAddress}
-      buttonIcon={faSearch}
-      bind:rawValue={newAddressObject.postalCode}
-      placeHolder="CEP"
-    />
-    <Views.TextEdit
-      placeHolder="Endereço"
-      type="spacedAlphanumeric"
-      bind:value={newAddressObject.street}
-    />
-    <Views.TextEdit placeHolder="Numero" bind:value={newAddressObject.number} />
-    <Views.TextEdit
-      placeHolder="Complemento"
-      type="spacedAlphanumeric"
-      bind:value={newAddressObject.complement}
-    />
-    <Views.TextEdit
-      placeHolder="Bairro"
-      type="spacedAlphanumeric"
-      bind:value={newAddressObject.neighborhood}
-    />
-    <Views.TextEdit placeHolder="Cidade" bind:value={newAddressObject.city} />
-    <Views.TextEdit placeHolder="UF" bind:value={newAddressObject.stat} />
-  </Views.Alert>
-{/if}
-
-{#if showUpdateAddress}
-  <Views.Alert
-    {Layout}
-    title="Escolha um endereço!"
-    closeCallBack={toggleUpdateAddress}
-    buttons={[
-      { name: "OK", callback: toggleUpdateAddress, principal: true },
-      { name: "Novo", callback: toggleNewAddress },
-    ]}
-  >
-    {#each addresses as { id, postalCode, street, number, complement, neighborhood, city, stat, selected }}
-      <div class="address">
-        <div class="content">
-          <span class="delivery">Entregar em</span>
-          <span>{street}, {number}</span>
-          <span class="neighborhood">{neighborhood} | {complement}</span>
-          <span class="city">{city}/{stat} CEP: {postalCode}</span>
-        </div>
-        <div class="edit" on:click={updateAddress(id)}>
-          <input type="checkbox" bind:checked={selected} />
-        </div>
-      </div>
-    {/each}
-  </Views.Alert>
-{/if}
-<!-- MARK: end address-->
-
-<!-- MARK: Card -->
-{#if showNewCard}
-  <Views.Alert
-    {Layout}
-    title="Novo cartão!"
-    closeCallBack={toggleNewCard}
-    buttons={[
-      { name: "Cancelar", callback: toggleNewCard, principal: true },
-      { name: "Adicionar", callback: newCard },
-    ]}
-  >
-    <Views.TextEdit
-      mask="____ ____ ____ ____"
-      maskKey="_"
-      bind:rawValue={newCardObject.number}
-      placeHolder="Numero do cartão"
-    />
-    <Views.TextEdit placeHolder="Nome" bind:value={newCardObject.name} />
-    <Views.TextEdit
-      mask="__/__"
-      maskKey="_"
-      placeHolder="Validade"
-      bind:value={newCardObject.validity}
-    />
-    <Views.TextEdit
-      mask="___"
-      maskKey="_"
-      placeHolder="CVV"
-      bind:value={newCardObject.cvc}
-    />
-    <Views.TextEdit
-      type="cpf"
-      placeHolder="CPF"
-      bind:value={newCardObject.cpf}
-    />
-  </Views.Alert>
-{/if}
-
-{#if showUpdateCard}
-  <Views.Alert
-    {Layout}
-    title="Escolha um cartão!"
-    closeCallBack={toggleUpdateCard}
-    buttons={[
-      { name: "OK", callback: toggleUpdateCard, principal: true },
-      { name: "Novo", callback: toggleNewCard },
-    ]}
-  >
-    {#each payments as { id, type, brand, last4Digits, selected }}
-      <div class="paymentCard">
-        <div class="content">
-          <span class="payWith">Pagar com</span>
-          <span>{PaymentType(type)}</span>
-          <span class="brand">
-            {#if type !== "Cash"}
-              {brand} **** **** **** {last4Digits}
-            {:else}
-              Pagar na entrega
-            {/if}
-          </span>
-        </div>
-        <div class="edit" on:click={updateCard(id)}>
-          <input type="checkbox" bind:checked={selected} />
-        </div>
-      </div>
-    {/each}
-  </Views.Alert>
-{/if}
-<!-- MARK: end Card-->
 
 <table>
   <thead>
@@ -476,59 +213,49 @@
 <Views.Button {Layout} type="transparent" on:click={addMoreItems}
   >Addionar mais itens</Views.Button
 >
-{#if !addresses}
+<Views.Divider />
+<Views.Button {Layout} on:click={manageAddress}>gerenciar endereço</Views.Button
+>
+{#if address === undefined}
   <Views.LocalLoading size="2" />
-{:else if addresses.length == 0}
-  <Views.Button {Layout} on:click={toggleNewAddress}>novo endereço</Views.Button
-  >
+{:else if address}
+  <div class="address">
+    <div class="content">
+      <span class="delivery">Entregar em</span>
+      <span>{address?.street}</span>
+      <span class="neighborhood"
+        >{address?.neighborhood} | {address?.complement}</span
+      >
+      <span class="city"
+        >{address?.city}/{address?.stat} CEP: {address?.postalCode}</span
+      >
+    </div>
+  </div>
 {:else}
-  {#each addresses as { postalCode, street, complement, neighborhood, city, stat, selected }}
-    {#if selected}
-      <div class="address">
-        <div class="content">
-          <span class="delivery">Entregar em</span>
-          <span>{street}</span>
-          <span class="neighborhood">{neighborhood} | {complement}</span>
-          <span class="city">{city}/{stat} CEP: {postalCode}</span>
-        </div>
-        <div class="edit" on:click={toggleUpdateAddress}>
-          <Fa
-            style="font-size: 1.5em; color: black; padding-left: 10px;"
-            icon={faEdit}
-          />
-        </div>
-      </div>
-    {/if}
-  {/each}
+  <h3>Para continuar precisa selecionar ou adicionar um endereço</h3>
 {/if}
-{#if !payments}
+<Views.Divider />
+<Views.Button {Layout} on:click={manageCard}>gerenciar cartões</Views.Button>
+{#if payment === undefined}
   <Views.LocalLoading size="2" />
-{:else if payments.length == 0}
-  <Views.Button {Layout} on:click={toggleNewCard}>novo cartão</Views.Button>
+{:else if payment}
+  <div class="paymentCard">
+    <div class="content">
+      <span class="payWith">Pagar com</span>
+      <span>{PaymentType(payment?.type)}</span>
+      <span class="brand">
+        {#if payment?.type !== "Cash"}
+          {payment?.brand} **** **** **** {payment?.last4Digits}
+        {:else}
+          Pagar na entrega
+        {/if}
+      </span>
+    </div>
+  </div>
 {:else}
-  {#each payments as { id, type, brand, last4Digits, selected }}
-    {#if selected}
-      <div class="paymentCard">
-        <div class="content">
-          <span class="payWith">Pagar com</span>
-          <span>{PaymentType(type)}</span>
-          <span class="brand">
-            {#if type !== "Cash"}
-              {brand} **** **** **** {last4Digits}
-            {:else}
-              Pagar na entrega
-            {/if}
-          </span>
-        </div>
-        <div class="edit" on:click={toggleUpdateCard}>
-          <Fa
-            style="font-size: 1.5em; color: black; padding-left: 10px;"
-            icon={faEdit}
-          />
-        </div>
-      </div>
-    {/if}
-  {/each}
+  <h3>
+    Para continuar precisa selecionar ou adicionar um novo cartão de crédito
+  </h3>
 {/if}
 {#if businessTime}
   <Views.Button {Layout} disabled={!validate} isFloat={true} on:click={forward}>
@@ -542,43 +269,17 @@
     Estámos fora do horario do funcionamento, confire os nossos horarios
   </h2>
 {/if}
+
+{#if isLoading}
+  <Views.Loading
+    topPadding={$StatusBar.height}
+    bottomPadding={$StatusBar.bottomPadding}
+  />
+{/if}
+
 <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 
 <style>
-  input[type="checkbox"] {
-    appearance: none;
-    background-color: #fff;
-    margin: 0;
-    font: inherit;
-    width: 2.2em;
-    height: 2.2em;
-    border: 0.05em solid #000;
-    border-radius: 0.35em;
-    transform: translateY(0.375em);
-    display: grid;
-    place-content: center;
-  }
-  input[type="checkbox"]::before {
-    content: "";
-    width: 1.15em;
-    height: 1.15em;
-    transform: scale(0);
-    transition: 120ms transform ease-in-out;
-    box-shadow: inset 1em 1em #ccc;
-    transform-origin: bottom left;
-    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-  }
-
-  input[type="checkbox"]:checked::before {
-    transform: scale(1);
-  }
-
-  input[type="checkbox"]:disabled {
-    --form-control-color: #ccc;
-
-    color: #ccc;
-    cursor: not-allowed;
-  }
   .paymentCard {
     width: 100%;
     display: flex;
@@ -626,11 +327,6 @@
     font-weight: lighter;
     font-size: 0.9em;
     width: 100%;
-  }
-
-  .edit {
-    flex-grow: 1;
-    text-align: end;
   }
   table {
     width: 100%;

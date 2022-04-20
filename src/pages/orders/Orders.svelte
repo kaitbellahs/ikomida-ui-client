@@ -37,7 +37,7 @@
 <div>
   {#each orders as { id, status, discount, products, address, payment, createdAt, finishedAt, subtotal, coupon, delivery }}
     <div class="leftShadow orderContainer" on:click={goToOrder(id)}>
-      <h3>#{id}: pedido {OrderStatus(status)}</h3>
+      <h3>Pedido {OrderStatus(status)}</h3>
       {#if products.length > 0}
         <div class="product">1. {products[0].title}</div>
       {/if}

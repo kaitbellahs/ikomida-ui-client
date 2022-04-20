@@ -14,7 +14,7 @@
   />
 {:then items}
   <Views.Divider />
-  {#if items.length > 0}
+  {#if (items?.length || 0) > 0}
     <Views.ItemsList {items} productPage={Routes.product} {Navigation} />
   {:else}
     Não há produtos para exibir!

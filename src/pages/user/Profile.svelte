@@ -4,16 +4,49 @@
   import { Views, Utils } from "@tian/components";
   import { onMount } from "svelte";
   import { StatusBar, Layout } from "../../stores/Setup";
+  import { updatePassword } from "../../network/Auth";
 
   let userInfo;
 
-  onMount(async () => {
-    userInfo = await Utils.Jws.extractToken($Auth);
-  });
+  let passwordObject = {
+    oldPass: null,
+    newPass: null,
+    reNewPass: null,
+  };
+
+  async function editPassword() {
+    if (passwordObject.oldPass === null || passwordObject.oldPass.length < 6) {
+      toggleErrorAlert("Senha atual invalida!");
+      return;
+    } else if (
+      passwordObject.newPass === null ||
+      passwordObject.newPass.length < 6
+    ) {
+      toggleErrorAlert("A nova senha invalida!");
+      return;
+    } else if (passwordObject.newPass !== passwordObject.reNewPass) {
+      toggleErrorAlert("Senha nova e verifição não confirem");
+      return;
+    }
+    isLoading = true;
+    let response = await updatePassword(passwordObject);
+    if (response.success) {
+      toggleErrorAlert("Senha atualizada com sucesso!");
+    } else {
+      toggleErrorAlert(response?.data);
+      isLoading = false;
+      return;
+    }
+    isLoading = false;
+  }
 
   function logout() {
     Auth.setToken(null);
   }
+
+  onMount(async () => {
+    userInfo = await Utils.Jws.extractToken($Auth);
+  });
 
   Title.set("Perfil");
 </script>
@@ -49,6 +82,28 @@
         value={userInfo.email}
         fontSize="1.5em"
       />
+      <Views.Divider />
+      <h2>Senha</h2>
+      <Views.TextEdit
+        name="Senha atual:"
+        bind:value={passwordObject.oldPass}
+        secret={true}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        name="Nova senha:"
+        bind:value={passwordObject.newPass}
+        secret={true}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        name="Confirmação:"
+        bind:value={passwordObject.reNewPass}
+        secret={true}
+        placeHolder=""
+      />
+      <Views.Divider />
+      <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
     </div>
     <!-- <Views.Button type="transparent" on:click={logout}>Atualizar</Views.Button> -->
     <Views.Button {Layout} type="transparent" on:click={logout}

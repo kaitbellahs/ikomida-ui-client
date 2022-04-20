@@ -21,12 +21,20 @@ function _store() {
 }
 
 export const Store = _store();
+
 const reset = async () => {
     await Storage.set({
         key: 'Cart',
         value: JSON.stringify([])
     });
     Store.reset();
+}
+const update = async (object) => {
+    await Storage.set({
+        key: 'Cart',
+        value: JSON.stringify(object)
+    });
+    Store.updateItems(object);
 }
 
 const items = async () => {
@@ -71,6 +79,7 @@ const subtotal = async () => {
 export const Cart = {
     items,
     reset,
+    update,
     addItem,
     subtotal
 };
