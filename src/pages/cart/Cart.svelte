@@ -3,9 +3,12 @@
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
   import { faTrash } from "@fortawesome/free-solid-svg-icons";
   import { Views, Utils } from "@tian/components";
-  import { Layout } from "../../stores/Setup";
+  import { Layout, Settings } from "../../stores/Setup";
+  import { GetAddresses } from "../../network/User";
+  import { onMount } from "svelte";
 
   let showAlert = false;
+  let address;
 
   $: subtotalArray = $Store.map(
     (item) =>
@@ -14,8 +17,17 @@
   );
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
-  $: delivery = 0;
+  $: calcDelivery = address
+    ? ((address?.distance || 0) / 1000) * ($Settings?.delivery?.value || 0)
+    : 0;
+  $: delivery = $Settings?.delivery?.free
+    ? 0
+    : calcDelivery < $Settings?.delivery?.min
+    ? $Settings?.delivery?.min
+    : calcDelivery;
+  $: netTotal = subtotal + delivery;
   $: total = subtotal + delivery;
+  $: console.log(address)
 
   function addMoreItems() {
     Navigation.pop(2);
@@ -70,6 +82,14 @@
     }
   }
 
+  onMount(async () => {
+    let response = await GetAddresses();
+    if (response?.success) {
+      const addresses = response?.data?.filter((item) => item.selected);
+      address = addresses?.length === 1 ? addresses[0] : null;
+    }
+  });
+
   Title.set("Sacola de compras");
   Menu.addItem({ name: "Limpar", icon: faTrash, callback: toggleAlert });
 </script>
@@ -106,6 +126,16 @@
     </tr>
   </thead>
   <tbody>
+    {#if address}
+      <tr>
+        <td class="resumeText">Taxa de entrega</td>
+        <td class="resumeValue"
+          ><span class:deliveryFree={delivery == 0}
+            >{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
+          ></td
+        >
+      </tr>
+    {/if}
     <tr>
       <td class="resumeText">Total</td>
       <td class="resumeValue">{Utils.Strings.currency(total)}</td>

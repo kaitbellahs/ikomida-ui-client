@@ -61,7 +61,7 @@
         holder: newCardObject?.holder,
         number: newCardObject?.number,
         expMonth: newCardObject?.validity?.substring(0, 2),
-        expYear: `20${newCardObject?.validity?.substring(3, 5)}`,
+        expYear: `20${newCardObject?.validity?.substring(2, 4)}`,
         cvc: newCardObject?.cvc,
         cpf: newCardObject?.cpf,
       };

@@ -11,16 +11,16 @@
   Title.set("Detalhes do predido");
 </script>
 
-<span class="time">Feito {Utils.Strings.dateToString(order.createdAt)}</span>
-<span class="status">
-  {#if ["open", "accepted", "waitingDelivery", "delivery"].includes(order.status)}
+<div class="time">Feito {Utils.Strings.dateToString(order.createdAt)}</div>
+<div class="status">
+  {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(order.status)}
     Seu pedido está
     <span class=open>{OrderStage(order.status)}</span>
   {:else}
     Pedido {OrderStatus(order.status)} em
     <span class=open>{Utils.Strings.dateToString(order.finishedAt)}</span>
   {/if}
-</span>
+</div>
 {#each order.products as { title, price, discount, discountType, quantity }, index}
   <div class="product">
     <span class="quantity">{quantity}</span><span class="title">{title}</span
@@ -42,7 +42,7 @@
       <td class="resumeText">Subtotal</td>
       <td class="resumeValue">{Utils.Strings.currency(order.subtotal)}</td>
     </tr>
-    {#if order.coupon}
+    {#if order.discount != 0}
       <tr>
         <td class="resumeText">Desconto</td>
         <td class="resumeValue"
@@ -117,8 +117,10 @@
   }
   .time {
     font-family: RobotoThin;
-    font-size: 0.6em;
+    font-size: 1em;
     margin-top: 5px;
+    width: 100%;
+    margin: 25px 0 10px 0;
   }
   table {
     width: 100%;

@@ -188,7 +188,7 @@
       <td class="resumeText">Taxa de entrega</td>
       <td class="resumeValue"
         ><span class:deliveryFree={delivery == 0}
-          >{Utils.Strings.currency(delivery)}</span
+          >{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
         ></td
       >
     </tr>
