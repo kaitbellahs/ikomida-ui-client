@@ -30,10 +30,10 @@
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   $: canContinue =
-    subscribeObject.name &&
-    subscribeObject.lastName &&
+  subscribeObject?.name && (subscribeObject?.name?.length || 0) <= 255 &&
+    subscribeObject?.lastName && (subscribeObject?.lastName?.length || 0) <= 255 &&
     isValidCPF &&
-    isValidEmail &&
+    isValidEmail && (subscribeObject?.email?.length || 0) <= 255 &&
     isValidPassword;
 
   async function doSubscribe() {

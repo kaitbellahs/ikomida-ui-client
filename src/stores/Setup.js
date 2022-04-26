@@ -47,7 +47,8 @@ function createSettings() {
 		business: {
 			hours: [],
 			days: []
-		}
+		},
+		isActive: false
 	});
 
 	return {

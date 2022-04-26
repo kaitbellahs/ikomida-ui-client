@@ -9,12 +9,14 @@
   import Tac from "./pages/user/Tac.svelte";
   import { Network } from "@capacitor/network";
   import { onMount } from "svelte";
-  import { StatusBar as _StatusBar, Layout } from "./stores/Setup";
+  import { StatusBar as _StatusBar, Layout, Settings } from "./stores/Setup";
   import { Router, Routes } from "./stores/Navigation";
   import { StatusBar } from "@capacitor/status-bar";
   import { Utils, PushNotification } from "@tian/components";
   import { registerPushNotificationToken } from "./network/PushNotification";
   import { getLayout } from "./network/Layout";
+  import { GetSettings } from "./network/User";
+  import NoService from "./pages/user/NoService.svelte";
 
   let networkStatus = null;
 
@@ -59,7 +61,11 @@
   );
 
   onMount(async () => {
-    const response = await getLayout();
+    let response = await GetSettings();
+    if (response?.success && response?.data) {
+      Settings.set({ ...$Settings, ...response?.data });
+    }
+    response = await getLayout();
     if (response?.success && response?.data) {
       Layout.set(response?.data);
     }
@@ -97,7 +103,9 @@
   // });
 </script>
 
-{#if logedIn}
+{#if !$Settings.isActive}
+  <NoService />
+{:else if logedIn}
   <Main />
 {:else if route == Routes.login}
   <Login />

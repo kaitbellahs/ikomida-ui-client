@@ -13,6 +13,7 @@
   } from "../../network/Payment";
   import { onMount } from "svelte";
   import { Layout } from "../../stores/Setup";
+  import creditCardType from "credit-card-type";
 
   let payments;
   let showNewCard = false;
@@ -24,6 +25,9 @@
     cvc: null,
     number: null,
   };
+  let cardNumberMask = "____ ____ ____ ____";
+  let cardCodeMask = "___";
+  let cardBrandIcon;
   let newCardObjectValidation = {
     holder: false,
     validity: false,
@@ -34,6 +38,27 @@
 
   let errorAlert;
   let showAlert = false;
+
+  $: if ((newCardObject?.number?.length || 0) === 6) {
+    const cardInfos = creditCardType(newCardObject?.number);
+    if (cardInfos && (cardInfos?.length || 0) > 0) {
+      const cardInfo = cardInfos[0];
+      let gapsIndex = 0;
+      cardNumberMask = "";
+      for (let i = 1; i <= cardInfo?.lengths[0]; i++) {
+        cardNumberMask += "_";
+        if (i == cardInfo?.gaps[gapsIndex]) {
+          gapsIndex++;
+          cardNumberMask += " ";
+        }
+      }
+      cardCodeMask = "";
+      for (let i = 1; i <= cardInfo?.code.size; i++) {
+        cardCodeMask += "_";
+      }
+    cardBrandIcon = `/assets/cardBrand/${cardInfo.type.toLowerCase()}.svg`;
+    }
+  }
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -77,7 +102,6 @@
   }
 
   async function updateCard(id) {
-    console.log(id);
     isLoading = true;
     const response = await UpdateCard(id);
     if (response?.success) {
@@ -159,7 +183,8 @@
     ]}
   >
     <Views.TextEdit
-      mask="____ ____ ____ ____"
+      mask={cardNumberMask}
+      icon={cardBrandIcon}
       maskKey="_"
       type="number"
       bind:rawValue={newCardObject.number}
@@ -180,7 +205,7 @@
       bind:isValid={newCardObjectValidation.validity}
     />
     <Views.TextEdit
-      mask="___"
+      mask={cardCodeMask}
       maskKey="_"
       type="number"
       placeHolder="Codigo de segurança do cartão"

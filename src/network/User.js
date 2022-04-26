@@ -29,5 +29,5 @@ export async function DeleteAddress(id) {
 }
 
 export async function GetSettings() {
-    return Network.instance.get(`/settings`, get(Auth));
+    return Network.instance.get(`/settings`);
 }

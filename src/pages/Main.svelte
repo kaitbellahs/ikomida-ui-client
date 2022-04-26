@@ -18,8 +18,7 @@
   import Product from "./products/Product.svelte";
   import Checkout from "./cart/Checkout.svelte";
   import Cart from "./cart/Cart.svelte";
-  import { GetSettings } from "../network/User";
-  import { StatusBar, Layout, Settings } from "../stores/Setup";
+  import { StatusBar, Layout } from "../stores/Setup";
   import {
     faHome,
     faList,
@@ -109,10 +108,6 @@
   }
 
   onMount(async () => {
-    const response = await GetSettings();
-    if (response?.success && response?.data) {
-      Settings.set({ ...$Settings, ...response?.data });
-    }
     await CartStore.items();
   });
 </script>

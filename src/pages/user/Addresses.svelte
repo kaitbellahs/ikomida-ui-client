@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faTrashAlt, faSearch } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views } from "@tian/components";
+  import { Views, Utils } from "@tian/components";
   import {
     GetAddresses,
     GetAddressByCep,
@@ -69,7 +69,8 @@
   }
 
   async function newAddress() {
-    if ((newAddressObject?.postalCode?.length || 0) !== 8) {
+    console.log(newAddressObject)
+    if ((Utils.Numbers.toNumber(newAddressObject?.postalCode)?.length || 0) !== 8) {
       toggleErrorAlert(`é obrigatorio o preencheemento do CEP`);
     } else if ((newAddressObject?.street?.length || 0) < 3) {
       toggleErrorAlert(`é obrigatorio o preencheemento do nome da rua`);
@@ -84,10 +85,13 @@
       const response = await NewAddress(newAddressObject);
       if (response?.success) {
         addresses = response?.data;
+        newAddressObject = {
+          postalCode: null,
+        };
       } else {
         toggleErrorAlert(response?.data);
       }
-      showNewAddress = !showNewAddress;
+      showNewAddress = false;
       isLoading = false;
     }
   }
@@ -170,6 +174,7 @@
       type="number"
       callback={findAddress}
       buttonIcon={faSearch}
+      bind:value={newAddressObject.postalCode}
       bind:rawValue={newAddressObject.postalCode}
       placeHolder="CEP"
     />
