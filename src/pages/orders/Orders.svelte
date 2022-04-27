@@ -1,13 +1,30 @@
 <script>
-  import { Title, Navigation, Routes } from "../../stores/Navigation";
+  import {
+    Title,
+    Navigation,
+    Routes,
+    Router,
+    Menu,
+  } from "../../stores/Navigation";
   import { GetOrders, OrderStatus } from "../../network/Orders";
   import { Views, Utils } from "@tian/components";
-  import { onMount } from "svelte";
   import { PaymentType } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
+  import { faHistory } from "@fortawesome/free-solid-svg-icons";
 
   let isLoading = false;
   let orders = [];
+
+  $: if ($Router.options === null || $Router.options !== null) {
+    if ($Router.options === null || !$Router.options) {
+      Menu.addItem({
+        icon: faHistory,
+        name: "Históricos",
+        callback: goToOrdersHistory,
+      });
+    }
+    update();
+  }
 
   function goToOrder(id) {
     const order = orders.find((order) => {
@@ -16,14 +33,24 @@
     Navigation.goTo(Routes.order, { newOrder: false, order });
   }
 
-  onMount(async () => {
+  async function update() {
     isLoading = true;
-    const response = await GetOrders();
-    if (response?.success) {
-      orders = response?.data;
-    }
+    orders = await GetOrders($Router.options);
     isLoading = false;
-  });
+  }
+
+  function goToOrdersHistory() {
+    Navigation.goTo(Routes.orders, true);
+  }
+
+  // onMount(async () => {
+  //   isLoading = true;
+  //   const response = await GetOrders();
+  //   if (response?.success) {
+  //     orders = response?.data;
+  //   }
+  //   isLoading = false;
+  // });
 
   Title.set("Pedidos");
 </script>

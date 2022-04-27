@@ -7,12 +7,19 @@
   import { updatePassword } from "../../network/Auth";
 
   let userInfo;
+  let isLoading = false;
 
   let passwordObject = {
     oldPass: null,
     newPass: null,
     reNewPass: null,
   };
+  let errorAlert;
+  let showAlert = false;
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
 
   async function editPassword() {
     if (passwordObject.oldPass === null || passwordObject.oldPass.length < 6) {
@@ -53,7 +60,7 @@
 
 {#if userInfo}
   <div class="profil">
-    <div>
+    <div class="avatar">
       {#if userInfo.avatar}
         <img class="avatarCircle" src={userInfo.avatar} alt={userInfo.name} />
       {:else}
@@ -61,26 +68,40 @@
           {userInfo.name[0]}{userInfo.lastName[0]}
         </div>
       {/if}
-      <h2>{userInfo.name} {userInfo.lastName}</h2>
     </div>
     <div class="data">
+      <h2>{userInfo.name} {userInfo.lastName}</h2>
+      <Views.Divider />
       <Views.TextValue
         {Layout}
         text="CPF:"
-        value={userInfo.cpf}
+        value={Utils?.Strings?.formatString(
+          /\d/gi,
+          "___.___.___-__",
+          "_",
+          userInfo?.identity
+        )}
         fontSize="1.5em"
+        leftMargin="30"
       />
       <Views.TextValue
         {Layout}
         text="Telefone:"
-        value={userInfo.phone}
+        value={Utils?.Strings?.formatString(
+          /\d/gi,
+          "(__) _____-____",
+          "_",
+          userInfo?.phone
+        )}
         fontSize="1.5em"
+        leftMargin="30"
       />
       <Views.TextValue
         {Layout}
         text="mail:"
         value={userInfo.email}
         fontSize="1.5em"
+        leftMargin="30"
       />
       <Views.Divider />
       <h2>Senha</h2>
@@ -103,6 +124,7 @@
         placeHolder=""
       />
       <Views.Divider />
+      <Views.Divider />
       <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
     </div>
     <!-- <Views.Button type="transparent" on:click={logout}>Atualizar</Views.Button> -->
@@ -110,7 +132,9 @@
       >Logout</Views.Button
     >
   </div>
-{:else}
+  <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
+{/if}
+{#if isLoading || !userInfo}
   <Views.Loading
     topPadding={$StatusBar.height}
     bottomPadding={$StatusBar.bottomPadding}
@@ -124,6 +148,11 @@
   .profil > div {
     width: 100%;
   }
+  .profil > .avatar {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
   .profil > div > h2 {
     margin-left: 20px;
   }
@@ -131,6 +160,9 @@
     width: 100%;
     float: left;
     margin-top: 20px;
+  }
+  .profil > .data > h2 {
+    text-align: center;
   }
   .avatarCircle {
     font-size: 3em;

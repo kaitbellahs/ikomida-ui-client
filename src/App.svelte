@@ -3,6 +3,7 @@
   import { App } from "@capacitor/app";
   import { Auth, PushNotificationToken } from "./stores/Auth";
   import Login from "./pages/user/Login.svelte";
+  import ForgotPassword from "./pages/user/ForgotPassword.svelte";
   import Main from "./pages/Main.svelte";
   import Subscribe from "./pages/user/Subscribe.svelte";
   import ConfirmSubscribe from "./pages/user/ConfirmSubscribe.svelte";
@@ -111,6 +112,8 @@
   <Login />
 {:else if route == Routes.subscribe}
   <Subscribe />
+{:else if route == Routes.forgotPassword}
+  <ForgotPassword />
 {:else if route == Routes.confirmSubscribe}
   <ConfirmSubscribe />
 {:else if route == Routes.tac}

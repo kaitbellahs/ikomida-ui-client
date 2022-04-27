@@ -18,7 +18,7 @@
   import Product from "./products/Product.svelte";
   import Checkout from "./cart/Checkout.svelte";
   import Cart from "./cart/Cart.svelte";
-  import { StatusBar, Layout } from "../stores/Setup";
+  import { StatusBar, Layout, Settings } from "../stores/Setup";
   import {
     faHome,
     faList,
@@ -94,11 +94,11 @@
       callback: () => Navigation.goTo(Routes.businessHours),
       icon: faSlidersH,
     },
-    {
-      name: "Sobre",
-      callback: () => Navigation.goTo(Routes.about),
-      icon: faIdCard,
-    },
+    // {
+    //   name: "Sobre",
+    //   callback: () => Navigation.goTo(Routes.about),
+    //   icon: faIdCard,
+    // },
   ];
   MenuHamburger.reset();
   menuHamburgerItems.forEach((page) => MenuHamburger.addItem(page));
@@ -153,6 +153,7 @@
   {/if}
 </main>
 <Views.NavigationBar
+  logo={$Settings?.profile?.mainPicture}
   {Layout}
   {MenuHamburger}
   {Menu}

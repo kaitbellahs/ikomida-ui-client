@@ -17,6 +17,7 @@ export const Routes = {
     checkout: Symbol("/checkout"),
     confirmSubscribe: Symbol("/confirmSubscribe"),
     subscribe: Symbol("/subscribe"),
+    forgotPassword: Symbol("/forgotPassword"),
     tac: Symbol("/tac"),
     addresses: Symbol("/addresses"),
     payments: Symbol("/payments"),
