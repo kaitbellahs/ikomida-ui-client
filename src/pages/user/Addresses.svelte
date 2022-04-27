@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faTrashAlt, faSearch } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils } from "@tian/components";
+  import { Views } from "@tian/components";
   import {
     GetAddresses,
     GetAddressByCep,
@@ -20,6 +20,9 @@
   let isLoading = false;
   let newAddressObject = {
     postalCode: null,
+  };
+  let newAddressObjectValidation = {
+    postalCode: false,
   };
 
   let errorAlert;
@@ -41,19 +44,13 @@
 
   function findAddress() {
     isLoading = true;
-    currentPostalCode = newAddressObject.postalCode;
-    GetAddressByCep(newAddressObject.postalCode)
+    currentPostalCode = newAddressObject?.postalCode;
+    GetAddressByCep(newAddressObject?.postalCode)
       .then((response) => {
         if (response?.success) {
           const address = response?.data;
-          currentPostalCode = address.postalCode;
-          newAddressObject.id = address.id;
-          newAddressObject.street = address.street;
-          newAddressObject.number = address.number;
-          newAddressObject.complement = address.complement;
-          newAddressObject.neighborhood = address.neighborhood;
-          newAddressObject.city = address.city;
-          newAddressObject.stat = address.stat;
+          currentPostalCode = address?.postalCode;
+          newAddressObject = { ...newAddressObject, ...address };
         } else {
           toggleErrorAlert(response?.data);
         }
@@ -69,8 +66,9 @@
   }
 
   async function newAddress() {
-    console.log(newAddressObject)
-    if ((Utils.Numbers.toNumber(newAddressObject?.postalCode)?.length || 0) !== 8) {
+    if (
+      (newAddressObject?.postalCode?.length || 0) !== 8
+    ) {
       toggleErrorAlert(`é obrigatorio o preencheemento do CEP`);
     } else if ((newAddressObject?.street?.length || 0) < 3) {
       toggleErrorAlert(`é obrigatorio o preencheemento do nome da rua`);
@@ -115,7 +113,6 @@
 
   async function onRemoveClick(id) {
     isLoading = true;
-    console.log(id);
     const response = await DeleteAddress(id);
     if (response?.success) {
       addresses = addresses?.filter((item) => item.id !== id);
@@ -171,10 +168,10 @@
     <Views.TextEdit
       mask="_____-___"
       maskKey="_"
-      type="number"
+      type="cep"
       callback={findAddress}
       buttonIcon={faSearch}
-      bind:value={newAddressObject.postalCode}
+      bind:isValid={newAddressObjectValidation.postalCode}
       bind:rawValue={newAddressObject.postalCode}
       placeHolder="CEP"
     />

@@ -17,13 +17,7 @@
     email: null,
     password: null,
   };
-  // let subscribeObject = {
-  //   name: "khalid",
-  //   lastName: "Ait Bellahs",
-  //   cpf: null,
-  //   email: "aitbellahs@gmail.com",
-  //   password: "123456",
-  // };
+  
   let isValidCPF = false;
   let isValidEmail = false;
   let isValidPassword = false;

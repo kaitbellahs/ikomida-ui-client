@@ -22,7 +22,7 @@
     holder: null,
     validity: null,
     cpf: null,
-    cvc: null,
+    code: null,
     number: null,
   };
   let cardNumberMask = "____ ____ ____ ____";
@@ -32,31 +32,32 @@
     holder: false,
     validity: false,
     cpf: false,
-    cvc: false,
+    code: false,
     number: false,
   };
 
+  let cardInfo;
   let errorAlert;
   let showAlert = false;
 
-  $: if ((newCardObject?.number?.length || 0) === 6) {
+  $: if ((newCardObject?.number?.length || 0) <= 6) {
     const cardInfos = creditCardType(newCardObject?.number);
     if (cardInfos && (cardInfos?.length || 0) > 0) {
-      const cardInfo = cardInfos[0];
+      cardInfo = cardInfos?.[0];
       let gapsIndex = 0;
       cardNumberMask = "";
-      for (let i = 1; i <= cardInfo?.lengths[0]; i++) {
+      for (let i = 1; i <= cardInfo?.lengths[0] || 0; i++) {
         cardNumberMask += "_";
-        if (i == cardInfo?.gaps[gapsIndex]) {
+        if (i == cardInfo?.gaps?.[gapsIndex]) {
           gapsIndex++;
           cardNumberMask += " ";
         }
       }
       cardCodeMask = "";
-      for (let i = 1; i <= cardInfo?.code.size; i++) {
+      for (let i = 1; i <= cardInfo?.code?.size; i++) {
         cardCodeMask += "_";
       }
-    cardBrandIcon = `/assets/cardBrand/${cardInfo.type.toLowerCase()}.svg`;
+      cardBrandIcon = `/assets/cardBrand/${cardInfo?.type?.toLowerCase() || ''}.svg`;
     }
   }
 
@@ -70,13 +71,16 @@
   }
 
   async function newCard() {
-    if ((newCardObject?.holder?.length || 0) < 3) {
+    if (
+      (newCardObject?.holder?.length || 0) < 3 ||
+      (newCardObject?.holder?.length || 0) > 255
+    ) {
       toggleErrorAlert(`é obrigatorio o preencheemento do nome`);
-    } else if ((newCardObject?.number?.length || 0) < 15) {
+    } else if ((newCardObject?.number?.length || 0) !== cardInfo?.lengths[0]) {
       toggleErrorAlert(`é obrigatorio o preencheemento do nomenro do cartão`);
-    } else if ((newCardObject?.validity?.length || 0) < 4) {
+    } else if ((newCardObject?.validity?.length || 0) !== 4) {
       toggleErrorAlert(`é obrigatorio o preencheemento da validade do cartão`);
-    } else if ((newCardObject?.cvc?.length || 0) < 3) {
+    } else if ((newCardObject?.code?.length || 0) !== cardInfo?.code.size) {
       toggleErrorAlert(`é obrigatorio o preencheemento do codigo de segurança`);
     } else if (!newCardObjectValidation?.cpf) {
       toggleErrorAlert(`é obrigatorio o preencheemento do CPF`);
@@ -87,7 +91,7 @@
         number: newCardObject?.number,
         expMonth: newCardObject?.validity?.substring(0, 2),
         expYear: `20${newCardObject?.validity?.substring(2, 4)}`,
-        cvc: newCardObject?.cvc,
+        code: newCardObject?.code,
         cpf: newCardObject?.cpf,
       };
       const response = await NewCard(newCard);
@@ -136,7 +140,7 @@
   onMount(async () => {
     const response = await GetPaymentMethods();
     if (response?.success) {
-      payments = response?.data;
+      payments = response?.data || [];
     }
   });
 
@@ -209,8 +213,8 @@
       maskKey="_"
       type="number"
       placeHolder="Codigo de segurança do cartão"
-      bind:rawValue={newCardObject.cvc}
-      bind:isValid={newCardObjectValidation.cvc}
+      bind:rawValue={newCardObject.code}
+      bind:isValid={newCardObjectValidation.code}
     />
     <Views.TextEdit
       type="cpf"

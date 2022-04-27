@@ -1,7 +1,7 @@
 <script>
   import { Title } from "../../stores/Navigation";
   import { Views } from "@tian/components";
-  import { Layout, Settings } from "../../stores/Setup";
+  import { Settings } from "../../stores/Setup";
 
   const days = [
     { name: "Domingo", checked: false },

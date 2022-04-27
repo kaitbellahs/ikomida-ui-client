@@ -12,13 +12,13 @@
   let phone = "11953635016";
   let initialValue = "(11) 95363-5016";
   let password = "123456";
-  let errorMessage = "";
   let validPhone = false;
   let validPassword = false;
 
   $: canLogin = validPhone && validPassword;
   let errorAlert;
   let showAlert = false;
+  
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;

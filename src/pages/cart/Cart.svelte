@@ -25,9 +25,7 @@
     : calcDelivery < $Settings?.delivery?.min
     ? $Settings?.delivery?.min
     : calcDelivery;
-  $: netTotal = subtotal + delivery;
   $: total = subtotal + delivery;
-  $: console.log(address)
 
   function addMoreItems() {
     Navigation.pop(2);

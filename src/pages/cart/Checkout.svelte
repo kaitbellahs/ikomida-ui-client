@@ -95,7 +95,12 @@
       isLoading = false;
       if (response && response?.success) {
         Cart.reset();
-        Navigation.goTo(Routes.order, response?.data);
+        Navigation.goTo(Routes.order, {
+          newOrder: true,
+          order: response?.data,
+        });
+      } else {
+        toggleErrorAlert(response?.data);
       }
     } else {
       Navigation.reset(Routes.login);
@@ -188,7 +193,7 @@
       <td class="resumeText">Taxa de entrega</td>
       <td class="resumeValue"
         ><span class:deliveryFree={delivery == 0}
-          >{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
+          >{delivery == 0 ? "Gratis" : Utils.Strings.currency(delivery)}</span
         ></td
       >
     </tr>

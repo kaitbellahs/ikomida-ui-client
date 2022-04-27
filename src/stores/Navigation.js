@@ -96,7 +96,8 @@ function createNavigation() {
                 }
             });
             Menu.reset();
-        }
+        },
+        backCallBack: null
     };
 }
 export const Navigation = createNavigation();

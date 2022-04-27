@@ -1,13 +1,19 @@
 <script>
-  import { Title, Router } from "../../stores/Navigation";
+  import { Title, Router, Routes, Navigation } from "../../stores/Navigation";
   import { OrderStatus, OrderStage } from "../../network/Orders";
-  import {Utils} from "@tian/components";
+  import { Utils } from "@tian/components";
   import { PaymentType } from "../../network/Payment";
-
-  const order = $Router.options;
-
-  $: total = Number(order.subtotal) + Number(order.delivery) - Number(order.discount);
   
+  const { newOrder, order } = $Router.options;
+
+  $: total =
+    Number(order.subtotal) + Number(order.delivery) - Number(order.discount);
+
+  $: if (newOrder) {
+    Navigation.backCallBack = () => {
+      Navigation.reset(Routes.orders);
+    };
+  }
   Title.set("Detalhes do predido");
 </script>
 
@@ -15,16 +21,20 @@
 <div class="status">
   {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(order.status)}
     Seu pedido está
-    <span class=open>{OrderStage(order.status)}</span>
+    <span class="open">{OrderStage(order.status)}</span>
   {:else}
     Pedido {OrderStatus(order.status)} em
-    <span class=open>{Utils.Strings.dateToString(order.finishedAt)}</span>
+    <span class="open">{Utils.Strings.dateToString(order.finishedAt)}</span>
   {/if}
 </div>
 {#each order.products as { title, price, discount, discountType, quantity }, index}
   <div class="product">
     <span class="quantity">{quantity}</span><span class="title">{title}</span
-    ><span class="price">{Utils.Strings.currency(quantity * Utils.Numbers.calcDiscount(price, discount, discountType))}</span>
+    ><span class="price"
+      >{Utils.Strings.currency(
+        quantity * Utils.Numbers.calcDiscount(price, discount, discountType)
+      )}</span
+    >
   </div>
 {/each}
 <div class="address">Entregue em: <b>{order.address.street}</b></div>
@@ -46,7 +56,9 @@
       <tr>
         <td class="resumeText">Desconto</td>
         <td class="resumeValue"
-          ><span class="deliveryFree">- {Utils.Strings.currency(order.discount)}</span></td
+          ><span class="deliveryFree"
+            >- {Utils.Strings.currency(order.discount)}</span
+          ></td
         >
       </tr>
     {/if}
@@ -78,7 +90,7 @@
   }
   .status > .open {
     font-size: 1.2em;
-    font-family: 'RobotoBold';
+    font-family: "RobotoBold";
     color: green;
   }
   .product {

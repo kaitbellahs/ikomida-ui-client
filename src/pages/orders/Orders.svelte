@@ -13,7 +13,7 @@
     const order = orders.find((order) => {
       return order.id === id;
     });
-    Navigation.goTo(Routes.order, order);
+    Navigation.goTo(Routes.order, { newOrder: false, order });
   }
 
   onMount(async () => {
