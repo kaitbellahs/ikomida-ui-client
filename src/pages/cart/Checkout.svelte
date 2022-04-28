@@ -135,12 +135,12 @@
     let response = await GetAddresses();
     if (response?.success) {
       const addresses = response?.data?.filter((item) => item.selected);
-      address = addresses?.length === 1 ? addresses[0] : null;
+      address = (addresses?.length || 0) === 1 ? addresses[0] : null;
     }
     response = await GetPaymentMethods();
     if (response?.success) {
       const payments = response?.data?.filter((item) => item.selected);
-      payment = payments?.length === 1 ? payments[0] : null;
+      payment = (payments?.length || 0) === 1 ? payments[0] : null;
     }
     if (Capacitor.isNativePlatform()) {
       const checkpermissions = await Geolocation.checkPermissions();

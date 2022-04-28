@@ -29,10 +29,8 @@
   let showAlert = false;
 
   $: if (
-    newAddressObject &&
-    newAddressObject.postalCode &&
-    newAddressObject.postalCode.length === 8 &&
-    newAddressObject.postalCode != currentPostalCode
+    (newAddressObject?.postalCode?.length || 0) === 8 &&
+    newAddressObject?.postalCode != currentPostalCode
   ) {
     findAddress();
   }

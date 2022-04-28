@@ -11,6 +11,9 @@
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
   import * as AuthNetwork from "../../network/Auth";
   import { Layout } from "../../stores/Setup";
+  import { onDestroy } from "svelte";
+
+  const countdownWaitTime = 60;
 
   let isLoading = false;
   let subscribeObject = {
@@ -24,15 +27,23 @@
   let isValidationValid = false;
   let errorAlert;
   let showAlert = false;
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
+  let timer = null;
+  let countdownCanRequestCode = true;
+  let countdown = 0;
+
+  $: if (countdown === 0) {
+    if (timer) {
+      clearInterval(timer);
+    }
+    countdownCanRequestCode = true;
+    countdown = countdownWaitTime;
   }
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
 
-  function validateValidationCode(validationValid) {
-    return validationValid.length == 4;
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
   }
 
   async function doSubscribe() {
@@ -46,6 +57,10 @@
     isLoading = false;
   }
 
+  function validateValidationCode(validationValid) {
+    return (validationValid?.length || 0) == 4;
+  }
+
   async function requestPhoneValidation() {
     isLoading = true;
     subscribeObject.phone = subscribeObject.phone;
@@ -53,6 +68,11 @@
     if (response?.success) {
       subscribeObject = { ...subscribeObject, signature: response?.data };
       canDigitValidationCode = true;
+      countdownCanRequestCode = false;
+      countdown = countdownWaitTime;
+      timer = setInterval(() => {
+        countdown--;
+      }, 1000);
     } else {
       toggleErrorAlert(response?.data);
     }
@@ -71,6 +91,12 @@
     }
     isLoading = false;
   }
+
+  onDestroy(() => {
+    if (timer) {
+      clearInterval(timer);
+    }
+  });
 
   Title.set("Cadastro");
 </script>
@@ -95,9 +121,15 @@
     icon={faPhone}
     buttonName="Enviar"
     callback={requestPhoneValidation}
-    buttonDisabled={!canRequestCode}
+    buttonDisabled={!canRequestCode || !countdownCanRequestCode}
     bind:isValid={canRequestCode}
   />
+  {#if !countdownCanRequestCode}
+    <span
+      >Caso não receber o codigo, espera {countdown} segundos para solicitar um
+      novo!</span
+    >
+  {/if}
   <Views.TextEdit
     type="number"
     bind:rawValue={subscribeObject.phoneValidationCode}

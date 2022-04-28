@@ -84,7 +84,7 @@
     let response = await GetAddresses();
     if (response?.success) {
       const addresses = response?.data?.filter((item) => item.selected);
-      address = addresses?.length === 1 ? addresses[0] : null;
+      address = (addresses?.length || 0) === 1 ? addresses[0] : null;
     }
   });
 

@@ -81,7 +81,7 @@
           "_",
           userInfo?.identity
         )}
-        fontSize="1.5em"
+        fontSize="1.3em"
         leftMargin="30"
       />
       <Views.TextValue
@@ -93,14 +93,14 @@
           "_",
           userInfo?.phone
         )}
-        fontSize="1.5em"
+        fontSize="1.3em"
         leftMargin="30"
       />
       <Views.TextValue
         {Layout}
         text="mail:"
         value={userInfo.email}
-        fontSize="1.5em"
+        fontSize="1.3em"
         leftMargin="30"
       />
       <Views.Divider />
@@ -124,10 +124,8 @@
         placeHolder=""
       />
       <Views.Divider />
-      <Views.Divider />
-      <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
     </div>
-    <!-- <Views.Button type="transparent" on:click={logout}>Atualizar</Views.Button> -->
+    <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
     <Views.Button {Layout} type="transparent" on:click={logout}
       >Logout</Views.Button
     >
@@ -149,13 +147,14 @@
     width: 100%;
   }
   .profil > .avatar {
+    margin-top: 20px;
     display: flex;
     align-items: center;
     flex-direction: column;
   }
-  .profil > div > h2 {
+  /* .profil > div > h2 {
     margin-left: 20px;
-  }
+  } */
   .profil > .data {
     width: 100%;
     float: left;
