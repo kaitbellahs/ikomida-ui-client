@@ -30,6 +30,9 @@
   import { onMount } from "svelte";
   import Addresses from "./user/Addresses.svelte";
   import Payments from "./user/Payments.svelte";
+  import { swipe } from "svelte-gestures";
+
+  let direction;
 
   const tabs = [
     {
@@ -48,26 +51,6 @@
       icon: faList,
     },
   ];
-
-  $: styleHeight = `${Number($StatusBar.height) + 50}px`;
-  $: route = $Router.route;
-  $: subtotalArray = $Store.map(
-    (item) =>
-      item.quantity *
-      Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
-  );
-  $: subtotal =
-    subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
-  $: delivery = 0;
-  $: total = subtotal + delivery;
-  $: showCart =
-    $Store.length > 0 &&
-    route !== Routes.cart &&
-    route !== Routes.product &&
-    route !== Routes.checkout &&
-    route !== Routes.orders &&
-    route !== Routes.order &&
-    route !== Routes.profile;
   const menuHamburgerItems = [
     {
       name: "Home",
@@ -94,26 +77,56 @@
       callback: () => Navigation.goTo(Routes.businessHours),
       icon: faSlidersH,
     },
-    // {
-    //   name: "Sobre",
-    //   callback: () => Navigation.goTo(Routes.about),
-    //   icon: faIdCard,
-    // },
   ];
+
+  $: styleHeight = `${Number($StatusBar.height) + 50}px`;
+  $: route = $Router.route;
+  $: subtotalArray = $Store.map(
+    (item) =>
+      item.quantity *
+      Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+  );
+  $: subtotal =
+    subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
+  $: delivery = 0;
+  $: total = subtotal + delivery;
+  $: showCart =
+    $Store.length > 0 &&
+    route !== Routes.cart &&
+    route !== Routes.product &&
+    route !== Routes.checkout &&
+    route !== Routes.orders &&
+    route !== Routes.order &&
+    route !== Routes.profile;
+
   MenuHamburger.reset();
   menuHamburgerItems.forEach((page) => MenuHamburger.addItem(page));
+
+  function handler(event) {
+    direction = event.detail.direction;
+  }
 
   function goToCart() {
     Navigation.goTo(Routes.cart);
   }
 
   onMount(async () => {
+    const style = document.createElement("style");
+    style.innerHTML = `
+      body {
+        --paddingTop: ${styleHeight};
+        --paddingBottom: ${showCart ? "115px" : "50px"};
+      }
+    `;
+    document.head.appendChild(style);
     await CartStore.items();
   });
 </script>
 
 <main
-  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; padding-bottom: {showCart
+  use:swipe={{ timeframe: 300, minSwipeDistance: 60 }}
+  on:swipe={handler}
+  style="--paddingTop:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; --paddingBottom: {showCart
     ? '115px'
     : '50px'}; overflow: scroll;max-width: 100%;background: {$Layout.background};height: 100%;"
 >
@@ -177,5 +190,9 @@
     padding: 0;
     font-weight: normal;
     box-sizing: border-box;
+  }
+  body {
+    padding-top: var(--paddingTop);
+    padding-bottom: var(--paddingBottom);
   }
 </style>

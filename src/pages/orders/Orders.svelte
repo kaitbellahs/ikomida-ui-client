@@ -27,8 +27,8 @@
   }
 
   function goToOrder(id) {
-    const order = orders.find((order) => {
-      return order.id === id;
+    const order = orders?.find((order) => {
+      return order?.id === id;
     });
     Navigation.goTo(Routes.order, { newOrder: false, order });
   }
@@ -43,15 +43,6 @@
     Navigation.goTo(Routes.orders, true);
   }
 
-  // onMount(async () => {
-  //   isLoading = true;
-  //   const response = await GetOrders();
-  //   if (response?.success) {
-  //     orders = response?.data;
-  //   }
-  //   isLoading = false;
-  // });
-
   Title.set("Pedidos");
 </script>
 
@@ -62,9 +53,25 @@
   />
 {/if}
 <div>
-  {#each orders as { id, status, discount, products, address, payment, createdAt, finishedAt, subtotal, coupon, delivery }}
+  {#each orders as { id, status, products, address, payment, createdAt, preparation }}
     <div class="leftShadow orderContainer" on:click={goToOrder(id)}>
-      <h3>Pedido {OrderStatus(status)}</h3>
+      {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(status)}
+        {#if new Date(new Date(createdAt).getTime() + (preparation?.max + address?.duration) * 1000) < new Date()}
+          <span class="lateOrder">Pedido atrasado</span>
+        {/if}
+        <span class="deliveryForecast">Previsão de entrega</span>
+        <span class="deliveryForecastValue">
+          entre
+          {Utils.Strings.dateToString(
+            new Date(createdAt).getTime() +
+              (preparation?.min + address?.duration) * 1000
+          )} e {Utils.Strings.dateToString(
+            new Date(createdAt).getTime() +
+              (preparation?.max + address?.duration) * 1000
+          )}</span
+        >
+      {/if}
+      <h3 class={["delivered"].includes(status) ? 'delivered' : ''}>Pedido {OrderStatus(status)}</h3>
       {#if products.length > 0}
         <div class="product">1. {products[0].title}</div>
       {/if}
@@ -78,7 +85,7 @@
       <div class="paymentMethod">
         Forma de pagamento: <b>{PaymentType(payment.type)}</b>
       </div>
-      <div class="time">{Utils.Strings.timestampToString(createdAt)}</div>
+      <div class="time">{Utils.Strings.dateToString(createdAt)}</div>
     </div>
   {/each}
 </div>
@@ -91,17 +98,23 @@
     margin-bottom: 10px;
     margin-top: 10px;
     background: #eeeeee33;
+    display: flex;
+    flex-direction: column;
   }
   .orderContainer > h3 {
     padding: 0;
     margin: 0;
     font-size: 1.1em;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
+  .orderContainer > h3.delivered {
+    color:rgb(0, 177, 0);
   }
   .orderContainer > .product {
     font-family: RobotoLight;
     font-size: 0.9em;
-    margin-bottom: 2px;
+    margin-bottom: 10px;
   }
   .orderContainer > .address {
     font-family: RobotoThin;
@@ -115,6 +128,21 @@
   }
   .orderContainer > .time {
     font-family: RobotoThin;
-    font-size: 0.6em;
+    font-size: 0.8em;
+  }
+  .orderContainer > .deliveryForecast {
+    font-size: 1.1em;
+    color: #00000099;
+  }
+  .orderContainer > .deliveryForecastValue {
+    color: rgb(0, 177, 0);
+  }
+  .orderContainer > .lateOrder {
+    background-color: red;
+    border-radius: 6px;
+    color: white;
+    padding: 4px 20px;
+    align-self: center;
+    margin-bottom: 10px;
   }
 </style>

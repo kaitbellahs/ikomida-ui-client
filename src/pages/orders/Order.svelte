@@ -3,11 +3,13 @@
   import { OrderStatus, OrderStage } from "../../network/Orders";
   import { Utils } from "@tian/components";
   import { PaymentType } from "../../network/Payment";
-  
+
   const { newOrder, order } = $Router.options;
 
   $: total =
-    Number(order.subtotal) + Number(order.delivery) - Number(order.discount);
+    Number(order?.subtotal || 0) +
+    Number(order?.delivery || 0) -
+    Number(order?.discount || 0);
 
   $: if (newOrder) {
     Navigation.backCallBack = () => {
@@ -17,14 +19,31 @@
   Title.set("Detalhes do predido");
 </script>
 
-<div class="time">Feito {Utils.Strings.dateToString(order.createdAt)}</div>
+<h3>N˚ do pedido: {order?.customID}</h3>
+<div class="time">Realizado {Utils.Strings.dateToString(order?.createdAt)}</div>
 <div class="status">
   {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(order.status)}
+    {#if new Date(new Date(order?.createdAt).getTime() + ((order?.preparation?.max || 0) + (order?.address?.duration || 0)) * 1000) < new Date()}
+      <span class="lateOrder">Pedido atrasado</span>
+    {/if}
+    <span class="deliveryForecast">Previsão de entrega</span>
+    <span class="deliveryForecastValue">
+      entre
+      {Utils.Strings.dateToString(
+        new Date(order?.createdAt).getTime() +
+          ((order?.preparation?.min || 0) + (order?.address?.duration || 0)) *
+            1000
+      )} e {Utils.Strings.dateToString(
+        new Date(order.createdAt).getTime() +
+          ((order?.preparation?.max || 0) + (order?.address?.duration || 0)) *
+            1000
+      )}</span
+    >
     Seu pedido está
-    <span class="open">{OrderStage(order.status)}</span>
+    <span class="open">{OrderStage(order?.status)}</span>
   {:else}
-    Pedido {OrderStatus(order.status)} em
-    <span class="open">{Utils.Strings.dateToString(order.finishedAt)}</span>
+    Pedido {OrderStatus(order?.status)} em
+    <span class="open">{Utils.Strings.dateToString(order?.finishedAt)}</span>
   {/if}
 </div>
 {#each order.products as { title, price, discount, discountType, quantity }, index}
@@ -37,9 +56,10 @@
     >
   </div>
 {/each}
-<div class="address">Entregue em: <b>{order.address.street}</b></div>
+
+<div class="address">Entregue em: <b>{order?.address?.street}</b></div>
 <div class="paymentMethod">
-  Forma de pagamento: <b>{PaymentType(order.payment.type)}</b>
+  Forma de pagamento: <b>{PaymentType(order?.payment?.type)}</b>
 </div>
 <table>
   <thead>
@@ -50,14 +70,14 @@
   <tbody>
     <tr>
       <td class="resumeText">Subtotal</td>
-      <td class="resumeValue">{Utils.Strings.currency(order.subtotal)}</td>
+      <td class="resumeValue">{Utils.Strings.currency(order?.subtotal)}</td>
     </tr>
-    {#if order.discount != 0}
+    {#if order?.discount != 0}
       <tr>
         <td class="resumeText">Desconto</td>
         <td class="resumeValue"
           ><span class="deliveryFree"
-            >- {Utils.Strings.currency(order.discount)}</span
+            >- {Utils.Strings.currency(order?.discount)}</span
           ></td
         >
       </tr>
@@ -65,8 +85,8 @@
     <tr>
       <td class="resumeText">Taxa de entrega</td>
       <td class="resumeValue"
-        ><span class:deliveryFree={order.delivery == 0}
-          >{Utils.Strings.currency(order.delivery)}</span
+        ><span class:deliveryFree={order?.delivery == 0}
+          >{Utils.Strings.currency(order?.delivery)}</span
         ></td
       >
     </tr>
@@ -83,10 +103,13 @@
     margin: 0;
     font-size: 1.1em;
     margin-bottom: 5px;
-    margin-top: 10px;
+    margin-top: 20px;
+    text-align: center;
   }
   .status {
     margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
   }
   .status > .open {
     font-size: 1.2em;
@@ -153,5 +176,21 @@
   }
   .deliveryFree {
     color: green;
+  }
+  .status > .deliveryForecast {
+    font-size: 1.1em;
+    color: #00000099;
+  }
+  .status > .deliveryForecastValue {
+    color: rgb(0, 177, 0);
+    margin-bottom: 10px;
+  }
+  .status > .lateOrder {
+    background-color: red;
+    border-radius: 6px;
+    color: white;
+    padding: 4px 20px;
+    align-self: center;
+    margin-bottom: 10px;
   }
 </style>

@@ -1,9 +1,9 @@
 <script>
   import { Title, Navigation, Routes } from "../../stores/Navigation";
   import { search } from "../../network/Products";
-  import { Views } from "@tian/components";
+  import { Views, Utils } from "@tian/components";
   import { faSearch } from "@fortawesome/free-solid-svg-icons";
-  import { StatusBar } from "../../stores/Setup";
+  import { StatusBar, Settings } from "../../stores/Setup";
 
   let items = [];
   let value = "";
@@ -40,6 +40,12 @@
   <Views.TextEdit icon={faSearch} bind:value placeHolder="Buscar no cardápio" />
   <Views.Divider />
   {#if items.length > 0 && !error}
+    <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
+    <div class="preparationTime">
+      entre {Utils.Strings.timeToString($Settings?.preparation?.min * 60)}, e {Utils.Strings.timeToString(
+        $Settings?.preparation?.max * 60
+      )}
+    </div>
     <Views.ItemsList {items} productPage={Routes.product} {Navigation} />
   {:else if error}
     <h2>Nenhum produto foi encontrado</h2>
@@ -49,3 +55,14 @@
     <h3>Tente usar outro termo para pequisar</h3>
   {/if}
 </div>
+
+<style>
+  .preparationTitle,
+  .preparationTime {
+    text-align: center;
+  }
+  .preparationTime {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+  }
+</style>

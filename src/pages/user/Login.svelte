@@ -12,12 +12,10 @@
   let phone = "11953635016";
   let initialValue = "(11) 95363-5016";
   let password = "123456";
+  let isValidPassword = false;
+  let isValidPhone = false;
 
-  $: canLogin =
-    phone &&
-    (phone?.length || 0) === 11 &&
-    password &&
-    (password?.length || 0) > 5;
+  $: canLogin = isValidPhone && isValidPhone;
   let errorAlert;
   let showAlert = false;
 
@@ -85,6 +83,7 @@
     icon={faPhone}
     type="phone"
     placeHolder="Numero de celular"
+    bind:isValid={isValidPhone}
   />
   <Views.TextEdit
     bind:value={password}
@@ -92,6 +91,7 @@
     placeHolder="Senha"
     secret={true}
     type="password"
+    bind:isValid={isValidPassword}
   />
   <div />
   <Views.Button {Layout} on:click={doLogin} disabled={!canLogin}
