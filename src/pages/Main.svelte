@@ -8,7 +8,7 @@
     Routes,
     MenuHamburger,
   } from "../stores/Navigation";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils } from "@ikomida/components";
   import Home from "./products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
@@ -30,7 +30,6 @@
   import { onMount } from "svelte";
   import Addresses from "./user/Addresses.svelte";
   import Payments from "./user/Payments.svelte";
-  import { swipe } from "svelte-gestures";
 
   let direction;
 
@@ -124,8 +123,6 @@
 </script>
 
 <main
-  use:swipe={{ timeframe: 300, minSwipeDistance: 60 }}
-  on:swipe={handler}
   style="--paddingTop:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; --paddingBottom: {showCart
     ? '115px'
     : '50px'}; overflow: scroll;max-width: 100%;background: {$Layout.background};height: 100%;"
@@ -166,7 +163,7 @@
   {/if}
 </main>
 <Views.NavigationBar
-  logo={$Settings?.profile?.mainPicture}
+  logo={$Settings?.profile?.mainPicture || 'assets/icons/logo.svg'}
   {Layout}
   {MenuHamburger}
   {Menu}

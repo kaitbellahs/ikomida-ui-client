@@ -6,7 +6,7 @@ import {
 } from '../stores/Auth';
 import {
     Network
-} from "@tian/components";
+} from "@ikomida/components";
 
 let items;
 let updateTime;

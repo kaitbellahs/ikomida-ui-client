@@ -1,7 +1,7 @@
 <script>
   import { Title, Navigation, Routes } from "../../stores/Navigation";
   import { search } from "../../network/Products";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils } from "@ikomida/components";
   import { faSearch } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar, Settings } from "../../stores/Setup";
 

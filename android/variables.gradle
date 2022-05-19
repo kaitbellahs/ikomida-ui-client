@@ -11,5 +11,5 @@ ext {
     androidxJunitVersion = '1.1.2'
     androidxEspressoCoreVersion = '3.3.0'
     cordovaAndroidVersion = '7.0.0'
-    projxID = 'com.deluxe.restaurant'
+    ikomidaID = 'com.deluxe.restaurant'
 }

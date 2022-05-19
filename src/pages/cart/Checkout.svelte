@@ -1,5 +1,5 @@
 <script>
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils } from "@ikomida/components";
   import { Capacitor } from "@capacitor/core";
   import { Auth } from "../../stores/Auth";
   import { Geolocation } from "@capacitor/geolocation";
@@ -355,7 +355,7 @@
   }
   .businessHoursError {
     text-align: center;
-    color: red;
+    color: #b52124;
     margin-top: 20px;
   }
 </style>

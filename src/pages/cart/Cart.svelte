@@ -2,7 +2,7 @@
   import { Cart, Store } from "../../stores/Cart";
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
   import { faTrash } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils } from "@ikomida/components";
   import { Layout, Settings } from "../../stores/Setup";
   import { GetAddresses } from "../../network/User";
   import { onMount } from "svelte";

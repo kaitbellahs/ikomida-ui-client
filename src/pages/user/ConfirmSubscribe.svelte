@@ -6,7 +6,7 @@
     Menu,
     Router,
   } from "../../stores/Navigation";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
   import * as AuthNetwork from "../../network/Auth";

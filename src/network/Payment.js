@@ -1,6 +1,6 @@
 import {
     Network
-} from "@tian/components";
+} from "@ikomida/components";
 import {
     get
 } from 'svelte/store';

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>projx</string>
+	<string>ikomida</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -61,7 +61,7 @@
 		<string>com.getcapacitor.capacitor</string>
 		<key>CFBundleURLSchemes</key>
 		<array>
-		<string>projx://</string>
+		<string>ikomida://</string>
 		</array>
 	</dict>
 	</array>

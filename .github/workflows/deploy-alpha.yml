@@ -1,4 +1,4 @@
-name: PROJX ALPHA PIPELINE
+name: IKOMIDA ALPHA PIPELINE
 on:
   push:
     branches:

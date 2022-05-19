@@ -1,6 +1,6 @@
 {
-  "appId": "br.com.tialtonivel.projx",
-  "appName": "projx",
+  "appId": "com.ikomida.br.client",
+  "appName": "iKomida",
   "webDir": "public",
   "bundledWebRuntime": false,
   "npmClient": "npm"

@@ -1,10 +1,10 @@
 <script>
   import { Auth, PushNotificationToken } from "../../stores/Auth";
   import * as AuthNetwork from "../../network/Auth";
-  import { Views } from "@tian/components";
+  import { Views } from "@ikomida/components";
   import { Routes, Navigation } from "../../stores/Navigation";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
-  import { Utils } from "@tian/components";
+  import { Utils } from "@ikomida/components";
   import { registerPushNotificationToken } from "../../network/PushNotification";
   import { Layout, Settings } from "../../stores/Setup";
 
@@ -74,7 +74,7 @@
   <h3>
     Se você ainda não abriu sua conta, <span
       on:click={doSubscribe}
-      style="color:red;">clique aqui</span
+      style="color: #b52124;">clique aqui</span
     > é rápido e fácil.
   </h3>
   <Views.TextEdit

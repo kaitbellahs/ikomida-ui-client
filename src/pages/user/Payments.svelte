@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views } from "@tian/components";
+  import { Views } from "@ikomida/components";
   import {
     GetPaymentMethods,
     PaymentType,
@@ -263,8 +263,8 @@
     font-size: 0.9em;
     color: white;
     font-family: RobotoBold;
-    border: 1px solid red;
-    background: red;
+    border: 1px solid #b52124;
+    background: #b52124;
     border-radius: 16px;
     width: 28px;
     height: 28px;

@@ -1,6 +1,6 @@
 <script>
     import { Title } from "../../stores/Navigation";
-    import {Views} from "@tian/components";
+    import {Views} from "@ikomida/components";
     import { StatusBar } from "../../stores/Setup";
     
     Title.set("Perfil");

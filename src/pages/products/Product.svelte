@@ -9,7 +9,7 @@
     faCartPlus,
   } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils, Network, Types } from "@tian/components";
+  import { Views, Utils, Network, Types } from "@ikomida/components";
   import { Layout } from "../../stores/Setup";
 
   const item = $Router.options;

@@ -1,7 +1,7 @@
 <script>
   import { Title, Navigation, Routes } from "../../stores/Navigation";
   import { all } from "../../network/Products";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils } from "@ikomida/components";
   import { StatusBar, Settings } from "../../stores/Setup";
 
   Title.set("Home");

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">projx</string>
-    <string name="title_activity_main">projx</string>
+    <string name="app_name">ikomida</string>
+    <string name="title_activity_main">ikomida</string>
     <string name="package_name">com.deluxe.restaurant</string>
-    <string name="custom_url_scheme">projx</string>
+    <string name="custom_url_scheme">ikomida</string>
 </resources>

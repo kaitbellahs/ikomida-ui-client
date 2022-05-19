@@ -1,6 +1,6 @@
 <script>
   import { Title } from "../../stores/Navigation";
-  import { Views } from "@tian/components";
+  import { Views } from "@ikomida/components";
   import { Settings } from "../../stores/Setup";
 
   const days = [

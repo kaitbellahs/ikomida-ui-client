@@ -1,6 +1,6 @@
 <script>
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
-  import { Views } from "@tian/components";
+  import { Views } from "@ikomida/components";
   import { StatusBar, Layout } from "../../stores/Setup";
   import {
     faUser,

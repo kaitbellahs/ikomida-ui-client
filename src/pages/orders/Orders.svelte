@@ -7,7 +7,7 @@
     Menu,
   } from "../../stores/Navigation";
   import { GetOrders, OrderStatus } from "../../network/Orders";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
   import { faHistory } from "@fortawesome/free-solid-svg-icons";
@@ -138,7 +138,7 @@
     color: rgb(0, 177, 0);
   }
   .orderContainer > .lateOrder {
-    background-color: red;
+    background-color: #b52124;
     border-radius: 6px;
     color: white;
     padding: 4px 20px;

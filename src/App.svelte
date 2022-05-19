@@ -13,7 +13,7 @@
   import { StatusBar as _StatusBar, Layout, Settings } from "./stores/Setup";
   import { Router, Routes } from "./stores/Navigation";
   import { StatusBar } from "@capacitor/status-bar";
-  import { Utils, PushNotification } from "@tian/components";
+  import { Utils, PushNotification } from "@ikomida/components";
   import { registerPushNotificationToken } from "./network/PushNotification";
   import { getLayout } from "./network/Layout";
   import { GetSettings } from "./network/User";
@@ -104,9 +104,10 @@
   // });
 </script>
 
-{#if !$Settings.isActive}
+<!-- {#if !$Settings.isActive}
   <NoService />
-{:else if logedIn}
+{:else if logedIn} -->
+{#if logedIn}
   <Main />
 {:else if route == Routes.login}
   <Login />
@@ -127,7 +128,7 @@
 
 <style>
   #internetError {
-    background-color: red;
+    background-color: #b52124;
     color: white;
     position: fixed;
     top: 0;

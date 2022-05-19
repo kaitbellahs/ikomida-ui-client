@@ -1,7 +1,7 @@
 <script>
   import { Title, Router, Routes, Navigation } from "../../stores/Navigation";
   import { OrderStatus, OrderStage } from "../../network/Orders";
-  import { Utils } from "@tian/components";
+  import { Utils } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
 
   const { newOrder, order } = $Router.options;
@@ -186,7 +186,7 @@
     margin-bottom: 10px;
   }
   .status > .lateOrder {
-    background-color: red;
+    background-color: #b52124;
     border-radius: 6px;
     color: white;
     padding: 4px 20px;

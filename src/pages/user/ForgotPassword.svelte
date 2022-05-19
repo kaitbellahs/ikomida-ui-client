@@ -1,6 +1,6 @@
 <script>
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
-  import { Views } from "@tian/components";
+  import { Views } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
   import {
