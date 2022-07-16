@@ -216,7 +216,7 @@
   />
 {/if}
 <Views.Button {Layout} type="transparent" on:click={addMoreItems}
-  >Addionar mais itens</Views.Button
+  >Adicionar mais itens</Views.Button
 >
 <Views.Divider />
 <Views.Button {Layout} on:click={manageAddress}>gerenciar endereço</Views.Button
@@ -250,7 +250,7 @@
       <span>{PaymentType(payment?.type)}</span>
       <span class="brand">
         {#if payment?.type !== "Cash"}
-          {payment?.brand} **** **** **** {payment?.last4Digits}
+          {payment?.brand} **** **** **** {payment?.lastDigits}
         {:else}
           Pagar na entrega
         {/if}
@@ -355,7 +355,7 @@
   }
   .businessHoursError {
     text-align: center;
-    color: #b52124;
+    color: #4c0708;
     margin-top: 20px;
   }
 </style>

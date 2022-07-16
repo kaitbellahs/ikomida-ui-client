@@ -22,20 +22,28 @@
   <div class="days">
     <h3>Abrimos nestes dias:</h3>
     <br />
-    {#each $Settings?.business?.days as day}
-      <span>{days?.[day]?.name || "-"}, </span>
-    {/each}
+    {#if $Settings?.business?.days}
+      {#each $Settings?.business?.days as day}
+        <span>{days?.[day]?.name || "-"}, </span>
+      {/each}
+    {:else}
+      <span>Não foi definido dias de funcionamento</span>
+    {/if}
   </div>
   <Views.Divider />
   <div class="busninessHours">
     <h3>E nestes horarios:</h3>
     <br />
-    {#each $Settings?.business?.hours as businessHour}
-      <div class="TextValue">
-        <div class="text">{`de ${businessHour?.start}`}</div>
-        <div class="value">{`até ${businessHour?.end}`}</div>
-      </div>
-    {/each}
+    {#if $Settings?.business?.hours}
+      {#each $Settings?.business?.hours as businessHour}
+        <div class="TextValue">
+          <div class="text">{`de ${businessHour?.start}`}</div>
+          <div class="value">{`até ${businessHour?.end}`}</div>
+        </div>
+      {/each}
+    {:else}
+      <span>Não foi definido horários de funcionamento</span>
+    {/if}
   </div>
 {/if}
 

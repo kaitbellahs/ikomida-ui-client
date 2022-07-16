@@ -60,21 +60,26 @@
   <div class="avatar">
     {#if $Settings?.profile?.mainPicture}
       <img
-        src={$Settings?.profile?.mainPicture}
-        alt={$Settings?.profile?.restaurantName}
+        src={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+        alt={$Settings?.profile?.restaurantName ?? 'iKomida'}
       />
-    {:else}
+    {:else if $Settings?.profile?.restaurantName}
       <div class="avatarCircle">
         {$Settings?.profile?.restaurantName?.[0]}{$Settings?.profile
           ?.restaurantName?.[1]}
       </div>
       <h2>{$Settings?.profile?.restaurantName}</h2>
+      {:else}
+        <img
+          src="assets/icons/transparent-logo-1.svg"
+          alt="iKomida"
+        />
     {/if}
   </div>
   <h3>
     Se você ainda não abriu sua conta, <span
       on:click={doSubscribe}
-      style="color: #b52124;">clique aqui</span
+      style="color: #4c0708;">clique aqui</span
     > é rápido e fácil.
   </h3>
   <Views.TextEdit
@@ -112,6 +117,10 @@
     padding: 1em;
     min-width: 90%;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    place-content: center;
   }
 
   h1 {

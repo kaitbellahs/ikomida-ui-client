@@ -159,8 +159,8 @@
     title="Novo endereço!"
     closeCallBack={toggleNewAddress}
     buttons={[
-      { name: "Cancelar", callback: toggleNewAddress, principal: true },
-      { name: "Adicionar", callback: newAddress },
+      { name: "Cancelar", callback: toggleNewAddress},
+      { name: "Adicionar", callback: newAddress, principal: true  },
     ]}
   >
     <Views.TextEdit
@@ -255,8 +255,8 @@
     font-size: 0.9em;
     color: white;
     font-family: RobotoBold;
-    border: 1px solid #b52124;
-    background: #b52124;
+    border: 1px solid #4c0708;
+    background: #4c0708;
     border-radius: 16px;
     width: 28px;
     height: 28px;

@@ -186,7 +186,7 @@
     margin-bottom: 10px;
   }
   .status > .lateOrder {
-    background-color: #b52124;
+    background-color: #4c0708;
     border-radius: 6px;
     color: white;
     padding: 4px 20px;

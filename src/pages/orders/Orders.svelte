@@ -52,45 +52,67 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {/if}
-<div>
-  {#each orders as { id, status, products, address, payment, createdAt, preparation }}
-    <div class="leftShadow orderContainer" on:click={goToOrder(id)}>
-      {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(status)}
-        {#if new Date(new Date(createdAt).getTime() + (preparation?.max + address?.duration) * 1000) < new Date()}
-          <span class="lateOrder">Pedido atrasado</span>
+{#if orders.length > 0}
+  <div>
+    {#each orders as { id, status, products, address, payment, createdAt, preparation }}
+      <div class="leftShadow orderContainer" on:click={goToOrder(id)}>
+        {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(status)}
+          {#if new Date(new Date(createdAt).getTime() + (preparation?.max + address?.duration) * 1000) < new Date()}
+            <span class="lateOrder">Pedido atrasado</span>
+          {/if}
+          <span class="deliveryForecast">Previsão de entrega</span>
+          <span class="deliveryForecastValue">
+            entre
+            {Utils.Strings.dateToString(
+              new Date(createdAt).getTime() +
+                (preparation?.min + address?.duration) * 1000
+            )} e {Utils.Strings.dateToString(
+              new Date(createdAt).getTime() +
+                (preparation?.max + address?.duration) * 1000
+            )}</span
+          >
         {/if}
-        <span class="deliveryForecast">Previsão de entrega</span>
-        <span class="deliveryForecastValue">
-          entre
-          {Utils.Strings.dateToString(
-            new Date(createdAt).getTime() +
-              (preparation?.min + address?.duration) * 1000
-          )} e {Utils.Strings.dateToString(
-            new Date(createdAt).getTime() +
-              (preparation?.max + address?.duration) * 1000
-          )}</span
-        >
-      {/if}
-      <h3 class={["delivered"].includes(status) ? 'delivered' : ''}>Pedido {OrderStatus(status)}</h3>
-      {#if products.length > 0}
-        <div class="product">1. {products[0].title}</div>
-      {/if}
-      {#if products.length > 1}
-        <div class="product">
-          e mais {products.length - 1}
-          {products.length - 1 == 1 ? "item" : "itens"}
+        <h3 class={["delivered"].includes(status) ? "delivered" : ""}>
+          Pedido {OrderStatus(status)}
+        </h3>
+        {#if products.length > 0}
+          <div class="product">1. {products[0].title}</div>
+        {/if}
+        {#if products.length > 1}
+          <div class="product">
+            e mais {products.length - 1}
+            {products.length - 1 == 1 ? "item" : "itens"}
+          </div>
+        {/if}
+        <div class="address">Entregue em: <b>{address.street}</b></div>
+        <div class="paymentMethod">
+          Forma de pagamento: <b>{PaymentType(payment.type)}</b>
         </div>
-      {/if}
-      <div class="address">Entregue em: <b>{address.street}</b></div>
-      <div class="paymentMethod">
-        Forma de pagamento: <b>{PaymentType(payment.type)}</b>
+        <div class="time">{Utils.Strings.dateToString(createdAt)}</div>
       </div>
-      <div class="time">{Utils.Strings.dateToString(createdAt)}</div>
-    </div>
-  {/each}
-</div>
+    {/each}
+  </div>
+{:else}
+  <div id="noOrders">
+    <h2>
+      Não há pedido para exiber, aproveite e faça seu primeiro pedido agora
+      mesmo!
+    </h2>
+  </div>
+{/if}
 
 <style>
+  #noOrders {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+  }
+  #noOrders > h2 {
+    place-self: center;
+    align-self: center;
+    justify-self: center;
+    text-align: center;
+  }
   .orderContainer {
     border-radius: 4px;
     border: 1px solid #ccc;
@@ -109,7 +131,7 @@
     margin-top: 10px;
   }
   .orderContainer > h3.delivered {
-    color:rgb(0, 177, 0);
+    color: rgb(0, 177, 0);
   }
   .orderContainer > .product {
     font-family: RobotoLight;
@@ -138,7 +160,7 @@
     color: rgb(0, 177, 0);
   }
   .orderContainer > .lateOrder {
-    background-color: #b52124;
+    background-color: #4c0708;
     border-radius: 6px;
     color: white;
     padding: 4px 20px;

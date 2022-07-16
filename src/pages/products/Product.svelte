@@ -62,7 +62,7 @@
   <h2>{item.title}</h2>
   <p>{item.description}</p>
   <span class="serves"
-    >Aproximadamente {Utils.Strings.formatNumber(item.weight)} Kg</span
+    >Aproximadamente {Utils.Numbers.formatWeight(item.weight)}</span
   >
 
   <div class="price">

@@ -1,4 +1,4 @@
-package com.deluxe.restaurant;
+package br.com.ikomida.restaurant;
 
 import com.getcapacitor.BridgeActivity;
 

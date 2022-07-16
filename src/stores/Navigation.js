@@ -21,7 +21,8 @@ export const Routes = {
     tac: Symbol("/tac"),
     addresses: Symbol("/addresses"),
     payments: Symbol("/payments"),
-    businessHours: Symbol("businessHours")
+    businessHours: Symbol("businessHours"),
+    newMethod: Symbol("newMethod")
 };
 
 function createTitle() {

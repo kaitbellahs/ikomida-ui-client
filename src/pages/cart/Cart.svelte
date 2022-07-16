@@ -115,7 +115,7 @@
   />
 {/each}
 <Views.Button {Layout} type="transparent" on:click={addMoreItems}
-  >Addionar mais itens</Views.Button
+  >Adicionar mais itens</Views.Button
 >
 <table>
   <thead>

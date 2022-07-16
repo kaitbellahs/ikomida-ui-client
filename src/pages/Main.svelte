@@ -29,7 +29,8 @@
   } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
   import Addresses from "./user/Addresses.svelte";
-  import Payments from "./user/Payments.svelte";
+  import Payments from "./payments/Payments.svelte";
+  import NewMethod from "./payments/NewMethod.svelte";
 
   let direction;
 
@@ -53,7 +54,7 @@
   const menuHamburgerItems = [
     {
       name: "Home",
-      callback: () => Navigation.goTo(Routes.home),
+      callback: () => Navigation.reset(Routes.home),
       icon: faHome,
     },
     {
@@ -113,13 +114,15 @@
     const style = document.createElement("style");
     style.innerHTML = `
       body {
+        --backgroundColor: ${$Layout.background};
         --paddingTop: ${styleHeight};
-        --paddingBottom: ${showCart ? "115px" : "50px"};
+        --paddingBottom: ${showCart ? "115px" : "55px"};
       }
     `;
     document.head.appendChild(style);
     await CartStore.items();
   });
+  $: console.log($Layout)
 </script>
 
 <main
@@ -149,6 +152,8 @@
     <Payments />
   {:else if route == Routes.businessHours}
     <BusinessHours />
+  {:else if route == Routes.newMethod}
+    <NewMethod />
   {:else}
     <Home />
   {/if}
@@ -163,7 +168,7 @@
   {/if}
 </main>
 <Views.NavigationBar
-  logo={$Settings?.profile?.mainPicture || 'assets/icons/logo.svg'}
+  logo={$Settings?.profile?.mainPicture || 'assets/icons/transparent-logo-1.svg'}
   {Layout}
   {MenuHamburger}
   {Menu}
@@ -191,5 +196,10 @@
   body {
     padding-top: var(--paddingTop);
     padding-bottom: var(--paddingBottom);
+    background: var(--backgroundColor);
+  }
+  main{
+    display: flex;
+    flex-direction: column;
   }
 </style>

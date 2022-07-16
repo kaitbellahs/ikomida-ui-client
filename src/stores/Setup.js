@@ -15,15 +15,17 @@ export const StatusBar = createStatusBar();
 
 function createLayout() {
 	const { subscribe, set } = writable({
-		background: "#ccc",
-		color: "#000",
+		link: "#e8d130",
+		background: "#dfdfdf",
+		color: "#000000",
 		header: {
-		  background: "#ffe4c4",
-		  color: "#a52a2a",
-		  menuHamburger: "black",
+		  color: "#ffffff",
+		  background: "#4c0708",
+		  menuHamburger: "#ffffff",
 		},
-		tabs: { background: "#ffe4c4" },
-		button: { background: "#a52a2a", color: "white" },
+		tabs: { background: "#ffe4c4", color: "#4c0708" },
+		button: { background: "#4c0708", color: "white" },
+		dialog: { background: "#ffffffdf", color: "#4c0708" },
 	  });
 
 	return {
