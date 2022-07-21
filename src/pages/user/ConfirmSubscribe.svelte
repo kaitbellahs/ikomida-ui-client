@@ -91,6 +91,14 @@
     }
     isLoading = false;
   }
+  
+  async function goToTAC() {
+    Navigation.goTo(Routes.tac);
+  }
+  
+  async function goToPP() {
+    Navigation.goTo(Routes.pp);
+  }
 
   onDestroy(() => {
     if (timer) {
@@ -146,6 +154,8 @@
   <Views.Button {Layout} on:click={doSubscribe} disabled={!canSubscribe}
     >Confirmar</Views.Button
   >
+  <Views.Divider />
+  <small>Ao confirmar você concorda com <a href="#/" on:click={goToTAC}>termos de uso</a> e nossa <a on:click={goToTAC} href="#/">politica de privacidade</a></small>
   <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 </main>
 

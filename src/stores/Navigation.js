@@ -22,6 +22,7 @@ export const Routes = {
     addresses: Symbol("/addresses"),
     payments: Symbol("/payments"),
     businessHours: Symbol("businessHours"),
+    pp: Symbol("privacyPolicy"),
     newMethod: Symbol("newMethod")
 };
 

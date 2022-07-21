@@ -117,6 +117,10 @@
         secret={true}
         placeHolder=""
       />
+      <small
+        >A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
+        uma letra maiúscula, uma letra minúscula, um número e um símbolo</small
+      >
       <Views.TextEdit
         name="Confirmação:"
         bind:value={passwordObject.reNewPass}

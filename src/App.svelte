@@ -17,7 +17,7 @@
   import { registerPushNotificationToken } from "./network/PushNotification";
   import { getLayout } from "./network/Layout";
   import { GetSettings } from "./network/User";
-  import NoService from "./pages/user/NoService.svelte";
+  import Pp from "./pages/user/Pp.svelte";
 
   let networkStatus = null;
 
@@ -119,6 +119,8 @@
   <ConfirmSubscribe />
 {:else if route == Routes.tac}
   <Tac />
+{:else if route == Routes.pp}
+  <Pp />
 {:else}
   <Login />
 {/if}

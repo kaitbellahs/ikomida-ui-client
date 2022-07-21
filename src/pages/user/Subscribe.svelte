@@ -17,24 +17,27 @@
     email: null,
     password: null,
   };
-  
+
   let isValidCPF = false;
   let isValidEmail = false;
   let isValidPassword = false;
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   $: canContinue =
-  subscribeObject?.name && (subscribeObject?.name?.length || 0) <= 255 &&
-    subscribeObject?.lastName && (subscribeObject?.lastName?.length || 0) <= 255 &&
+    subscribeObject?.name &&
+    (subscribeObject?.name?.length || 0) <= 255 &&
+    subscribeObject?.lastName &&
+    (subscribeObject?.lastName?.length || 0) <= 255 &&
     isValidCPF &&
-    isValidEmail && (subscribeObject?.email?.length || 0) <= 255 &&
+    isValidEmail &&
+    (subscribeObject?.email?.length || 0) <= 255 &&
     isValidPassword;
 
   async function doSubscribe() {
     Navigation.goTo(Routes.confirmSubscribe, subscribeObject);
   }
 
-  Title.set("Cadastro");
+  Title.set("Criar conta");
 </script>
 
 <Views.NavigationBar
@@ -84,10 +87,15 @@
     secret={true}
     bind:isValid={isValidPassword}
   />
+  <small
+    >A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
+    uma letra maiúscula, uma letra minúscula, um número e um símbolo</small
+  >
   <Views.Divider />
   <Views.Button {Layout} disabled={!canContinue} on:click={doSubscribe}
     >Cadastrar</Views.Button
   >
+  <Views.Divider />
 </main>
 
 <style>
