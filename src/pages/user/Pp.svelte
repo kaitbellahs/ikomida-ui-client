@@ -14,7 +14,6 @@
 
   onMount(async () => {
     isLoading = true;
-    console.log(1);
     term = await getPrivacyPolicy();
     if (term) {
       Title.set(term?.name);

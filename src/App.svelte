@@ -11,15 +11,26 @@
   import { Network } from "@capacitor/network";
   import { onMount } from "svelte";
   import { StatusBar as _StatusBar, Layout, Settings } from "./stores/Setup";
-  import { Router, Routes } from "./stores/Navigation";
+  import { Navigation, Router, Routes } from "./stores/Navigation";
   import { StatusBar } from "@capacitor/status-bar";
-  import { Utils, PushNotification } from "@ikomida/components";
+  import { Utils, PushNotification, Views } from "@ikomida/components";
   import { registerPushNotificationToken } from "./network/PushNotification";
   import { getLayout } from "./network/Layout";
   import { GetSettings } from "./network/User";
   import Pp from "./pages/user/Pp.svelte";
+  import Cache from "./stores/Cache";
 
   let networkStatus = null;
+  let showNotificationPopup = false;
+  let notificationIds = [];
+  let notificationPopup = {
+    title: null,
+    body: null,
+    buttons: [],
+  };
+  function togglePushNotificationPopup() {
+    showNotificationPopup = !showNotificationPopup;
+  }
 
   $: route = $Router.route;
 
@@ -41,24 +52,76 @@
   };
 
   async function hasRegisteredCallBack(token, platform) {
-    CAPNativeLog.log({ level: "info", message: JSON.stringify(token) });
     const tokenObject = { platform, token };
     PushNotificationToken.setToken(tokenObject);
-    await registerPushNotificationToken(tokenObject);
+    const response = await registerPushNotificationToken(tokenObject);
   }
 
-  function pushNotificationReceivedCallBack(notification) {
-    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+  async function hasErrorCallBack(error) {
+    //TODO: -- handle and report error
+    CAPNativeLog.log({ level: "error", message: JSON.stringify(error) });
   }
 
-  function pushNotificationActionPerformedCallBack(notification) {
+  async function permissionStatus(permissionStatus) {
+    //TODO: -- handle and report permissions
+    CAPNativeLog.log({
+      level: "info",
+      message: `permissionStatusObject: ${JSON.stringify(permissionStatus)}`,
+    });
+  }
+
+  function receivedCallBack(notification) {
     CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+    if (
+      !notificationIds.includes(notification?.id) &&
+      (logedIn || !((notification?.data?.logon ?? "true") === "true"))
+    ) {
+      notificationIds.push(notification?.id);
+      notificationPopup.title = notification?.title;
+      notificationPopup.body = notification?.body;
+      notificationPopup.buttons = [
+        {
+          name: "Fechar",
+          callback: togglePushNotificationPopup,
+        },
+      ];
+      if (notification?.data?.uri) {
+        notificationPopup?.buttons?.push({
+          name: "Abrir",
+          callback: () => {
+            showNotificationPopup = false;
+            openNotification(notification);
+          },
+          principal: true,
+        });
+      }
+      notificationPopup = notificationPopup;
+      CAPNativeLog.log({ level: "info", message: "Inside" });
+      togglePushNotificationPopup();
+    }
+  }
+
+  function actionPerformedCallBack(notification) {
+    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+    openNotification(notification?.notification);
+  }
+
+  async function openNotification(notification) {
+    if (logedIn) {
+      if (["/order/", "/orders/"].includes(notification?.data?.uri)) {
+        Cache.setObject("ORDERS_HISTORY", null);
+        Cache.setObject("ORDERS", null);
+        Navigation.goTo(Routes.orders, false);
+      }
+    }
   }
 
   let pushNotification = new PushNotification(
     hasRegisteredCallBack,
-    pushNotificationReceivedCallBack,
-    pushNotificationActionPerformedCallBack
+    receivedCallBack,
+    actionPerformedCallBack,
+    hasErrorCallBack,
+    permissionStatus
   );
 
   onMount(async () => {
@@ -74,8 +137,8 @@
     if (Capacitor.isNativePlatform()) {
       pushNotification.init();
       const statusBar = await StatusBar.getInfo();
-      statusBar.topMargin = statusBar?.topMargin || 0;
-      _StatusBar.setStatusBar();
+      statusBar.topMargin = statusBar?.topMargin ?? 0;
+      _StatusBar.setStatusBar(statusBar);
     }
   });
   $: if (networkStatus == null || !networkStatus.connected) {
@@ -91,22 +154,10 @@
   Network.addListener("networkStatusChange", (status) => {
     networkStatus = status;
   });
-  // App.addListener("appStateChange", ({ isActive }) => {
-  //   console.log("App state changed. Is active?", isActive);
-  // });
-
-  // App.addListener("appUrlOpen", (data) => {
-  //   console.log("App opened with URL:", data);
-  // });
-
-  // App.addListener("appRestoredResult", (data) => {
-  //   console.log("Restored state:", data);
-  // });
 </script>
-
-<!-- {#if !$Settings.isActive}
-  <NoService />
-{:else if logedIn} -->
+<Views.LoadJS
+  url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS"
+/>
 {#if logedIn}
   <Main />
 {:else if route == Routes.login}
@@ -127,6 +178,14 @@
 {#if networkStatus == null || !networkStatus.connected}
   <div id="internetError">Esperando por conexão a internet...</div>
 {/if}
+{#if showNotificationPopup}
+  <Views.Alert
+    title={notificationPopup?.title}
+    message={notificationPopup?.body}
+    closeCallBack={togglePushNotificationPopup}
+    buttons={notificationPopup?.buttons}
+  />
+{/if}
 
 <style>
   #internetError {
@@ -138,5 +197,8 @@
     right: 0;
     padding-left: 10px;
     padding-right: 10px;
+  }
+  :global(.grecaptcha-badge) {
+    visibility: hidden;
   }
 </style>

@@ -122,7 +122,6 @@
     document.head.appendChild(style);
     await CartStore.items();
   });
-  $: console.log($Layout)
 </script>
 
 <main

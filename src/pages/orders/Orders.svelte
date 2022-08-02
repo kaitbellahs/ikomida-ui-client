@@ -6,23 +6,63 @@
     Router,
     Menu,
   } from "../../stores/Navigation";
-  import { GetOrders, OrderStatus } from "../../network/Orders";
+  import { getOrders, OrderStatus } from "../../network/Orders";
   import { Views, Utils } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
-  import { faHistory } from "@fortawesome/free-solid-svg-icons";
+  import { faHistory, faSync } from "@fortawesome/free-solid-svg-icons";
+  import Cache from "../../stores/Cache";
+  let orders;
+
+  let hasMore = true;
+  let canGetMore = true;
+  let lastTimestamp = null;
+
+  async function getMore(e, refresh = false) {
+    if (refresh || (canGetMore && hasMore)) {
+      isLoading = true;
+      const timestamp = refresh
+        ? 0
+        : orders?.[orders.length - 1]?.timestamp ?? -1;
+      canGetMore = false;
+      orders = Cache.getObject(CACHE_NAME);
+      const newOrders = await getOrders($Router.options, timestamp);
+      hasMore = newOrders.length > 0;
+      orders = refresh
+        ? newOrders
+        : orders
+        ? [...orders, ...newOrders]
+        : newOrders;
+      orders.sort((item1, item2) => item2.timestamp - item1.timestamp);
+      Cache.setObject(CACHE_NAME, orders);
+      canGetMore = refresh || lastTimestamp !== timestamp;
+      lastTimestamp = timestamp;
+      isLoading = false;
+    }
+  }
+
+  async function update() {
+    orders = Cache.getObject(CACHE_NAME);
+    if (!orders) {
+      await getMore(null, true);
+    }
+  }
+
+  async function refresh() {
+    await getMore(null, true);
+  }
 
   let isLoading = false;
-  let orders = [];
-
-  $: if ($Router.options === null || $Router.options !== null) {
-    if ($Router.options === null || !$Router.options) {
+  $: CACHE_NAME = $Router?.options ? "ORDERS_HISTORY" : "ORDERS";
+  $: if ($Router?.options === null || $Router?.options !== null) {
+    if (!$Router?.options) {
       Menu.addItem({
         icon: faHistory,
         name: "Históricos",
         callback: goToOrdersHistory,
       });
     }
+    Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
     update();
   }
 
@@ -31,12 +71,6 @@
       return order?.id === id;
     });
     Navigation.goTo(Routes.order, { newOrder: false, order });
-  }
-
-  async function update() {
-    isLoading = true;
-    orders = await GetOrders($Router.options);
-    isLoading = false;
   }
 
   function goToOrdersHistory() {
@@ -52,7 +86,7 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {/if}
-{#if orders.length > 0}
+{#if (orders?.length ?? 0) > 0}
   <div>
     {#each orders as { id, status, products, address, payment, createdAt, preparation }}
       <div class="leftShadow orderContainer" on:click={goToOrder(id)}>
@@ -91,11 +125,19 @@
         <div class="time">{Utils.Strings.dateToString(createdAt)}</div>
       </div>
     {/each}
+    <Views.Divider />
+    {#if hasMore && !canGetMore}
+      <Views.LocalLoading />
+    {:else}
+      <Views.Button disabled={!hasMore || !canGetMore} on:click={getMore}
+        >carregar mais</Views.Button
+      >
+    {/if}
   </div>
 {:else}
   <div id="noOrders">
     <h2>
-      Não há pedido para exiber, aproveite e faça seu primeiro pedido agora
+      Não há pedido para exibir, aproveite e faça seu primeiro pedido agora
       mesmo!
     </h2>
   </div>

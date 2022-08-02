@@ -46,7 +46,7 @@
   }
 
   function validateValidationCode(validationValid) {
-    return (validationValid?.length || 0) == 4;
+    return (validationValid?.length ?? 0) == 4;
   }
 
   async function requestNewPassword() {
@@ -109,27 +109,28 @@
   style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%; background: {$Layout.background};height: 100%;"
 >
   <Views.Divider />
-  <h2>Por favor enforma seu numero de telefone cadastrado</h2>
+  <h2>Por favor informe seu número de telefone cadastrado</h2>
+  <small
+    >clique em "<b>Solicitar</b>" para solicitar o código de validação</small
+  >
   <Views.TextEdit
     type="phone"
-    bind:rawValue={requestPasswordObject.phone}
-    icon={faPhone}
-    buttonName="Enviar"
+    bind:value={requestPasswordObject.phone}
+    buttonName="Solicitar"
     callback={requestPhoneValidation}
     buttonDisabled={!canRequestCode || !countdownCanRequestCode}
     bind:isValid={canRequestCode}
-    name="Numero do telefone"
+    placeHolder="Número de telefone"
   />
   {#if !countdownCanRequestCode}
-    <span
-      >Caso não receber o codigo, espera {countdown} segundos para solicitar um
-      novo!</span
+    <small
+      >Caso não receber o código, espera {countdown} segundos para solicitar um novo!</small
     >
   {/if}
   <Views.Divider />
   <Views.TextEdit
     type="number"
-    bind:rawValue={requestPasswordObject.phoneValidationCode}
+    bind:value={requestPasswordObject.phoneValidationCode}
     icon={faUnlock}
     mask="_ _ _ _"
     buttonName="Confirmar"
@@ -138,7 +139,7 @@
     disabled={!canDigitValidationCode}
     bind:isValid={isValidationValid}
     validation={validateValidationCode}
-    name="Codigo de validação"
+    placeHolder="Código de validação"
   />
   <Views.Divider />
   <Views.Divider />
@@ -147,6 +148,7 @@
     on:click={requestNewPassword}
     disabled={!canRequestPassword}>Solicitar nova senha</Views.Button
   >
+  <Views.GTerms />
   <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 </main>
 

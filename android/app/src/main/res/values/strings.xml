@@ -1,7 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">ikomida</string>
-    <string name="title_activity_main">ikomida</string>
-    <string name="package_name">br.com.ikomida.restaurant</string>
+    <string name="app_name">iKomida</string>
+    <string name="title_activity_main">iKomida</string>
+    <string name="package_name">com.ikomida.br.tialtonivel</string>
     <string name="custom_url_scheme">ikomida</string>
+    <string name="filter_view">iKomida</string>
+    <string name="url_scheme">com.ikomida.br.tialtonivel</string>
+    <string name="url_host">pagseguro.integration.callback</string>
 </resources>

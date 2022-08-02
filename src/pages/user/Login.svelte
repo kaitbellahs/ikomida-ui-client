@@ -9,13 +9,11 @@
   import { Layout, Settings } from "../../stores/Setup";
 
   let isLoading = false;
-  let phone = "11953635016";
-  let initialValue = "(11) 95363-5016";
-  let password = "123456";
-  let isValidPassword = false;
+  let phone;
+  let password;
   let isValidPhone = false;
 
-  $: canLogin = isValidPhone && isValidPhone;
+  $: canLogin = isValidPhone;
   let errorAlert;
   let showAlert = false;
 
@@ -44,7 +42,7 @@
         }
         Navigation.reset(Routes.home);
       } else {
-        toggleErrorAlert("Token não é valido");
+        toggleErrorAlert("O token de acesso não é válido");
       }
     } else {
       toggleErrorAlert(response?.data);
@@ -83,11 +81,10 @@
     > é rápido e fácil.
   </h3>
   <Views.TextEdit
-    bind:rawValue={phone}
-    bind:value={initialValue}
+    bind:value={phone}
     icon={faPhone}
     type="phone"
-    placeHolder="Numero de celular"
+    placeHolder="Número de celular"
     bind:isValid={isValidPhone}
   />
   <Views.TextEdit
@@ -96,7 +93,6 @@
     placeHolder="Senha"
     secret={true}
     type="password"
-    bind:isValid={isValidPassword}
   />
   <div />
   <Views.Button {Layout} on:click={doLogin} disabled={!canLogin}
@@ -106,8 +102,9 @@
     >Criar conta</Views.Button
   >
   <Views.Button {Layout} type="transparent" on:click={forgotPassword}
-    >Esqueci minha senha</Views.Button
+    >Recuperar a senha</Views.Button
   >
+  <Views.GTerms />
   <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 </main>
 
@@ -123,13 +120,6 @@
     place-content: center;
   }
 
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4em;
-    font-weight: 100;
-  }
-  main > p,
   main > div {
     margin-bottom: 30px;
   }

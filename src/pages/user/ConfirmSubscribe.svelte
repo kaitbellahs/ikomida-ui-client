@@ -9,12 +9,18 @@
   import { Views, Utils } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
-  import * as AuthNetwork from "../../network/Auth";
+  import {
+    requestPhoneValidation,
+    validatePhoneValidationCode,
+    subscribe,
+  } from "../../network/Auth";
+  import { getTermOfUse } from "../../network/Terms";
   import { Layout } from "../../stores/Setup";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   const countdownWaitTime = 60;
 
+  let showRequestValidatingCodeAlert = false;
   let isLoading = false;
   let subscribeObject = {
     ...Utils.Objects.copy($Router.options),
@@ -30,6 +36,7 @@
   let timer = null;
   let countdownCanRequestCode = true;
   let countdown = 0;
+  let callbackId;
 
   $: if (countdown === 0) {
     if (timer) {
@@ -48,23 +55,38 @@
 
   async function doSubscribe() {
     isLoading = true;
-    const response = await AuthNetwork.subscribe(subscribeObject);
+    const response = await subscribe(subscribeObject);
     if (response?.success) {
-      Navigation.reset(Routes.login);
+      callbackId = "doSubscribe";
+      toggleErrorAlert(
+        "Seu cadastro foi concluído com sucesso, agora é só você usar seu número de telefone como usuário e sua senha para acessar a área logada e usufruir dos nossos produtos e serviços."
+      );
     } else {
       toggleErrorAlert(response?.data);
     }
     isLoading = false;
   }
 
-  function validateValidationCode(validationValid) {
-    return (validationValid?.length || 0) == 4;
+  function closeCallBack() {
+    if (callbackId === "doSubscribe") {
+      callbackId = null;
+      Navigation.reset(Routes.login);
+    }
   }
 
-  async function requestPhoneValidation() {
+  function validateValidationCode(validationValid) {
+    return (validationValid?.length ?? 0) == 4;
+  }
+
+  function toggleshowRequestValidatingCodeAlert() {
+    showRequestValidatingCodeAlert = !showRequestValidatingCodeAlert;
+  }
+
+  async function RequestPhoneValidation() {
     isLoading = true;
+    showRequestValidatingCodeAlert = false;
     subscribeObject.phone = subscribeObject.phone;
-    const response = await AuthNetwork.requestPhoneValidation(subscribeObject);
+    const response = await requestPhoneValidation(subscribeObject);
     if (response?.success) {
       subscribeObject = { ...subscribeObject, signature: response?.data };
       canDigitValidationCode = true;
@@ -73,6 +95,9 @@
       timer = setInterval(() => {
         countdown--;
       }, 1000);
+      toggleErrorAlert(
+        `Digite o código que você receberá em instantes no seu celular no campo "Código de validação" e clica no botão “CONFIRMAR”`
+      );
     } else {
       toggleErrorAlert(response?.data);
     }
@@ -81,24 +106,32 @@
 
   async function ValidatePhoneCode() {
     isLoading = true;
-    const response = await AuthNetwork.validatePhoneValidationCode(
-      subscribeObject
-    );
+    const response = await validatePhoneValidationCode(subscribeObject);
     if (response?.success) {
       canSubscribe = true;
+      toggleErrorAlert(
+        `O código inserido é correto!, agora é só clicar no botão “CONTINUAR” para finalizar seu cadastro`
+      );
     } else {
       toggleErrorAlert(response?.data);
     }
     isLoading = false;
   }
-  
+
   async function goToTAC() {
     Navigation.goTo(Routes.tac);
   }
-  
+
   async function goToPP() {
     Navigation.goTo(Routes.pp);
   }
+
+  onMount(async () => {
+    const term = await getTermOfUse();
+    if (term) {
+      subscribeObject.termId = term?.id;
+    }
+  });
 
   onDestroy(() => {
     if (timer) {
@@ -122,25 +155,27 @@
 <main
   style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%; background: {$Layout.background};height: 100%;"
 >
-  <p>Por favor confirme seu numero de telefone</p>
+  <h2>Por favor informe seu número de telefone cadastrado</h2>
+  <small
+    >clique em "<b>Solicitar</b>" para solicitar o código de validação</small
+  >
   <Views.TextEdit
     type="phone"
-    bind:rawValue={subscribeObject.phone}
-    icon={faPhone}
-    buttonName="Enviar"
-    callback={requestPhoneValidation}
+    bind:value={subscribeObject.phone}
+    buttonName="Solicitar"
+    callback={toggleshowRequestValidatingCodeAlert}
     buttonDisabled={!canRequestCode || !countdownCanRequestCode}
     bind:isValid={canRequestCode}
+    placeHolder="Número do telefone"
   />
   {#if !countdownCanRequestCode}
-    <span
-      >Caso não receber o codigo, espera {countdown} segundos para solicitar um
-      novo!</span
+    <small
+      >Caso não receber o código, espera {countdown} segundos para solicitar um novo!</small
     >
   {/if}
   <Views.TextEdit
     type="number"
-    bind:rawValue={subscribeObject.phoneValidationCode}
+    bind:value={subscribeObject.phoneValidationCode}
     icon={faUnlock}
     mask="_ _ _ _"
     buttonName="Confirmar"
@@ -149,14 +184,47 @@
     disabled={!canDigitValidationCode}
     bind:isValid={isValidationValid}
     validation={validateValidationCode}
+    placeHolder="Código de validação"
   />
   <Views.Divider />
   <Views.Button {Layout} on:click={doSubscribe} disabled={!canSubscribe}
     >Confirmar</Views.Button
   >
   <Views.Divider />
-  <small>Ao confirmar você concorda com <a href="#/" on:click={goToTAC}>termos de uso</a> e nossa <a on:click={goToTAC} href="#/">politica de privacidade</a></small>
-  <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
+  <small
+    >Ao confirmar você concorda com <a href="#/" on:click={goToTAC}
+      >termos de uso</a
+    >
+    e nossa <a on:click={goToTAC} href="#/">politica de privacidade</a></small
+  >
+  <Views.GTerms />
+  <Views.MessageAlert
+    {closeCallBack}
+    {Layout}
+    object={errorAlert}
+    bind:show={showAlert}
+  />
+
+  {#if showRequestValidatingCodeAlert}
+    <Views.Alert
+      title="Alerta"
+      message={`Verifica se seu número de telefone inserido ${Utils.Strings.formatAsPhone(
+        subscribeObject?.phone
+      )} está correto para prosseguir`}
+      closeCallBack={toggleshowRequestValidatingCodeAlert}
+      buttons={[
+        {
+          name: "Quero corrigir",
+          callback: toggleshowRequestValidatingCodeAlert,
+        },
+        {
+          name: "Está correto",
+          callback: RequestPhoneValidation,
+          principal: true,
+        },
+      ]}
+    />
+  {/if}
 </main>
 
 <style>

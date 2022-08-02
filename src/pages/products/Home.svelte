@@ -14,7 +14,7 @@
   />
 {:then items}
   <Views.Divider />
-  {#if (items?.length || 0) > 0}
+  {#if (items?.length ?? 0) > 0}
     <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
     <div class="preparationTime">
       entre {Utils.Strings.timeToString($Settings?.preparation?.min * 60)}, e {Utils.Strings.timeToString($Settings?.preparation?.max * 60)}

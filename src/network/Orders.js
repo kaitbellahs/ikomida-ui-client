@@ -8,8 +8,8 @@ import {
     Auth
 } from '../stores/Auth';
 
-export async function GetOrders(history) {
-    let response = await Network.instance.get(`/orders${history ? '/history' : ''}`, get(Auth));
+export async function getOrders(history, timestamp = 0) {
+    let response = await Network.instance.get(`/orders/${timestamp}${history ? '/history' : ''}`, get(Auth));
     let orders = [];
     if (response?.success) {
         orders = response?.data || [];
@@ -18,7 +18,7 @@ export async function GetOrders(history) {
 }
 
 export async function NewOrders(payload) {
-    return Network.instance.post("/order", get(Auth), payload);
+    return Network.instance.post("/order", get(Auth), payload, "newOrder");
 }
 
 export function OrderStatus(status) {

@@ -50,7 +50,7 @@
     const response = await DeleteCard(id);
     if (response?.success) {
       payments = payments?.filter((item) => item.id !== id);
-      if ((payments?.length || 0) === 1) {
+      if ((payments?.length ?? 0) === 1) {
         payments[0].selected = true;
         payments = payments;
       }

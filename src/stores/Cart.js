@@ -60,10 +60,11 @@ const addItem = async (item) => {
     } catch (error) {
         //TODO: -- report errors
     }
-    Store.updateItems(oldItems == null ? [item] : [...oldItems, item]);
+    const update = [...new Set([...oldItems, item])]
+    Store.updateItems(oldItems == null ? [item] : update);
     await Storage.set({
         key: 'Cart',
-        value: JSON.stringify([...oldItems, item])
+        value: JSON.stringify(update)
     });
 }
 const subtotal = async () => {

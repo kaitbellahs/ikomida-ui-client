@@ -14,7 +14,7 @@
   $: if (value != oldValue) {
     isLoading = true;
     error = false;
-    if ((value?.length || 0) > 0) {
+    if ((value?.length ?? 0) > 0) {
       search(value).then((_items) => {
         items = _items;
         oldValue = value;

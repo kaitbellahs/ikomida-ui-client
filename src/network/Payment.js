@@ -17,7 +17,7 @@ export async function GetPaymentMethods() {
 // }
 
 export async function NewCard(method) {
-    return Network.instance.post(`/payment`, get(Auth), method);
+    return Network.instance.post(`/payment`, get(Auth), method, "newPaymentMethod");
 }
 
 export async function UpdateCard(id) {
@@ -29,18 +29,18 @@ export async function DeleteCard(id) {
 }
 
 export async function AddCoupon(coupon) {
-    return Network.instance.post(`/coupon`, get(Auth), {coupon});
+    return Network.instance.post(`/coupon`, get(Auth), { coupon });
 }
 
 export function PaymentType(type) {
-    switch (type) {
-        case "creditCard":
+    switch (type?.toLowerCase()) {
+        case "creditcard":
             return "cartão de crédito";
         case "pix":
             return "PIX";
         case "boleto":
             return "boleto bancário";
-        case "Cash":
+        case "cash":
             return "Dinheiro";
         default:
             return "-";

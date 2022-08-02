@@ -7,9 +7,9 @@
   const { newOrder, order } = $Router.options;
 
   $: total =
-    Number(order?.subtotal || 0) +
-    Number(order?.delivery || 0) -
-    Number(order?.discount || 0);
+    Number(order?.subtotal ?? 0) +
+    Number(order?.delivery ?? 0) -
+    Number(order?.discount ?? 0);
 
   $: if (newOrder) {
     Navigation.backCallBack = () => {
@@ -23,7 +23,7 @@
 <div class="time">Realizado {Utils.Strings.dateToString(order?.createdAt)}</div>
 <div class="status">
   {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(order.status)}
-    {#if new Date(new Date(order?.createdAt).getTime() + ((order?.preparation?.max || 0) + (order?.address?.duration || 0)) * 1000) < new Date()}
+    {#if new Date(new Date(order?.createdAt).getTime() + ((order?.preparation?.max ?? 0) + (order?.address?.duration ?? 0)) * 1000) < new Date()}
       <span class="lateOrder">Pedido atrasado</span>
     {/if}
     <span class="deliveryForecast">Previsão de entrega</span>
@@ -31,11 +31,11 @@
       entre
       {Utils.Strings.dateToString(
         new Date(order?.createdAt).getTime() +
-          ((order?.preparation?.min || 0) + (order?.address?.duration || 0)) *
+          ((order?.preparation?.min ?? 0) + (order?.address?.duration ?? 0)) *
             1000
       )} e {Utils.Strings.dateToString(
         new Date(order.createdAt).getTime() +
-          ((order?.preparation?.max || 0) + (order?.address?.duration || 0)) *
+          ((order?.preparation?.max ?? 0) + (order?.address?.duration ?? 0)) *
             1000
       )}</span
     >

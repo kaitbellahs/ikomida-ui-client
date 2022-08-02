@@ -1,7 +1,12 @@
 {
-  "appId": "br.com.ikomida.client",
+  "appId": "com.ikomida.br.tialtonivel",
   "appName": "iKomida",
   "webDir": "public",
   "bundledWebRuntime": false,
-  "npmClient": "npm"
+  "npmClient": "npm",
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
 }

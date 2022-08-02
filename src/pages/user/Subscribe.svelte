@@ -25,12 +25,12 @@
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   $: canContinue =
     subscribeObject?.name &&
-    (subscribeObject?.name?.length || 0) <= 255 &&
+    (subscribeObject?.name?.length ?? 0) <= 255 &&
     subscribeObject?.lastName &&
-    (subscribeObject?.lastName?.length || 0) <= 255 &&
+    (subscribeObject?.lastName?.length ?? 0) <= 255 &&
     isValidCPF &&
     isValidEmail &&
-    (subscribeObject?.email?.length || 0) <= 255 &&
+    (subscribeObject?.email?.length ?? 0) <= 255 &&
     isValidPassword;
 
   async function doSubscribe() {
@@ -56,41 +56,38 @@
   <Views.TextEdit
     icon={faUser}
     bind:value={subscribeObject.name}
+    initialValue={subscribeObject.name}
     type="name"
     placeHolder="Nome"
   />
   <Views.TextEdit
     icon={faUser}
     bind:value={subscribeObject.lastName}
+    initialValue={subscribeObject.lastName}
     type="name"
     placeHolder="Sobre nome"
   />
   <Views.TextEdit
-    icon={faIdCard}
-    bind:rawValue={subscribeObject.identity}
+    bind:value={subscribeObject.identity}
     type="cpf"
     placeHolder="CPF"
     bind:isValid={isValidCPF}
   />
   <Views.TextEdit
     type="email"
-    icon={faPhone}
     bind:value={subscribeObject.email}
     placeHolder="E-mail"
     bind:isValid={isValidEmail}
   />
   <Views.TextEdit
     type="password"
-    icon={faUnlock}
     bind:value={subscribeObject.password}
     placeHolder="Senha"
     secret={true}
     bind:isValid={isValidPassword}
+    error="A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
+  uma letra maiúscula, uma letra minúscula, um número e um símbolo"
   />
-  <small
-    >A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
-    uma letra maiúscula, uma letra minúscula, um número e um símbolo</small
-  >
   <Views.Divider />
   <Views.Button {Layout} disabled={!canContinue} on:click={doSubscribe}
     >Cadastrar</Views.Button

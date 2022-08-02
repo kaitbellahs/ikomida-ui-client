@@ -39,7 +39,7 @@
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: calcDelivery = address
-    ? ((address?.distance || 0) / 1000) * ($Settings?.delivery?.value || 0)
+    ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0)
     : 0;
   $: delivery = $Settings?.delivery?.free
     ? 0
@@ -135,12 +135,12 @@
     let response = await GetAddresses();
     if (response?.success) {
       const addresses = response?.data?.filter((item) => item.selected);
-      address = (addresses?.length || 0) === 1 ? addresses[0] : null;
+      address = (addresses?.length ?? 0) === 1 ? addresses[0] : null;
     }
     response = await GetPaymentMethods();
     if (response?.success) {
       const payments = response?.data?.filter((item) => item.selected);
-      payment = (payments?.length || 0) === 1 ? payments[0] : null;
+      payment = (payments?.length ?? 0) === 1 ? payments[0] : null;
     }
     if (Capacitor.isNativePlatform()) {
       const checkpermissions = await Geolocation.checkPermissions();
@@ -210,6 +210,7 @@
 {:else}
   <Views.TextEdit
     bind:value={coupon}
+    initialValue={coupon}
     placeHolder="Adicionar cupom"
     buttonName="Adicionar"
     callback={addCoupon}
@@ -271,9 +272,10 @@
   >
 {:else}
   <h2 class="businessHoursError">
-    Estámos fora do horario do funcionamento, confire os nossos horarios
+    Estámos fora do horario do funcionamento, confire os nossos horários
   </h2>
 {/if}
+<Views.GTerms />
 
 {#if isLoading}
   <Views.Loading

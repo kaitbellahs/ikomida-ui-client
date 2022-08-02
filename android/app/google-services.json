@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "981415290588",
+    "project_id": "ikomida-prod",
+    "storage_bucket": "ikomida-prod.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981415290588:android:6156e9cd478bb5505d3619",
+        "android_client_info": {
+          "package_name": "com.ikomida.br.tialtonivel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "981415290588-n7e8jqecsdo2viusgbskfi7sirjj683l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA11J9e4P7E076Yf1HPWbP5y65uX2g0JNs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "981415290588-n7e8jqecsdo2viusgbskfi7sirjj683l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

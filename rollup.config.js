@@ -11,6 +11,7 @@ import sveltePreprocess from 'svelte-preprocess';
 import {
 	asMarkupPreprocessor
 } from 'svelte-as-markup-preprocessor';
+import replace from "@rollup/plugin-replace";
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -24,7 +25,7 @@ function serve() {
 	return {
 		writeBundle() {
 			if (server) return;
-			server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
+			server = require('child_process').spawn('yarn', ['start', '--', '--dev'], {
 				stdio: ['ignore', 'inherit', 'inherit'],
 				shell: true
 			});
@@ -39,12 +40,16 @@ export default {
 	input: 'src/main.js',
 	output: {
 		inlineDynamicImports: true,
-		sourcemap: true,
+		sourcemap: !production,
 		format: 'iife',
 		name: 'app',
 		file: 'public/build/bundle.js',
 	},
 	plugins: [
+        replace({
+			preventAssignment: true,
+            isProduction: process.env.ENV === 'prod',
+        }),
 		svelte({
 			preprocess: [
 				asMarkupPreprocessor([

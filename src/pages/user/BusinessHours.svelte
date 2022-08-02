@@ -32,7 +32,7 @@
   </div>
   <Views.Divider />
   <div class="busninessHours">
-    <h3>E nestes horarios:</h3>
+    <h3>E nestes horários:</h3>
     <br />
     {#if $Settings?.business?.hours}
       {#each $Settings?.business?.hours as businessHour}
@@ -69,10 +69,5 @@
     border-bottom: 1px solid #ccc;
     padding: 20px;
     font-size: 1.1em;
-  }
-
-  .edit {
-    flex-grow: 1;
-    text-align: end;
   }
 </style>

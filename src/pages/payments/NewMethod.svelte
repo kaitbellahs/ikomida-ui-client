@@ -6,6 +6,7 @@
     import { Layout } from "../../stores/Setup";
     import creditCardType from "credit-card-type";
 
+    let recaptcha = false;
     let isLoading = false;
     let newCardObject = {
         holder: null,
@@ -59,24 +60,19 @@
     }
 
     function openNewMethodAlert() {
-        if (
-            (newCardObject?.holder?.length ?? 0) < 3 ||
-            (newCardObject?.holder?.length ?? 0) > 255
-        ) {
+        if (!newCardObjectValidation?.holder) {
             toggleErrorAlert(`é obrigatorio o preencheemento do nome`);
-        } else if (
-            (newCardObject?.number?.length ?? 0) !== cardInfo?.lengths[0]
-        ) {
+        } else if (!newCardObjectValidation?.number) {
             toggleErrorAlert(
-                `é obrigatorio o preencheemento do nomenro do cartão`
+                `é obrigatorio o preencheemento do Número do cartão`
             );
-        } else if ((newCardObject?.validity?.length ?? 0) !== 4) {
+        } else if (!newCardObjectValidation?.validity) {
             toggleErrorAlert(
                 `é obrigatorio o preencheemento da validade do cartão`
             );
-        } else if ((newCardObject?.code?.length ?? 0) !== cardInfo?.code.size) {
+        } else if (!newCardObjectValidation?.code) {
             toggleErrorAlert(
-                `é obrigatorio o preencheemento do codigo de segurança`
+                `é obrigatorio o preencheemento do código de segurança`
             );
         } else if (!newCardObjectValidation?.cpf) {
             toggleErrorAlert(`é obrigatorio o preencheemento do CPF`);
@@ -108,10 +104,8 @@
         }
         isLoading = false;
     }
-
     Title.set("Novo cartão");
 </script>
-
 <Views.Divider />
 <h2>Preencha aqui os dados do seu cartão</h2>
 <Views.Divider />
@@ -120,39 +114,51 @@
     icon={cardBrandIcon}
     maskKey="_"
     type="number"
-    bind:rawValue={newCardObject.number}
+    bind:value={newCardObject.number}
     bind:isValid={newCardObjectValidation.number}
-    placeHolder="Numero do cartão"
+    placeHolder="Número do cartão"
+    min={cardInfo?.lengths?.[0]}
+    max={cardInfo?.lengths?.[0]}
 />
 <Views.TextEdit
     type="name"
     placeHolder="Nome impresso no cartão"
     bind:value={newCardObject.holder}
+    bind:isValid={newCardObjectValidation.holder}
+    initialValue={newCardObject.holder}
+    min="3"
+    max="255"
 />
 <Views.TextEdit
     mask="__/__"
     maskKey="_"
     type="number"
     placeHolder="Validade do cartão"
-    bind:rawValue={newCardObject.validity}
+    bind:rvalue={newCardObject.validity}
     bind:isValid={newCardObjectValidation.validity}
+    min="4"
+    max="4"
+    error="Por favor preencha uma data válida usando este formato dd/YY."
 />
 <Views.TextEdit
     mask={cardCodeMask}
     maskKey="_"
     type="number"
-    placeHolder="Codigo de segurança do cartão"
-    bind:rawValue={newCardObject.code}
+    placeHolder="Código de segurança do cartão"
+    bind:value={newCardObject.code}
     bind:isValid={newCardObjectValidation.code}
+    min={cardInfo?.code?.size}
+    max={cardInfo?.code?.size}
 />
 <Views.TextEdit
     type="cpf"
     placeHolder="CPF vinculado com o cartão"
-    bind:rawValue={newCardObject.cpf}
+    bind:value={newCardObject.cpf}
     bind:isValid={newCardObjectValidation.cpf}
 />
 <Views.Divider />
 <Views.Button {Layout} on:click={openNewMethodAlert}>Adicionar</Views.Button>
+<Views.GTerms />
 {#if showNewMethodAlert}
     <Views.Alert
         {Layout}

@@ -1,4 +1,4 @@
-package com.getcapacitor.myapp;
+package com.ikomida;
 
 import static org.junit.Assert.*;
 

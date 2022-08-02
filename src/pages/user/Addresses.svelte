@@ -20,16 +20,36 @@
   let isLoading = false;
   let newAddressObject = {
     postalCode: null,
+    street: null,
+    number: null,
+    complement: null,
+    neighborhood: null,
+    city: null,
+    stat: null,
+  };
+  let newAddressObjectInputs = {
+    postalCode: null,
+    street: null,
+    number: null,
+    complement: null,
+    neighborhood: null,
+    city: null,
+    stat: null,
   };
   let newAddressObjectValidation = {
     postalCode: false,
+    street: false,
+    number: false,
+    neighborhood: false,
+    city: false,
+    stat: false,
   };
 
   let errorAlert;
   let showAlert = false;
 
   $: if (
-    (newAddressObject?.postalCode?.length || 0) === 8 &&
+    (newAddressObject?.postalCode?.length ?? 0) === 8 &&
     newAddressObject?.postalCode != currentPostalCode
   ) {
     findAddress();
@@ -49,6 +69,16 @@
           const address = response?.data;
           currentPostalCode = address?.postalCode;
           newAddressObject = { ...newAddressObject, ...address };
+          newAddressObjectInputs.street.updateValue(newAddressObject?.street);
+          newAddressObjectInputs.number.updateValue(newAddressObject?.number);
+          newAddressObjectInputs.complement.updateValue(
+            newAddressObject?.complement
+          );
+          newAddressObjectInputs.neighborhood.updateValue(
+            newAddressObject?.neighborhood
+          );
+          newAddressObjectInputs.city.updateValue(newAddressObject?.city);
+          newAddressObjectInputs.stat.updateValue(newAddressObject?.stat);
         } else {
           toggleErrorAlert(response?.data);
         }
@@ -64,17 +94,15 @@
   }
 
   async function newAddress() {
-    if (
-      (newAddressObject?.postalCode?.length || 0) !== 8
-    ) {
+    if ((newAddressObject?.postalCode?.length ?? 0) !== 8) {
       toggleErrorAlert(`é obrigatorio o preencheemento do CEP`);
-    } else if ((newAddressObject?.street?.length || 0) < 3) {
+    } else if ((newAddressObject?.street?.length ?? 0) < 3) {
       toggleErrorAlert(`é obrigatorio o preencheemento do nome da rua`);
-    } else if ((newAddressObject?.neighborhood?.length || 0) < 2) {
+    } else if ((newAddressObject?.neighborhood?.length ?? 0) < 2) {
       toggleErrorAlert(`é obrigatorio o preencheemento do nome do bairro`);
-    } else if ((newAddressObject?.city?.length || 0) < 3) {
+    } else if ((newAddressObject?.city?.length ?? 0) < 3) {
       toggleErrorAlert(`é obrigatorio o preencheemento do nome da cidade`);
-    } else if ((newAddressObject?.stat?.length || 0) !== 2) {
+    } else if ((newAddressObject?.stat?.length ?? 0) !== 2) {
       toggleErrorAlert(`é obrigatorio o preencheemento do simbolo do estado`);
     } else {
       isLoading = true;
@@ -159,47 +187,70 @@
     title="Novo endereço!"
     closeCallBack={toggleNewAddress}
     buttons={[
-      { name: "Cancelar", callback: toggleNewAddress},
-      { name: "Adicionar", callback: newAddress, principal: true  },
+      { name: "Cancelar", callback: toggleNewAddress },
+      { name: "Adicionar", callback: newAddress, principal: true },
     ]}
   >
     <Views.TextEdit
-      mask="_____-___"
-      maskKey="_"
       type="cep"
       callback={findAddress}
       buttonIcon={faSearch}
+      bind:value={newAddressObject.postalCode}
+      bind:this={newAddressObjectInputs.postalCode}
       bind:isValid={newAddressObjectValidation.postalCode}
-      bind:rawValue={newAddressObject.postalCode}
       placeHolder="CEP"
     />
     <Views.TextEdit
+      disabled={true}
       placeHolder="Endereço"
-      type="spacedAlphanumeric"
       bind:value={newAddressObject.street}
+      bind:this={newAddressObjectInputs.street}
+      bind:isValid={newAddressObjectValidation.street}
+      min="2"
+      max="255"
     />
-    <Views.TextEdit placeHolder="Numero" bind:value={newAddressObject.number} />
+    <Views.TextEdit
+      placeHolder="Número"
+      bind:value={newAddressObject.number}
+      bind:this={newAddressObjectInputs.number}
+      bind:isValid={newAddressObjectValidation.number}
+      min="1"
+      max="255"
+      empty={false}
+    />
     <Views.TextEdit
       placeHolder="Complemento"
-      type="spacedAlphanumeric"
       bind:value={newAddressObject.complement}
+      bind:this={newAddressObjectInputs.complement}
     />
     <Views.TextEdit
-      placeHolder="Bairro"
       disabled={true}
-      type="spacedAlphanumeric"
+      placeHolder="Bairro"
       bind:value={newAddressObject.neighborhood}
+      bind:isValid={newAddressObjectValidation.neighborhood}
+      bind:this={newAddressObjectInputs.neighborhood}
+      min="2"
+      max="255"
     />
     <Views.TextEdit
       disabled={true}
       placeHolder="Cidade"
       bind:value={newAddressObject.city}
+      bind:isValid={newAddressObjectValidation.city}
+      bind:this={newAddressObjectInputs.city}
+      min="2"
+      max="255"
     />
     <Views.TextEdit
       disabled={true}
       placeHolder="UF"
       bind:value={newAddressObject.stat}
+      bind:this={newAddressObjectInputs.stat}
+      bind:isValid={newAddressObjectValidation.stat}
+      min="2"
+      max="2"
     />
+    <Views.Divider />
   </Views.Alert>
 {/if}
 {#if isLoading}

@@ -106,26 +106,29 @@
       <Views.Divider />
       <h2>Senha</h2>
       <Views.TextEdit
-        name="Senha atual:"
+        placeHolder="Senha atual"
         bind:value={passwordObject.oldPass}
+    initialValue={passwordObject.oldPass}
         secret={true}
-        placeHolder=""
+       
       />
       <Views.TextEdit
-        name="Nova senha:"
+        placeHolder="Nova senha"
         bind:value={passwordObject.newPass}
+    initialValue={passwordObject.newPass}
         secret={true}
-        placeHolder=""
+       
       />
       <small
         >A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
         uma letra maiúscula, uma letra minúscula, um número e um símbolo</small
       >
       <Views.TextEdit
-        name="Confirmação:"
+        placeHolder="Confirmação"
         bind:value={passwordObject.reNewPass}
+    initialValue={passwordObject.reNewPass}
         secret={true}
-        placeHolder=""
+       
       />
       <Views.Divider />
     </div>
@@ -134,6 +137,7 @@
       >Logout</Views.Button
     >
   </div>
+  <Views.GTerms />
   <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 {/if}
 {#if isLoading || !userInfo}
