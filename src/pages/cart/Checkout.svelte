@@ -1,5 +1,5 @@
 <script>
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Types } from "@ikomida/components";
   import { Capacitor } from "@capacitor/core";
   import { Auth } from "../../stores/Auth";
   import { Geolocation } from "@capacitor/geolocation";
@@ -15,7 +15,10 @@
   import { StatusBar } from "../../stores/Setup";
   import { GetAddresses } from "../../network/User";
   import { Title, Navigation, Routes } from "../../stores/Navigation";
+  import Cache from "../../stores/Cache";
 
+  const ORDERS_HISTORY = "ORDERS_HISTORY"
+  const ORDERS = "ORDERS";
   let location;
   let coupon;
   let couponObject = null;
@@ -52,7 +55,7 @@
       Utils.Numbers.calcDiscount(
         subtotal,
         couponObject.value,
-        couponObject.valueType
+        couponObject.type
       )
     : 0;
   $: total = netTotal - discount;
@@ -95,6 +98,8 @@
       isLoading = false;
       if (response && response?.success) {
         Cart.reset();
+        Cache.setObject(ORDERS, null);
+        Cache.setObject(ORDERS_HISTORY, null);
         Navigation.goTo(Routes.order, {
           newOrder: true,
           order: response?.data,
@@ -182,7 +187,12 @@
     </tr>
     {#if discount !== 0}
       <tr>
-        <td class="resumeText">cupom</td>
+        <td class="resumeText"
+          >cupom (- {couponObject?.type?.toUpperCase() ===
+          Types?.DiscountTypes?.PERCENT?.toUpperCase()
+            ? Utils.Strings.percent(couponObject?.value)
+            : Utils.Strings.currency(couponObject?.value)})
+        </td>
         <td class="resumeValue"
           ><span class="deliveryFree">- {Utils.Strings.currency(discount)}</span
           ></td
@@ -210,10 +220,11 @@
 {:else}
   <Views.TextEdit
     bind:value={coupon}
-    initialValue={coupon}
     placeHolder="Adicionar cupom"
     buttonName="Adicionar"
     callback={addCoupon}
+    type="alphanumeric"
+    upper={true}
   />
 {/if}
 <Views.Button {Layout} type="transparent" on:click={addMoreItems}
@@ -265,9 +276,7 @@
 {/if}
 {#if businessTime}
   <Views.Button {Layout} disabled={!validate} isFloat={true} on:click={forward}>
-    <span
-      >{#if $Auth && $Auth !== "" && $Auth !== "null"}Confirmar o pagamento{:else}Faça
-        login{/if}</span
+    <span>Confirmar o {payment?.type === "Cash" ? "pedido" : "pagamento"}</span
     ></Views.Button
   >
 {:else}

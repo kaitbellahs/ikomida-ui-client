@@ -109,16 +109,27 @@
   function goToCart() {
     Navigation.goTo(Routes.cart);
   }
-
-  onMount(async () => {
-    const style = document.createElement("style");
+  $: if(style) if (showCart) {
     style.innerHTML = `
       body {
         --backgroundColor: ${$Layout.background};
         --paddingTop: ${styleHeight};
-        --paddingBottom: ${showCart ? "115px" : "55px"};
+        --paddingBottom: 115px;
       }
     `;
+    document.head.appendChild(style);
+  } else {
+    style.innerHTML = `
+      body {
+        --backgroundColor: ${$Layout.background};
+        --paddingTop: ${styleHeight};
+        --paddingBottom: 55px;
+      }
+    `;
+  }
+  let style;
+  onMount(async () => {
+    style = document.createElement("style");
     document.head.appendChild(style);
     await CartStore.items();
   });
@@ -167,7 +178,8 @@
   {/if}
 </main>
 <Views.NavigationBar
-  logo={$Settings?.profile?.mainPicture || 'assets/icons/transparent-logo-1.svg'}
+  logo={$Settings?.profile?.mainPicture ||
+    "assets/icons/transparent-logo-1.svg"}
   {Layout}
   {MenuHamburger}
   {Menu}
@@ -197,7 +209,7 @@
     padding-bottom: var(--paddingBottom);
     background: var(--backgroundColor);
   }
-  main{
+  main {
     display: flex;
     flex-direction: column;
   }

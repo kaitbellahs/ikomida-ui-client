@@ -75,7 +75,7 @@
     {/if}
   </div>
   <h3>
-    Se você ainda não abriu sua conta, <span
+    Se você ainda não tem uma conta, <span
       on:click={doSubscribe}
       style="color: #4c0708;">clique aqui</span
     > é rápido e fácil.

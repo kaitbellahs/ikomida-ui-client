@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faTrashAlt, faSearch } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views } from "@ikomida/components";
+  import { Views, Utils } from "@ikomida/components";
   import {
     GetAddresses,
     GetAddressByCep,
@@ -48,6 +48,8 @@
   let errorAlert;
   let showAlert = false;
 
+  $: canProceed = Utils?.Objects?.validateFields(newAddressObjectValidation)
+
   $: if (
     (newAddressObject?.postalCode?.length ?? 0) === 8 &&
     newAddressObject?.postalCode != currentPostalCode
@@ -69,16 +71,7 @@
           const address = response?.data;
           currentPostalCode = address?.postalCode;
           newAddressObject = { ...newAddressObject, ...address };
-          newAddressObjectInputs.street.updateValue(newAddressObject?.street);
-          newAddressObjectInputs.number.updateValue(newAddressObject?.number);
-          newAddressObjectInputs.complement.updateValue(
-            newAddressObject?.complement
-          );
-          newAddressObjectInputs.neighborhood.updateValue(
-            newAddressObject?.neighborhood
-          );
-          newAddressObjectInputs.city.updateValue(newAddressObject?.city);
-          newAddressObjectInputs.stat.updateValue(newAddressObject?.stat);
+          Utils?.Objects?.updateInputs(newAddressObjectInputs, newAddressObject)
         } else {
           toggleErrorAlert(response?.data);
         }
@@ -159,10 +152,10 @@
 </script>
 
 <Views.Divider />
-<Views.Button {Layout} on:click={toggleNewAddress}>novo endereço</Views.Button>
+<Views.Button {Layout} on:click={toggleNewAddress}>Novo endereço</Views.Button>
 {#if !addresses}
   <Views.LocalLoading size="2" />
-{:else}
+{:else if (addresses?.length ?? 0) > 0}
   {#each addresses as { id, postalCode, street, number, complement, neighborhood, city, stat, selected }}
     <div class="address">
       <span on:click={onRemoveClick(id)} class="remove"
@@ -178,6 +171,13 @@
       </div>
     </div>
   {/each}
+{:else}
+  <div id="noAddress">
+    <h2>
+      Não há endereços para exibir, aproveite e cadastre deu endereço pricipal agora
+      mesmo!
+    </h2>
+  </div>
 {/if}
 
 {#if showNewAddress}
@@ -188,7 +188,7 @@
     closeCallBack={toggleNewAddress}
     buttons={[
       { name: "Cancelar", callback: toggleNewAddress },
-      { name: "Adicionar", callback: newAddress, principal: true },
+      { name: "Adicionar", callback: newAddress, principal: true, disabled: !canProceed },
     ]}
   >
     <Views.TextEdit
@@ -216,7 +216,7 @@
       bind:isValid={newAddressObjectValidation.number}
       min="1"
       max="255"
-      empty={false}
+      empty={!newAddressObjectValidation.postalCode}
     />
     <Views.TextEdit
       placeHolder="Complemento"
@@ -262,6 +262,18 @@
 <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 
 <style>
+  
+  #noAddress {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+  }
+  #noAddress > h2 {
+    place-self: center;
+    align-self: center;
+    justify-self: center;
+    text-align: center;
+  }
   .address {
     position: relative;
     width: 100%;
