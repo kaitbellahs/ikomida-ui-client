@@ -1,7 +1,7 @@
 <script>
   import { Title, Router, Routes, Navigation } from "../../stores/Navigation";
   import { OrderStatus, OrderStage } from "../../network/Orders";
-  import { Utils } from "@ikomida/components";
+  import { Utils, Types } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
 
   const { newOrder, order } = $Router.options;
@@ -22,7 +22,7 @@
 <h3>N˚ do pedido: {order?.customID}</h3>
 <div class="time">Realizado {Utils.Strings.dateToString(order?.createdAt)}</div>
 <div class="status">
-  {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(order.status)}
+  {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status)}
     {#if new Date(new Date(order?.createdAt).getTime() + ((order?.preparation?.max ?? 0) + (order?.address?.duration ?? 0)) * 1000) < new Date()}
       <span class="lateOrder">Pedido atrasado</span>
     {/if}
@@ -40,7 +40,7 @@
       )}</span
     >
     Seu pedido está
-    <span class="open">{OrderStage(order?.status)}</span>
+    <span class="open">{OrderStatus(order?.status)}</span>
   {:else}
     Pedido {OrderStatus(order?.status)} em
     <span class="open">{Utils.Strings.dateToString(order?.finishedAt)}</span>

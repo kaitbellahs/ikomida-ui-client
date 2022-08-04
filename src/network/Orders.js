@@ -1,5 +1,6 @@
 import {
-    Network
+    Network,
+    Types
 } from "@ikomida/components";
 import {
     get
@@ -23,38 +24,19 @@ export async function NewOrders(payload) {
 
 export function OrderStatus(status) {
     switch (status) {
-        case "waitingPayment":
+        case Types.OrderStatusType.WAITING_PAYMENT:
             return "aguardando pagamento";
-        case "open":
+        case Types.OrderStatusType.OPEN:
             return "aguardando aprovação";
-        case "accepted":
+        case Types.OrderStatusType.ACCEPTED:
             return "em preparação";
-        case "waitingDelivery":
+        case Types.OrderStatusType.WAITING_DELIVERY:
             return "esperando para sair para delivery";
-        case "delivery":
+        case Types.OrderStatusType.IN_DELIVERY:
             return "está a caminho até você";
-        case "delivered":
+        case Types.OrderStatusType.DELIVERED:
             return "entregue";
-        case "canceled":
-            return "cancelado";
-    }
-}
-
-export function OrderStage(status) {
-    switch (status) {
-        case "waitingPayment":
-            return "aguardando pagamento";
-        case "open":
-            return "aguardando aprovação";
-        case "accepted":
-            return "em preparação";
-        case "waitingDelivery":
-            return "esperando para sair para delivery";
-        case "delivery":
-            return "a caminho até você";
-        case "delivered":
-            return "entregue";
-        case "canceled":
+        case Types.OrderStatusType.CANCELED:
             return "cancelado";
     }
 }

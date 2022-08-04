@@ -31,7 +31,7 @@
     let showAlert = false;
     let showNewMethodAlert = false;
 
-    $: if ((newCardObject?.number?.length ?? 0) <= 6) {
+    $: if ((newCardObject?.number?.length ?? 0) > 0) {
         const cardInfos = creditCardType(newCardObject?.number);
         if (cardInfos && (cardInfos?.length ?? 0) > 0) {
             cardInfo = cardInfos?.[0];
@@ -91,8 +91,7 @@
         const newCard = {
             holder: newCardObject?.holder,
             number: newCardObject?.number,
-            expMonth: newCardObject?.validity?.substring(0, 2),
-            expYear: `20${newCardObject?.validity?.substring(2, 4)}`,
+            validity: newCardObject?.validity,
             code: newCardObject?.code,
             cpf: newCardObject?.cpf,
         };
@@ -134,7 +133,7 @@
     maskKey="_"
     type="number"
     placeHolder="Validade do cartão"
-    bind:rvalue={newCardObject.validity}
+    bind:value={newCardObject.validity}
     bind:isValid={newCardObjectValidation.validity}
     min="4"
     max="4"

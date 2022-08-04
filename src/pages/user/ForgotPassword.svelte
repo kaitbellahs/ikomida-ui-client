@@ -1,6 +1,6 @@
 <script>
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
-  import { Views } from "@ikomida/components";
+  import { Views, Utils } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
   import {
     requestPasswordPhoneValidation,
