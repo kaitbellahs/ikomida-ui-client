@@ -38,5 +38,7 @@ export function OrderStatus(status) {
             return "entregue";
         case Types.OrderStatusType.CANCELED:
             return "cancelado";
+        case Types.OrderStatusType.IN_DISPUTE:
+            return "em disputa";
     }
 }

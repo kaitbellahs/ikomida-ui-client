@@ -13,7 +13,12 @@
   $: subtotalArray = $Store.map(
     (item) =>
       item.quantity *
-      Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+      (item?.price -
+        Utils.Numbers.calcDiscount(
+          item.price,
+          item.discount,
+          item.discountType
+        ))
   );
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
@@ -129,7 +134,7 @@
         <td class="resumeText">Taxa de entrega</td>
         <td class="resumeValue"
           ><span class:deliveryFree={delivery == 0}
-            >{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
+            >{delivery == 0 ? "Gratis" : Utils.Strings.currency(delivery)}</span
           ></td
         >
       </tr>

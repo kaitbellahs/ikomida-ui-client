@@ -84,7 +84,12 @@
   $: subtotalArray = $Store.map(
     (item) =>
       item.quantity *
-      Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+      (item.price -
+        Utils.Numbers.calcDiscount(
+          item.price,
+          item.discount,
+          item.discountType
+        ))
   );
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
@@ -109,24 +114,25 @@
   function goToCart() {
     Navigation.goTo(Routes.cart);
   }
-  $: if(style) if (showCart) {
-    style.innerHTML = `
+  $: if (style)
+    if (showCart) {
+      style.innerHTML = `
       body {
         --backgroundColor: ${$Layout.background};
         --paddingTop: ${styleHeight};
         --paddingBottom: 115px;
       }
     `;
-    document.head.appendChild(style);
-  } else {
-    style.innerHTML = `
+      document.head.appendChild(style);
+    } else {
+      style.innerHTML = `
       body {
         --backgroundColor: ${$Layout.background};
         --paddingTop: ${styleHeight};
         --paddingBottom: 55px;
       }
     `;
-  }
+    }
   let style;
   onMount(async () => {
     style = document.createElement("style");

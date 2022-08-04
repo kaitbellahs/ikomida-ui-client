@@ -17,7 +17,7 @@
   import { Title, Navigation, Routes } from "../../stores/Navigation";
   import Cache from "../../stores/Cache";
 
-  const ORDERS_HISTORY = "ORDERS_HISTORY"
+  const ORDERS_HISTORY = "ORDERS_HISTORY";
   const ORDERS = "ORDERS";
   let location;
   let coupon;
@@ -37,7 +37,12 @@
   $: subtotalArray = $Store.map(
     (item) =>
       item.quantity *
-      Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+      (item?.price -
+        Utils.Numbers.calcDiscount(
+          item.price,
+          item.discount,
+          item.discountType
+        ))
   );
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;

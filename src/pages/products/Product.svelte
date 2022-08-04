@@ -17,7 +17,12 @@
 
   $: total = Utils.Strings.currency(
     quantity *
-      Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+      (item.price -
+        Utils.Numbers.calcDiscount(
+          item.price,
+          item.discount,
+          item.discountType
+        ))
   );
 
   function minos() {
@@ -36,7 +41,10 @@
     let update = false;
     const cardItems = $Store;
     for (const cardItem of cardItems) {
-      if (item?.id === cardItem.id && (cardItem?.quantity + quantity) <= item?.quantity) {
+      if (
+        item?.id === cardItem.id &&
+        cardItem?.quantity + quantity <= item?.quantity
+      ) {
         cardItem.quantity += quantity;
         update = true;
       }
@@ -71,7 +79,12 @@
     {/if}
     <span class="current"
       >{Utils.Strings.currency(
-        Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+        item.price -
+          Utils.Numbers.calcDiscount(
+            item.price,
+            item.discount,
+            item.discountType
+          )
       )}</span
     >
   </div>

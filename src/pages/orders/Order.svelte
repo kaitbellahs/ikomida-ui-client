@@ -51,7 +51,8 @@
     <span class="quantity">{quantity}</span><span class="title">{title}</span
     ><span class="price"
       >{Utils.Strings.currency(
-        quantity * Utils.Numbers.calcDiscount(price, discount, discountType)
+        quantity *
+          (price - Utils.Numbers.calcDiscount(price, discount, discountType))
       )}</span
     >
   </div>
