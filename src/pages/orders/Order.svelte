@@ -1,6 +1,6 @@
 <script>
   import { Title, Router, Routes, Navigation } from "../../stores/Navigation";
-  import { OrderStatus, OrderStage } from "../../network/Orders";
+  import { OrderStatus } from "../../network/Orders";
   import { Utils, Types } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
 
