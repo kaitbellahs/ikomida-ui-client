@@ -25,7 +25,9 @@
     faUser,
     faSearch,
     faSlidersH,
-    faIdCard,
+    faMoneyBill1Wave,
+    faAddressCard,
+    faHourglass
   } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
   import Addresses from "./user/Addresses.svelte";
@@ -65,17 +67,17 @@
     {
       name: "Endereços",
       callback: () => Navigation.goTo(Routes.addresses),
-      icon: faSlidersH,
+      icon: faAddressCard,
     },
     {
       name: "Meios de pagamento",
       callback: () => Navigation.goTo(Routes.payments),
-      icon: faSlidersH,
+      icon: faMoneyBill1Wave,
     },
     {
       name: "Horario de funcionamento",
       callback: () => Navigation.goTo(Routes.businessHours),
-      icon: faSlidersH,
+      icon: faHourglass,
     },
   ];
 

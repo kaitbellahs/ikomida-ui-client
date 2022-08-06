@@ -1,10 +1,19 @@
 <script>
   import { Title, Router, Routes, Navigation } from "../../stores/Navigation";
   import { OrderStatus } from "../../network/Orders";
-  import { Utils, Types } from "@ikomida/components";
+  import { Utils, Types, Views } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
+  import { ChangeOrderStatus } from "../../network/Orders";
+  import { StatusBar } from "../../stores/Setup";
+  import Cache from "../../stores/Cache";
+
+  $: CACHE_NAME = "ORDERS";
 
   const { newOrder, order } = $Router.options;
+  let isLoading = false;
+
+  let errorAlert;
+  let showAlert = false;
 
   $: total =
     Number(order?.subtotal ?? 0) +
@@ -16,6 +25,39 @@
       Navigation.reset(Routes.orders);
     };
   }
+
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
+
+  async function changeOrderStatus(status) {
+    isLoading = true;
+    const response = await ChangeOrderStatus(order?.id, status);
+    const orderStatus = response?.data;
+    if (
+      response?.success &&
+      orderStatus?.id === order?.id &&
+      orderStatus?.status === status
+    ) {
+      order.status = orderStatus?.status;
+      order.finishedAt = orderStatus?.finishedAt;
+      Cache.setObject(CACHE_NAME, null);
+      toggleErrorAlert("O pedido foi atualizado con sucesso!");
+    } else {
+      toggleErrorAlert(response?.data);
+    }
+    isLoading = false;
+  }
+
+  async function cancel() {
+    await changeOrderStatus(Types.OrderStatusType.CANCELED);
+  }
+
+  async function delivered() {
+    await changeOrderStatus(Types.OrderStatusType.DELIVERED);
+  }
+
   Title.set("Detalhes do predido");
 </script>
 
@@ -97,6 +139,28 @@
     </tr>
   </tbody>
 </table>
+<Views.Divider />
+<div class="buttonGroup">
+  {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN].includes(order?.status)}
+    <Views.Button multiplier="0.8" type="secondary" on:click={cancel}
+      >Cancelar</Views.Button
+    >
+  {/if}
+  {#if [Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order?.status)}
+    <Views.Button multiplier="1" on:click={delivered}
+      >Confirmar entrega</Views.Button
+    >
+  {/if}
+</div>
+<Views.GTerms />
+<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
+
+{#if isLoading}
+  <Views.Loading
+    topPadding={$StatusBar.height}
+    bottomPadding={$StatusBar.bottomPadding}
+  />
+{/if}
 
 <style>
   h3 {
@@ -193,5 +257,19 @@
     padding: 4px 20px;
     align-self: center;
     margin-bottom: 10px;
+  }
+  .buttonGroup {
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+  }
+  .buttonGroup > :global(*) {
+    flex: 1;
+  }
+  .buttonGroup > :global(*):first-child {
+    margin-right: 5px;
+  }
+  .buttonGroup > :global(*):last-child {
+    margin-left: 5px;
   }
 </style>

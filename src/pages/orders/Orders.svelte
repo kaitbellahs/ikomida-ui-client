@@ -55,13 +55,13 @@
   let isLoading = false;
   $: CACHE_NAME = $Router?.options ? "ORDERS_HISTORY" : "ORDERS";
   $: if ($Router?.options === null || $Router?.options !== null) {
-    if (!$Router?.options) {
-      Menu.addItem({
-        icon: faHistory,
-        name: "Históricos",
-        callback: goToOrdersHistory,
-      });
-    }
+    // if (!$Router?.options) {
+    //   Menu.addItem({
+    //     icon: faHistory,
+    //     name: "Pedidos concluídos",
+    //     callback: goToOrdersHistory,
+    //   });
+    // }
     Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
     update();
   }

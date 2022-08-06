@@ -22,6 +22,13 @@ export async function NewOrders(payload) {
     return Network.instance.post("/order", get(Auth), payload, "newOrder");
 }
 
+export async function ChangeOrderStatus(id, status) {
+    return Network.instance.put("/order", get(Auth), {
+        id,
+        status
+    }, "editOrder");
+}
+
 export function OrderStatus(status) {
     switch (status) {
         case Types.OrderStatusType.WAITING_PAYMENT:
