@@ -11,6 +11,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
+            android:exported="true"
             android:name="com.ikomida.vendor.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
             android:label="@string/title_activity_main"

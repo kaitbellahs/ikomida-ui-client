@@ -77,7 +77,7 @@
     Navigation.goTo(Routes.orders, true);
   }
 
-  Title.set("Pedidos");
+  Title.set("Pedidos Pedidos Pedidos Pedidos Pedidos ");
 </script>
 
 {#if isLoading}
@@ -135,26 +135,13 @@
     {/if}
   </div>
 {:else}
-  <div id="noOrders">
-    <h2>
-      Não há pedido para exibir, aproveite e faça seu primeiro pedido agora
-      mesmo!
-    </h2>
-  </div>
+  <Views.CentredMessage
+    text="Não há pedido para exibir, aproveite e faça seu primeiro pedido agora
+mesmo!"
+  />
 {/if}
 
 <style>
-  #noOrders {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-  }
-  #noOrders > h2 {
-    place-self: center;
-    align-self: center;
-    justify-self: center;
-    text-align: center;
-  }
   .orderContainer {
     border-radius: 4px;
     border: 1px solid #ccc;

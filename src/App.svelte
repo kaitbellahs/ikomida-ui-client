@@ -1,24 +1,28 @@
 <script>
-  import { CAPNativeLog } from "capacitor-native-log";
-  import { App } from "@capacitor/app";
-  import { Auth, PushNotificationToken } from "./stores/Auth";
-  import Login from "./pages/user/Login.svelte";
-  import ForgotPassword from "./pages/user/ForgotPassword.svelte";
-  import Main from "./pages/Main.svelte";
-  import Subscribe from "./pages/user/Subscribe.svelte";
-  import ConfirmSubscribe from "./pages/user/ConfirmSubscribe.svelte";
-  import Tac from "./pages/user/Tac.svelte";
-  import { Network } from "@capacitor/network";
   import { onMount } from "svelte";
-  import { StatusBar as _StatusBar, Layout, Settings } from "./stores/Setup";
-  import { Navigation, Router, Routes } from "./stores/Navigation";
+  import { App } from "@capacitor/app";
+  import { CAPNativeLog } from "capacitor-native-log";
+  import { Network } from "@capacitor/network";
   import { StatusBar } from "@capacitor/status-bar";
   import { Utils, PushNotification, Views } from "@ikomida/components";
+
+  import { Auth, PushNotificationToken } from "./stores/Auth";
+  import { StatusBar as _StatusBar, Layout, Settings } from "./stores/Setup";
+  import { Navigation, Router, Routes } from "./stores/Navigation";
+  import Cache from "./stores/Cache";
+
   import { registerPushNotificationToken } from "./network/PushNotification";
   import { getLayout } from "./network/Layout";
   import { GetSettings } from "./network/User";
-  import Pp from "./pages/user/Pp.svelte";
-  import Cache from "./stores/Cache";
+
+  import Login from "./pages/unlogged/Login.svelte";
+  import ForgotPassword from "./pages/unlogged/ForgotPassword.svelte";
+  import Subscribe from "./pages/unlogged/Subscribe.svelte";
+  import ConfirmSubscribe from "./pages/unlogged/ConfirmSubscribe.svelte";
+  import Tac from "./pages/unlogged/Tac.svelte";
+  import Pp from "./pages/unlogged/Pp.svelte";
+  import NoService from "./pages/unlogged/NoService.svelte";
+  import Main from "./pages/Main.svelte";
 
   let networkStatus = null;
   let showNotificationPopup = false;
@@ -155,10 +159,13 @@
     networkStatus = status;
   });
 </script>
+
 <Views.LoadJS
   url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS"
 />
-{#if logedIn}
+{#if $Settings && !$Settings.isActive}
+  <NoService />
+{:else if logedIn}
   <Main />
 {:else if route == Routes.login}
   <Login />

@@ -43,7 +43,7 @@
       order.status = orderStatus?.status;
       order.finishedAt = orderStatus?.finishedAt;
       Cache.setObject(CACHE_NAME, null);
-      toggleErrorAlert("O pedido foi atualizado con sucesso!");
+      toggleErrorAlert("O pedido foi atualizado com sucesso!");
     } else {
       toggleErrorAlert(response?.data);
     }
@@ -152,7 +152,9 @@
     >
   {/if}
 </div>
-<Views.GTerms />
+{#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order?.status)}
+  <Views.GTerms />
+{/if}
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 {#if isLoading}

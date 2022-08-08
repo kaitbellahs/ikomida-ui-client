@@ -12,6 +12,7 @@
   let phone;
   let password;
   let isValidPhone = false;
+  let showImage = true;
 
   $: canLogin = isValidPhone;
   let errorAlert;
@@ -49,6 +50,10 @@
     }
     isLoading = false;
   }
+
+  function erroLoadImage(event) {
+    showImage = false;
+  }
 </script>
 
 {#if isLoading}
@@ -56,10 +61,12 @@
 {/if}
 <main style="background: {$Layout.background};height: 100%;">
   <div class="avatar">
-    {#if $Settings?.profile?.mainPicture}
+    {#if $Settings?.profile?.mainPicture && showImage}
       <img
-        src={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
-        alt={$Settings?.profile?.restaurantName ?? 'iKomida'}
+        on:error={erroLoadImage}
+        src={$Settings?.profile?.mainPicture ??
+          "assets/icons/transparent-logo-1.svg"}
+        alt={$Settings?.profile?.restaurantName ?? "iKomida"}
       />
     {:else if $Settings?.profile?.restaurantName}
       <div class="avatarCircle">
@@ -67,11 +74,9 @@
           ?.restaurantName?.[1]}
       </div>
       <h2>{$Settings?.profile?.restaurantName}</h2>
-      {:else}
-        <img
-          src="assets/icons/transparent-logo-1.svg"
-          alt="iKomida"
-        />
+    {:else}
+      <img src="assets/icons/transparent-logo-1.svg" alt="iKomida" />
+      <h2>{$Settings?.profile?.restaurantName}</h2>
     {/if}
   </div>
   <h3>

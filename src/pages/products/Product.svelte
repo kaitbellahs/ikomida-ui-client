@@ -14,6 +14,7 @@
 
   const item = $Router.options;
   let quantity = 1;
+  let showImage = true;
 
   $: total = Utils.Strings.currency(
     quantity *
@@ -60,12 +61,16 @@
     Navigation.goTo(Routes.cart);
   };
 
+  function erroLoadImage(event) {
+    showImage = false;
+  }
+
   Title.set(item.title);
 </script>
 
 <div class="product">
-  {#if item.image}
-    <img src={item.image} alt={item.title} />
+  {#if item.image && showImage}
+    <img on:error={erroLoadImage} src={item.image} alt={item.title} />
   {/if}
   <h2>{item.title}</h2>
   <p>{item.description}</p>

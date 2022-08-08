@@ -4,7 +4,7 @@
   import { Views, Utils } from "@ikomida/components";
   import { StatusBar, Settings } from "../../stores/Setup";
 
-  Title.set("Home");
+  $: Title.set($Settings?.profile?.restaurantName ?? "iKomida");
 </script>
 
 {#await all()}
@@ -17,11 +17,15 @@
   {#if (items?.length ?? 0) > 0}
     <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
     <div class="preparationTime">
-      entre {Utils.Strings.timeToString($Settings?.preparation?.min * 60)}, e {Utils.Strings.timeToString($Settings?.preparation?.max * 60)}
+      entre {Utils.Strings.timeToString($Settings?.preparation?.min * 60)}, e {Utils.Strings.timeToString(
+        $Settings?.preparation?.max * 60
+      )}
     </div>
     <Views.ItemsList {items} productPage={Routes.product} {Navigation} />
   {:else}
-    Não há produtos para exibir!
+    <Views.CentredMessage
+      text="Por enquanto estamos ainda organizando o nosso cardápio e ainda não cadastramos nenhum produto, volte a verificar de novo mais tarde!"
+    />
   {/if}
 {/await}
 

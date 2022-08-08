@@ -56,8 +56,7 @@
     : calcDelivery;
   $: netTotal = subtotal + delivery;
   $: discount = couponObject
-    ? subtotal -
-      Utils.Numbers.calcDiscount(
+    ? Utils.Numbers.calcDiscount(
         subtotal,
         couponObject.value,
         couponObject.type

@@ -24,9 +24,8 @@
   }
 
   function toggleNewCard() {
-    Navigation.goTo(Routes.newMethod)
+    Navigation.goTo(Routes.newMethod);
   }
-
 
   async function updateCard(id) {
     isLoading = true;
@@ -74,6 +73,10 @@
 <Views.Button {Layout} on:click={toggleNewCard}>novo cartão</Views.Button>
 {#if !payments}
   <Views.LocalLoading size="2" />
+{:else if (payments?.length ?? 0) === 0}
+  <Views.CentredMessage
+    text="Não há cartões de crédito cadastrados para exibir, cadastre agora uma para fazer seu pedido com segurança!"
+  />
 {:else}
   {#each payments as { id, type, brand, lastDigits, selected }}
     <div class="paymentCard">

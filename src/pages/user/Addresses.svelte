@@ -172,12 +172,8 @@
     </div>
   {/each}
 {:else}
-  <div id="noAddress">
-    <h2>
-      Não há endereços para exibir, aproveite e cadastre deu endereço pricipal agora
-      mesmo!
-    </h2>
-  </div>
+<Views.CentredMessage text="Não há endereços para exibir, aproveite e cadastre deu endereço pricipal agora
+mesmo!" />
 {/if}
 
 {#if showNewAddress}
@@ -262,18 +258,6 @@
 <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 
 <style>
-  
-  #noAddress {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-  }
-  #noAddress > h2 {
-    place-self: center;
-    align-self: center;
-    justify-self: center;
-    text-align: center;
-  }
   .address {
     position: relative;
     width: 100%;

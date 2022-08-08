@@ -1,5 +1,14 @@
 <script>
-  import { Cart as CartStore, Store } from "../stores/Cart";
+  import { onMount } from "svelte";
+  import {
+    faHome,
+    faList,
+    faUser,
+    faSearch,
+    faMoneyBill1Wave,
+    faAddressCard,
+    faHourglass,
+  } from "@fortawesome/free-solid-svg-icons";
   import {
     Router,
     Navigation,
@@ -9,6 +18,8 @@
     MenuHamburger,
   } from "../stores/Navigation";
   import { Views, Utils } from "@ikomida/components";
+  import { Cart as CartStore, Store } from "../stores/Cart";
+  import { StatusBar, Layout, Settings } from "../stores/Setup";
   import Home from "./products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
@@ -18,23 +29,9 @@
   import Product from "./products/Product.svelte";
   import Checkout from "./cart/Checkout.svelte";
   import Cart from "./cart/Cart.svelte";
-  import { StatusBar, Layout, Settings } from "../stores/Setup";
-  import {
-    faHome,
-    faList,
-    faUser,
-    faSearch,
-    faSlidersH,
-    faMoneyBill1Wave,
-    faAddressCard,
-    faHourglass
-  } from "@fortawesome/free-solid-svg-icons";
-  import { onMount } from "svelte";
   import Addresses from "./user/Addresses.svelte";
   import Payments from "./payments/Payments.svelte";
   import NewMethod from "./payments/NewMethod.svelte";
-
-  let direction;
 
   const tabs = [
     {
@@ -144,9 +141,9 @@
 </script>
 
 <main
-  style="--paddingTop:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; --paddingBottom: {showCart
-    ? '115px'
-    : '50px'}; overflow: scroll;max-width: 100%;background: {$Layout.background};height: 100%;"
+  style="margin-top:{styleHeight};padding: 20px; padding-bottom: {showCart
+    ? '140px'
+    : '70px'}; overflow: scroll;max-width: 100%;background: {$Layout.background};height: 100%;"
 >
   {#if route == Routes.home}
     <Home />
@@ -211,14 +208,5 @@
     padding: 0;
     font-weight: normal;
     box-sizing: border-box;
-  }
-  body {
-    padding-top: var(--paddingTop);
-    padding-bottom: var(--paddingBottom);
-    background: var(--backgroundColor);
-  }
-  main {
-    display: flex;
-    flex-direction: column;
   }
 </style>

@@ -36,25 +36,26 @@
   />
 {/if}
 
-<div>
-  <Views.TextEdit icon={faSearch} bind:value placeHolder="Buscar no cardápio" />
-  <Views.Divider />
-  {#if items.length > 0 && !error}
-    <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
-    <div class="preparationTime">
-      entre {Utils.Strings.timeToString($Settings?.preparation?.min * 60)}, e {Utils.Strings.timeToString(
-        $Settings?.preparation?.max * 60
-      )}
-    </div>
-    <Views.ItemsList {items} productPage={Routes.product} {Navigation} />
-  {:else if error}
-    <h2>Nenhum produto foi encontrado</h2>
+<Views.TextEdit
+  marginTop="-"
+  icon={faSearch}
+  bind:value
+  placeHolder="Buscar no cardápio"
+/>
+<Views.Divider />
+{#if (items?.length ?? 0) > 0 && !error}
+  <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
+  <div class="preparationTime">
+    entre {Utils.Strings.timeToString($Settings?.preparation?.min * 60)}, e {Utils.Strings.timeToString(
+      $Settings?.preparation?.max * 60
+    )}
+  </div>
+  <Views.ItemsList {items} productPage={Routes.product} {Navigation} />
+{:else}
+  <Views.CentredMessage text="Nenhum produto foi encontrad">
     <h3>Tente usar outro termo para pequisar</h3>
-  {:else}
-    <h2>Nenhum produto foi encontrado</h2>
-    <h3>Tente usar outro termo para pequisar</h3>
-  {/if}
-</div>
+  </Views.CentredMessage>
+{/if}
 
 <style>
   .preparationTitle,

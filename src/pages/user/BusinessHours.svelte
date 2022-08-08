@@ -48,26 +48,13 @@
     {/if}
   </div>
 {:else}
-  <div id="noService">
-    <h2>
-      Ainda não estamos funcionando para delivery, mas estamos organizando a
-      lojinha e abrimos em breve, volte mais tarde!
-    </h2>
-  </div>
+  <Views.CentredMessage
+    text="Ainda não estamos funcionando para delivery, mas estamos organizando a
+      lojinha e abrimos em breve, volte mais tarde!"
+  />
 {/if}
 
 <style>
-  #noService {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-  }
-  #noService > h2 {
-    place-self: center;
-    align-self: center;
-    justify-self: center;
-    text-align: center;
-  }
   .TextValue {
     width: 100%;
     display: flex;

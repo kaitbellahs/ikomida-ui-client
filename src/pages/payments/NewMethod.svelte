@@ -6,12 +6,10 @@
     import { Layout } from "../../stores/Setup";
     import creditCardType from "credit-card-type";
 
-    let recaptcha = false;
     let isLoading = false;
     let newCardObject = {
         holder: null,
         validity: null,
-        cpf: null,
         code: null,
         number: null,
     };
@@ -21,7 +19,6 @@
     let newCardObjectValidation = {
         holder: false,
         validity: false,
-        cpf: false,
         code: false,
         number: false,
     };
@@ -74,8 +71,6 @@
             toggleErrorAlert(
                 `é obrigatorio o preencheemento do código de segurança`
             );
-        } else if (!newCardObjectValidation?.cpf) {
-            toggleErrorAlert(`é obrigatorio o preencheemento do CPF`);
         } else {
             showNewMethodAlert = true;
         }
@@ -105,6 +100,7 @@
     }
     Title.set("Novo cartão");
 </script>
+
 <Views.Divider />
 <h2>Preencha aqui os dados do seu cartão</h2>
 <Views.Divider />
@@ -148,12 +144,6 @@
     bind:isValid={newCardObjectValidation.code}
     min={cardInfo?.code?.size}
     max={cardInfo?.code?.size}
-/>
-<Views.TextEdit
-    type="cpf"
-    placeHolder="CPF vinculado com o cartão"
-    bind:value={newCardObject.cpf}
-    bind:isValid={newCardObjectValidation.cpf}
 />
 <Views.Divider />
 <Views.Button {Layout} on:click={openNewMethodAlert}>Adicionar</Views.Button>
