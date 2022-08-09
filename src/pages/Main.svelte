@@ -199,14 +199,3 @@
   {Navigation}
   bottomPadding={$StatusBar.bottomPadding}
 />
-
-<style global>
-  *,
-  *:before,
-  *:after {
-    margin: 0;
-    padding: 0;
-    font-weight: normal;
-    box-sizing: border-box;
-  }
-</style>
