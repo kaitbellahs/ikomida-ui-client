@@ -174,11 +174,10 @@
   {/if}
   {#if showCart}
     <Views.Button
-      {Layout}
-      isFloat="true"
-      on:click={goToCart}
       bottomPadding={$StatusBar.bottomPadding}
-      >Ver sacola {Utils.Strings.currency(total)}</Views.Button
+      {Layout}
+      on:click={goToCart}
+      isFloat={true}>Ver sacola {Utils.Strings.currency(total)}</Views.Button
     >
   {/if}
 </main>

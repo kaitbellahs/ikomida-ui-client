@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">iKomida</string>
-    <string name="title_activity_main">iKomida</string>
+    <string name="app_name">Ti Alto Nivel</string>
+    <string name="title_activity_main">Ti Alto Nivel</string>
     <string name="package_name">com.ikomida.br.tialtonivel</string>
     <string name="custom_url_scheme">ikomida</string>
     <string name="filter_view">iKomida</string>

@@ -22,31 +22,44 @@
   import Tac from "./pages/unlogged/Tac.svelte";
   import Pp from "./pages/unlogged/Pp.svelte";
   import NoService from "./pages/unlogged/NoService.svelte";
+  import LaunchScreen from "./pages/unlogged/LaunchScreen.svelte";
   import Main from "./pages/Main.svelte";
 
   let networkStatus = null;
   let showNotificationPopup = false;
   let notificationIds = [];
+  let logedIn = false;
   let notificationPopup = {
     title: null,
     body: null,
     buttons: [],
   };
-  function togglePushNotificationPopup() {
-    showNotificationPopup = !showNotificationPopup;
-  }
 
   $: route = $Router.route;
 
-  let logedIn = false;
+  $: isActive = $Settings?.isActive ?? true;
 
-  $: if ($Auth) {
+  $: if ($Auth && isActive) {
     logedIn = false;
     Utils.Jws.extractToken($Auth).then((token) => {
       logedIn = token !== null;
     });
   } else {
     logedIn = false;
+  }
+
+  $: if (networkStatus == null || !networkStatus.connected) {
+    const statusBar = $_StatusBar;
+    statusBar.topMargin = 20;
+    _StatusBar.setStatusBar(statusBar);
+  } else {
+    const statusBar = $_StatusBar;
+    statusBar.topMargin = 0;
+    _StatusBar.setStatusBar(statusBar);
+  }
+
+  function togglePushNotificationPopup() {
+    showNotificationPopup = !showNotificationPopup;
   }
 
   const checkAppLaunchUrl = async () => {
@@ -145,25 +158,26 @@
       _StatusBar.setStatusBar(statusBar);
     }
   });
-  $: if (networkStatus == null || !networkStatus.connected) {
-    const statusBar = $_StatusBar;
-    statusBar.topMargin = 20;
-    _StatusBar.setStatusBar(statusBar);
-  } else {
-    const statusBar = $_StatusBar;
-    statusBar.topMargin = 0;
-    _StatusBar.setStatusBar(statusBar);
-  }
 
   Network.addListener("networkStatusChange", (status) => {
     networkStatus = status;
   });
+  $: console.log(
+    "Settings:",
+    $Settings,
+    "isActive:",
+    $Settings?.isActive,
+    "isActive:",
+    isActive
+  );
 </script>
 
 <Views.LoadJS
   url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS"
 />
-{#if $Settings && !$Settings.isActive}
+{#if !$Settings || $Settings?.isActive === null}
+  <LaunchScreen />
+{:else if !isActive}
   <NoService />
 {:else if logedIn}
   <Main />

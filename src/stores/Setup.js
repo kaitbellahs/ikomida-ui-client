@@ -1,9 +1,9 @@
 import {
-    writable
+	writable
 } from 'svelte/store';
 
 function createStatusBar() {
-	const { subscribe, set } = writable({style: null, visible: true, height: 0, bottomPadding: 0});
+	const { subscribe, set } = writable({ style: null, visible: true, height: 0, bottomPadding: 0 });
 
 	return {
 		subscribe,
@@ -19,14 +19,14 @@ function createLayout() {
 		background: "#dfdfdf",
 		color: "#000000",
 		header: {
-		  color: "#ffffff",
-		  background: "#4c0708",
-		  menuHamburger: "#ffffff",
+			color: "#ffffff",
+			background: "#4c0708",
+			menuHamburger: "#ffffff",
 		},
 		tabs: { background: "#ffe4c4", color: "#4c0708" },
 		button: { background: "#4c0708", color: "white" },
 		dialog: { background: "#ffffffdf", color: "#4c0708" },
-	  });
+	});
 
 	return {
 		subscribe,
@@ -50,7 +50,7 @@ function createSettings() {
 			hours: [],
 			days: []
 		},
-		isActive: false
+		isActive: null
 	});
 
 	return {
