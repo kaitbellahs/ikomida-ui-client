@@ -159,16 +159,21 @@
 {#if !addresses}
   <Views.LocalLoading size="2" />
 {:else if (addresses?.length ?? 0) > 0}
-  <h3>Escolha seu endereço padrão.</h3>
+  <h3>Selecione seu endereço principal</h3>
+  <small>Esse endereço será usado para entregar seus pedidos</small>
   {#each addresses as { id, postalCode, street, number, complement, neighborhood, city, stat, selected }}
     <div class="address">
       <Views.FloatRemove callback={() => onRemoveClick(id)} />
       <div class="content">
-        <span class="street">{street}, {number}</span>
-        <span class="neighborhood">{neighborhood} | {complement}</span>
+        <span class="street"
+          >{street}, {number}{address?.complement
+            ? ` - ${address?.complement}`
+            : ""}</span
+        >
+        <span class="neighborhood">{neighborhood}</span>
         <span class="city">{city}/{stat} CEP: {postalCode}</span>
       </div>
-      <div class="edit" on:click={updateAddress(id)}>
+      <div class="checkbox" on:click={updateAddress(id)}>
         <Views.Checkbox bind:checked={selected} />
       </div>
     </div>
@@ -277,6 +282,10 @@ mesmo!"
     margin-top: 30px;
     padding: 10px;
   }
+  .address > .checkbox {
+    display: flex;
+    align-items: flex-end;
+  }
   .address > .content {
     display: flex;
     flex-direction: column;
@@ -284,6 +293,7 @@ mesmo!"
   }
   .address > .content > .street {
     font-family: "RobotoMedium";
+    margin-bottom: 10px;
   }
   .address > .content > .neighborhood {
     font-weight: lighter;
@@ -295,14 +305,8 @@ mesmo!"
     font-size: 0.9em;
     width: 100%;
   }
-  .edit {
-    flex-grow: 1;
-    text-align: end;
-    position: absolute;
-    right: 10px;
-    bottom: 10px;
-  }
-  h3 {
+  h3,
+  small {
     text-align: center;
   }
 </style>

@@ -8,9 +8,8 @@
   } from "../../stores/Navigation";
   import { getOrders, OrderStatus } from "../../network/Orders";
   import { Views, Utils, Types } from "@ikomida/components";
-  import { PaymentType } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
-  import { faHistory, faSync } from "@fortawesome/free-solid-svg-icons";
+  import { faSync } from "@fortawesome/free-solid-svg-icons";
   import Cache from "../../stores/Cache";
   import { onMount } from "svelte";
   let orders;
@@ -28,6 +27,10 @@
       canGetMore = false;
       orders = Cache.getObject(CACHE_NAME);
       const newOrders = await getOrders($Router.options, timestamp);
+      if (!newOrders) {
+        isLoading = false;
+        return;
+      }
       hasMore = newOrders.length > 0;
       orders = refresh
         ? newOrders
@@ -66,11 +69,7 @@
     Navigation.goTo(Routes.order, { newOrder: false, order });
   }
 
-  function goToOrdersHistory() {
-    Navigation.goTo(Routes.orders, true);
-  }
-
-  Title.set("Pedidos");
+  Title.set("Meus pedidos");
 </script>
 
 {#if isLoading}
@@ -81,7 +80,7 @@
 {/if}
 {#if (orders?.length ?? 0) > 0}
   <div>
-    {#each orders as { id, status, products, address, payment, createdAt, preparation }}
+    {#each orders as { id, status, products, address, payment, createdAt, preparation, subtotal, delivery, discount }}
       <div class="leftShadow orderContainer" on:click={goToOrder(id)}>
         {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(status)}
           {#if new Date(new Date(createdAt).getTime() + (preparation?.max + address?.duration) * 1000) < new Date()}
@@ -119,9 +118,21 @@
             {products.length - 1 == 1 ? "item" : "itens"}
           </div>
         {/if}
-        <div class="address">Entregue em: <b>{address.street}</b></div>
+        <div class="address">Entregue na: <b>{address.street}</b></div>
         <div class="paymentMethod">
-          Forma de pagamento: <b>{PaymentType(payment.type)}</b>
+          Forma de pagamento: <b
+            >{new Types.PaymentMethodType(payment.type).name}
+            {new Types.PaymentMethodType(payment.type).description}</b
+          >
+        </div>
+        <div class="paymentMethod">
+          Total: <b
+            >{Utils.Strings.currency(
+              Number(subtotal ?? 0) +
+                Number(delivery ?? 0) -
+                Number(discount ?? 0)
+            )}</b
+          >
         </div>
         <div class="time">{Utils.Strings.dateToString(createdAt)}</div>
       </div>

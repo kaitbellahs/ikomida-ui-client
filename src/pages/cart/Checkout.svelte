@@ -6,11 +6,7 @@
   import { onMount } from "svelte";
   import { Store, Cart } from "../../stores/Cart";
   import { Layout, Settings } from "../../stores/Setup";
-  import {
-    GetPaymentMethods,
-    PaymentType,
-    AddCoupon,
-  } from "../../network/Payment";
+  import { GetPaymentMethods, AddCoupon } from "../../network/Payment";
   import { NewOrders } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
   import { GetAddresses } from "../../network/User";
@@ -210,10 +206,10 @@
           >{delivery == 0 ? "Gratis" : Utils.Strings.currency(delivery)}</span
         ></td
       >
-    </tr>
-    <tr>
+    </tr><tr class="spacer" />
+    <tr class="total">
       <td class="resumeText">Total</td>
-      <td class="resumeValue">{Utils.Strings.currency(total)}</td>
+      <td class="resumeValue total">{Utils.Strings.currency(total)}</td>
     </tr>
   </tbody>
 </table>
@@ -235,18 +231,19 @@
   >Adicionar mais itens</Views.Button
 >
 <Views.Divider />
-<Views.Button {Layout} on:click={manageAddress}>gerenciar endereço</Views.Button
->
+<Views.Button {Layout} on:click={manageAddress}>trocar endereço</Views.Button>
 {#if address === undefined}
   <Views.LocalLoading size="2" />
 {:else if address}
   <div class="address">
     <div class="content">
-      <span class="delivery">Entregar em</span>
-      <span>{address?.street}</span>
-      <span class="neighborhood"
-        >{address?.neighborhood} | {address?.complement}</span
+      <span class="delivery">A entrega será realizada na</span>
+      <span
+        >{address?.street}, {address?.number}{address?.complement
+          ? ` - ${address?.complement}`
+          : ""}</span
       >
+      <span class="neighborhood">{address?.neighborhood} </span>
       <span class="city"
         >{address?.city}/{address?.stat} CEP: {address?.postalCode}</span
       >
@@ -256,19 +253,28 @@
   <h3>Para continuar precisa selecionar ou adicionar um endereço</h3>
 {/if}
 <Views.Divider />
-<Views.Button {Layout} on:click={manageCard}>gerenciar cartões</Views.Button>
+<Views.Button {Layout} on:click={manageCard}
+  >Trocar meio de pagamento</Views.Button
+>
 {#if payment === undefined}
   <Views.LocalLoading size="2" />
 {:else if payment}
   <div class="paymentCard">
     <div class="content">
-      <span class="payWith">Pagar com</span>
-      <span>{PaymentType(payment?.type)}</span>
+      <span class="payWith">A cobrança será realizada com</span>
+      <span class="paymentType"
+        >{Utils.Strings.capitalizeFirstLeter(
+          new Types.PaymentMethodType(payment?.type).name
+        )}</span
+      >
+      {new Types.PaymentMethodType(payment?.type).description}
       <span class="brand">
-        {#if payment?.type !== "Cash"}
-          {payment?.brand} **** **** **** {payment?.lastDigits}
-        {:else}
-          Pagar na entrega
+        {#if payment?.type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
+          <img
+            src="/assets/cardBrand/{payment?.brand}.svg"
+            alt={payment?.brand}
+          />
+          **** {payment?.lastDigits}
         {/if}
       </span>
     </div>
@@ -316,17 +322,21 @@
     font-size: 0.9em;
     width: 100%;
   }
+  .paymentCard > .content > .brand > img {
+    height: 14px;
+  }
   .paymentCard > .content > .brand {
     font-weight: lighter;
     font-size: 1em;
     width: 100%;
+    margin-top: 5px;
   }
   .address {
     width: 100%;
     display: flex;
     justify-content: space-between;
     border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
+    padding: 10px 0;
   }
   .address > .content {
     display: flex;
@@ -350,7 +360,8 @@
   }
   table {
     width: 100%;
-    padding-bottom: 10px;
+    border-collapse: separate;
+    border-spacing: 0 0.4em;
   }
   .resumeHead {
     font-size: 1.1em;
@@ -364,6 +375,12 @@
   .resumeValue {
     text-align: right;
     font-size: 0.9em;
+  }
+  tr.total {
+    padding-top: 10px;
+  }
+  .resumeValue.total {
+    font-size: 1.1em;
   }
   .deliveryFree {
     color: green;

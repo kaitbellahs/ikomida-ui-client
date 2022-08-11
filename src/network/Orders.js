@@ -11,11 +11,10 @@ import {
 
 export async function getOrders(history, timestamp = 0) {
     let response = await Network.instance.get(`/orders/${timestamp}${history ? '/history' : ''}`, get(Auth));
-    let orders = [];
     if (response?.success) {
-        orders = response?.data || [];
+        return response?.data || [];
     }
-    return orders;
+    return null;
 }
 
 export async function NewOrders(payload) {

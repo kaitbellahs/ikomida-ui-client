@@ -2,7 +2,6 @@
   import { Title, Router, Routes, Navigation } from "../../stores/Navigation";
   import { OrderStatus } from "../../network/Orders";
   import { Utils, Types, Views } from "@ikomida/components";
-  import { PaymentType } from "../../network/Payment";
   import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
   import Cache from "../../stores/Cache";
@@ -109,10 +108,38 @@
     >
   </div>
 {/each}
-
-<div class="address">Entregue em: <b>{order?.address?.street}</b></div>
+<div class="address">
+  Entregue na
+  <span class="street"
+    >{order?.address?.street}, {order?.address?.number}{order?.address
+      ?.complement
+      ? ` - ${order?.address?.complement}`
+      : ""}</span
+  ><br />
+  <span class="neighborhood"
+    >{order?.address?.neighborhood}/span ><br />
+    <span class="city"
+      >{order?.address?.city}/{order?.address?.stat} CEP: {order?.address
+        ?.postalCode}</span
+    >
+  </span>
+</div>
 <div class="paymentMethod">
-  Forma de pagamento: <b>{PaymentType(order?.payment?.type)}</b>
+  <span
+    >Pago com <b
+      >{new Types.PaymentMethodType(order?.payment.type).name}
+      {new Types.PaymentMethodType(order?.payment.type).description}</b
+    ></span
+  >
+  <span class="brand">
+    {#if order?.payment.type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
+      <img
+        src="/assets/cardBrand/{order?.payment.brand}.svg"
+        alt={order?.payment.brand}
+      />
+      **** {order?.payment.lastDigits}
+    {/if}
+  </span>
 </div>
 <table>
   <thead>
@@ -217,24 +244,42 @@
     font-size: 1em;
   }
   .address {
-    font-family: RobotoThin;
     font-size: 0.9em;
     margin-top: 20px;
     margin-bottom: 10px;
   }
+  .address > .street {
+    font-family: "RobotoMedium";
+    margin-bottom: 10px;
+  }
+  .address > .neighborhood {
+    font-weight: lighter;
+    font-size: 1em;
+    width: 100%;
+  }
   .paymentMethod {
-    font-family: RobotoThin;
     font-size: 0.9em;
     margin-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+  }
+  .paymentMethod > .brand > img {
+    height: 14px;
+  }
+  .paymentMethod > .brand {
+    font-weight: lighter;
+    font-size: 1em;
+    width: 100%;
+    margin-top: 5px;
   }
   .time {
-    font-family: RobotoThin;
     font-size: 1em;
     margin-top: 5px;
     width: 100%;
     margin: 25px 0 10px 0;
   }
   table {
+    margin-top: 20px;
     width: 100%;
     padding-bottom: 10px;
   }

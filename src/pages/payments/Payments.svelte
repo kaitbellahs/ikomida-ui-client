@@ -1,12 +1,9 @@
 <script>
   import { Title, Navigation, Routes } from "../../stores/Navigation";
-  import Fa from "svelte-fa";
-  import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views } from "@ikomida/components";
+  import { Views, Types, Utils } from "@ikomida/components";
   import {
     GetPaymentMethods,
-    PaymentType,
     UpdateCreditCard,
     DeleteCreditCard,
   } from "../../network/Payment";
@@ -81,23 +78,29 @@
     text="Não há cartões de crédito cadastrados para exibir, cadastre agora uma para fazer seu pedido com segurança!"
   />
 {:else}
-  <h3>Escolha seu meio de pagamento padrão.</h3>
+  <h3>Selecione seu meio de pagamento principal</h3>
+  <small
+    >Esse meio de pagamento será usado para realizar cobranças do seus pedidos</small
+  >
   {#each payments as { id, type, brand, lastDigits, selected }}
     <div class="paymentCard">
-      {#if type !== "Cash"}
+      {#if type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
         <Views.FloatRemove callback={() => onRemoveClick(id)} />
       {/if}
       <div class="content">
-        <span class="paymentType">{PaymentType(type)}</span>
+        <span class="paymentType"
+          >{Utils.Strings.capitalizeFirstLeter(
+            new Types.PaymentMethodType(type).name
+          )}</span
+        >
+        Pagar {new Types.PaymentMethodType(type).description}
         <span class="brand">
-          {#if type !== "Cash"}
-            {brand} **** **** **** {lastDigits}
-          {:else}
-            Pagar na entrega
+          {#if type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
+            <img src="/assets/cardBrand/{brand}.svg" alt={brand} /> **** {lastDigits}
           {/if}
         </span>
       </div>
-      <div class="edit" on:click={updateCreditCard(id)}>
+      <div class="checkbox" on:click={updateCreditCard(id)}>
         <Views.Checkbox bind:checked={selected} />
       </div>
     </div>
@@ -122,6 +125,10 @@
     margin-top: 30px;
     padding: 10px;
   }
+  .paymentCard > .checkbox {
+    display: flex;
+    align-items: flex-end;
+  }
   .paymentCard > .content {
     display: flex;
     flex-direction: column;
@@ -129,13 +136,19 @@
   }
   .paymentCard > .content > .paymentType {
     font-family: "RobotoMedium";
+    margin-bottom: 10px;
+  }
+  .paymentCard > .content > .brand > img {
+    height: 14px;
   }
   .paymentCard > .content > .brand {
     font-weight: lighter;
     font-size: 1em;
     width: 100%;
+    margin-top: 5px;
   }
-  h3 {
+  h3,
+  small {
     text-align: center;
   }
 </style>

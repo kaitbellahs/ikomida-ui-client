@@ -20,6 +20,11 @@
   };
   let errorAlert;
   let showAlert = false;
+
+  $: if (userInfo?.avatar) {
+    // update()
+  }
+
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;
