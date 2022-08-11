@@ -7,11 +7,12 @@
     Menu,
   } from "../../stores/Navigation";
   import { getOrders, OrderStatus } from "../../network/Orders";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Types } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
   import { faHistory, faSync } from "@fortawesome/free-solid-svg-icons";
   import Cache from "../../stores/Cache";
+  import { onMount } from "svelte";
   let orders;
 
   let hasMore = true;
@@ -54,18 +55,10 @@
 
   let isLoading = false;
   $: CACHE_NAME = $Router?.options ? "ORDERS_HISTORY" : "ORDERS";
-  $: if ($Router?.options === null || $Router?.options !== null) {
-    // if (!$Router?.options) {
-    //   Menu.addItem({
-    //     icon: faHistory,
-    //     name: "Pedidos concluídos",
-    //     callback: goToOrdersHistory,
-    //   });
-    // }
+  onMount(async () => {
     Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
     update();
-  }
-
+  });
   function goToOrder(id) {
     const order = orders?.find((order) => {
       return order?.id === id;
@@ -77,7 +70,7 @@
     Navigation.goTo(Routes.orders, true);
   }
 
-  Title.set("Pedidos Pedidos Pedidos Pedidos Pedidos ");
+  Title.set("Pedidos");
 </script>
 
 {#if isLoading}
@@ -90,10 +83,13 @@
   <div>
     {#each orders as { id, status, products, address, payment, createdAt, preparation }}
       <div class="leftShadow orderContainer" on:click={goToOrder(id)}>
-        {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(status)}
+        {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(status)}
           {#if new Date(new Date(createdAt).getTime() + (preparation?.max + address?.duration) * 1000) < new Date()}
-            <span class="lateOrder">Pedido atrasado</span>
+            <span class="status lateOrder">ATRAZADO</span>
           {/if}
+          <span class="status">
+            Pedido {OrderStatus(status)}
+          </span>
           <span class="deliveryForecast">Previsão de entrega</span>
           <span class="deliveryForecastValue">
             entre
@@ -105,10 +101,15 @@
                 (preparation?.max + address?.duration) * 1000
             )}</span
           >
+        {:else if [Types.OrderStatusType.DELIVERED].includes(status)}
+          <span class="status delivered">Pedido {OrderStatus(status)}</span>
+        {:else if [Types.OrderStatusType.CANCELED].includes(status)}
+          <span class="status canceled">Pedido {OrderStatus(status)}</span>
+        {:else}
+          <span class="status">
+            Pedido {OrderStatus(status)}
+          </span>
         {/if}
-        <h3 class={["delivered"].includes(status) ? "delivered" : ""}>
-          Pedido {OrderStatus(status)}
-        </h3>
         {#if products.length > 0}
           <div class="product">1. {products[0].title}</div>
         {/if}
@@ -152,16 +153,6 @@ mesmo!"
     display: flex;
     flex-direction: column;
   }
-  .orderContainer > h3 {
-    padding: 0;
-    margin: 0;
-    font-size: 1.1em;
-    margin-bottom: 10px;
-    margin-top: 10px;
-  }
-  .orderContainer > h3.delivered {
-    color: rgb(0, 177, 0);
-  }
   .orderContainer > .product {
     font-family: RobotoLight;
     font-size: 0.9em;
@@ -188,12 +179,26 @@ mesmo!"
   .orderContainer > .deliveryForecastValue {
     color: rgb(0, 177, 0);
   }
-  .orderContainer > .lateOrder {
-    background-color: #4c0708;
+  .orderContainer > .status {
     border-radius: 6px;
-    color: white;
     padding: 4px 20px;
     align-self: center;
     margin-bottom: 10px;
+    color: #4c0708;
+    border: 1px solid #4c0708;
+  }
+  .orderContainer > .lateOrder {
+    background-color: #4c0708;
+    color: white;
+    border: none;
+  }
+  .orderContainer > .delivered {
+    background-color: rgb(0, 177, 0);
+    color: white;
+    border: none;
+  }
+  .orderContainer > .canceled {
+    background-color: rgb(255, 255, 0);
+    border: none;
   }
 </style>

@@ -7,8 +7,8 @@
   import {
     GetPaymentMethods,
     PaymentType,
-    UpdateCard,
-    DeleteCard,
+    UpdateCreditCard,
+    DeleteCreditCard,
   } from "../../network/Payment";
   import { onMount } from "svelte";
   import { Layout } from "../../stores/Setup";
@@ -23,13 +23,13 @@
     showAlert = true;
   }
 
-  function toggleNewCard() {
+  function toggleNewCreditCard() {
     Navigation.goTo(Routes.newMethod);
   }
 
-  async function updateCard(id) {
+  async function updateCreditCard(id) {
     isLoading = true;
-    const response = await UpdateCard(id);
+    const response = await UpdateCreditCard(id);
     if (response?.success) {
       for (const item of payments) {
         item.selected = false;
@@ -46,7 +46,7 @@
 
   async function onRemoveClick(id) {
     isLoading = true;
-    const response = await DeleteCard(id);
+    const response = await DeleteCreditCard(id);
     if (response?.success) {
       payments = payments?.filter((item) => item.id !== id);
       if ((payments?.length ?? 0) === 1) {
@@ -73,7 +73,7 @@
 </script>
 
 <Views.Divider />
-<Views.Button {Layout} on:click={toggleNewCard}>novo cartão</Views.Button>
+<Views.Button {Layout} on:click={toggleNewCreditCard}>novo cartão</Views.Button>
 {#if !payments}
   <Views.LocalLoading size="2" />
 {:else if (payments?.length ?? 0) === 0}
@@ -81,12 +81,11 @@
     text="Não há cartões de crédito cadastrados para exibir, cadastre agora uma para fazer seu pedido com segurança!"
   />
 {:else}
+  <h3>Escolha seu meio de pagamento padrão.</h3>
   {#each payments as { id, type, brand, lastDigits, selected }}
     <div class="paymentCard">
       {#if type !== "Cash"}
-        <span on:click={onRemoveClick(id)} class="remove"
-          ><Fa icon={faTrashAlt} /></span
-        >
+        <Views.FloatRemove callback={() => onRemoveClick(id)} />
       {/if}
       <div class="content">
         <span class="paymentType">{PaymentType(type)}</span>
@@ -98,7 +97,7 @@
           {/if}
         </span>
       </div>
-      <div class="edit" on:click={updateCard(id)}>
+      <div class="edit" on:click={updateCreditCard(id)}>
         <Views.Checkbox bind:checked={selected} />
       </div>
     </div>
@@ -136,20 +135,7 @@
     font-size: 1em;
     width: 100%;
   }
-  .remove {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    font-size: 0.9em;
-    color: white;
-    font-family: RobotoBold;
-    border: 1px solid #4c0708;
-    background: #4c0708;
-    border-radius: 16px;
-    width: 28px;
-    height: 28px;
-    vertical-align: middle;
+  h3 {
     text-align: center;
-    padding: 6px;
   }
 </style>

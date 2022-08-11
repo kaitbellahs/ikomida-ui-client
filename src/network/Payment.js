@@ -16,15 +16,15 @@ export async function GetPaymentMethods() {
 //     return Network.instance.get(`/pubKey`, get(Auth));
 // }
 
-export async function NewCard(method) {
-    return Network.instance.post(`/payment`, get(Auth), method, "newPaymentMethod");
+export async function NewCreditCard(method) {
+    return Network.instance.post(`/payment`, get(Auth), method, "newCreditCard");
 }
 
-export async function UpdateCard(id) {
+export async function UpdateCreditCard(id) {
     return Network.instance.put(`/payment/${id}`, get(Auth));
 }
 
-export async function DeleteCard(id) {
+export async function DeleteCreditCard(id) {
     return Network.instance.remove(`/payment/${id}`, get(Auth));
 }
 

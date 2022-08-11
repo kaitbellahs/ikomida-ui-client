@@ -48,7 +48,7 @@
   let errorAlert;
   let showAlert = false;
 
-  $: canProceed = Utils?.Objects?.validateFields(newAddressObjectValidation)
+  $: canProceed = Utils?.Objects?.validateFields(newAddressObjectValidation);
 
   $: if (
     (newAddressObject?.postalCode?.length ?? 0) === 8 &&
@@ -71,7 +71,10 @@
           const address = response?.data;
           currentPostalCode = address?.postalCode;
           newAddressObject = { ...newAddressObject, ...address };
-          Utils?.Objects?.updateInputs(newAddressObjectInputs, newAddressObject)
+          Utils?.Objects?.updateInputs(
+            newAddressObjectInputs,
+            newAddressObject
+          );
         } else {
           toggleErrorAlert(response?.data);
         }
@@ -156,11 +159,10 @@
 {#if !addresses}
   <Views.LocalLoading size="2" />
 {:else if (addresses?.length ?? 0) > 0}
+  <h3>Escolha seu endereço padrão.</h3>
   {#each addresses as { id, postalCode, street, number, complement, neighborhood, city, stat, selected }}
     <div class="address">
-      <span on:click={onRemoveClick(id)} class="remove"
-        ><Fa icon={faTrashAlt} /></span
-      >
+      <Views.FloatRemove callback={() => onRemoveClick(id)} />
       <div class="content">
         <span class="street">{street}, {number}</span>
         <span class="neighborhood">{neighborhood} | {complement}</span>
@@ -172,8 +174,10 @@
     </div>
   {/each}
 {:else}
-<Views.CentredMessage text="Não há endereços para exibir, aproveite e cadastre deu endereço pricipal agora
-mesmo!" />
+  <Views.CentredMessage
+    text="Não há endereços para exibir, aproveite e cadastre deu endereço pricipal agora
+mesmo!"
+  />
 {/if}
 
 {#if showNewAddress}
@@ -184,7 +188,12 @@ mesmo!" />
     closeCallBack={toggleNewAddress}
     buttons={[
       { name: "Cancelar", callback: toggleNewAddress },
-      { name: "Adicionar", callback: newAddress, principal: true, disabled: !canProceed },
+      {
+        name: "Adicionar",
+        callback: newAddress,
+        principal: true,
+        disabled: !canProceed,
+      },
     ]}
   >
     <Views.TextEdit
@@ -286,7 +295,6 @@ mesmo!" />
     font-size: 0.9em;
     width: 100%;
   }
-
   .edit {
     flex-grow: 1;
     text-align: end;
@@ -294,21 +302,7 @@ mesmo!" />
     right: 10px;
     bottom: 10px;
   }
-
-  .remove {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    font-size: 0.9em;
-    color: white;
-    font-family: RobotoBold;
-    border: 1px solid #4c0708;
-    background: #4c0708;
-    border-radius: 16px;
-    width: 28px;
-    height: 28px;
-    vertical-align: middle;
+  h3 {
     text-align: center;
-    padding: 6px;
   }
 </style>

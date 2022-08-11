@@ -2,12 +2,12 @@
     import { Title, Navigation } from "../../stores/Navigation";
     import { StatusBar } from "../../stores/Setup";
     import { Views } from "@ikomida/components";
-    import { NewCard } from "../../network/Payment";
+    import { NewCreditCard } from "../../network/Payment";
     import { Layout } from "../../stores/Setup";
     import creditCardType from "credit-card-type";
 
     let isLoading = false;
-    let newCardObject = {
+    let newCreditCardObject = {
         holder: null,
         validity: null,
         code: null,
@@ -16,7 +16,7 @@
     let cardNumberMask = "____ ____ ____ ____";
     let cardCodeMask = "___";
     let cardBrandIcon;
-    let newCardObjectValidation = {
+    let newCreditCardObjectValidation = {
         holder: false,
         validity: false,
         code: false,
@@ -28,8 +28,8 @@
     let showAlert = false;
     let showNewMethodAlert = false;
 
-    $: if ((newCardObject?.number?.length ?? 0) > 0) {
-        const cardInfos = creditCardType(newCardObject?.number);
+    $: if ((newCreditCardObject?.number?.length ?? 0) > 0) {
+        const cardInfos = creditCardType(newCreditCardObject?.number);
         if (cardInfos && (cardInfos?.length ?? 0) > 0) {
             cardInfo = cardInfos?.[0];
             let gapsIndex = 0;
@@ -57,17 +57,17 @@
     }
 
     function openNewMethodAlert() {
-        if (!newCardObjectValidation?.holder) {
+        if (!newCreditCardObjectValidation?.holder) {
             toggleErrorAlert(`é obrigatorio o preencheemento do nome`);
-        } else if (!newCardObjectValidation?.number) {
+        } else if (!newCreditCardObjectValidation?.number) {
             toggleErrorAlert(
                 `é obrigatorio o preencheemento do Número do cartão`
             );
-        } else if (!newCardObjectValidation?.validity) {
+        } else if (!newCreditCardObjectValidation?.validity) {
             toggleErrorAlert(
                 `é obrigatorio o preencheemento da validade do cartão`
             );
-        } else if (!newCardObjectValidation?.code) {
+        } else if (!newCreditCardObjectValidation?.code) {
             toggleErrorAlert(
                 `é obrigatorio o preencheemento do código de segurança`
             );
@@ -80,17 +80,17 @@
         showNewMethodAlert = false;
     }
 
-    async function newCard() {
+    async function newCreditCard() {
         showNewMethodAlert = false;
         isLoading = true;
-        const newCard = {
-            holder: newCardObject?.holder,
-            number: newCardObject?.number,
-            validity: newCardObject?.validity,
-            code: newCardObject?.code,
-            cpf: newCardObject?.cpf,
+        const newCreditCard = {
+            holder: newCreditCardObject?.holder,
+            number: newCreditCardObject?.number,
+            validity: newCreditCardObject?.validity,
+            code: newCreditCardObject?.code,
+            cpf: newCreditCardObject?.cpf,
         };
-        const response = await NewCard(newCard);
+        const response = await NewCreditCard(newCreditCard);
         if (response?.success) {
             Navigation.pop();
         } else {
@@ -109,8 +109,8 @@
     icon={cardBrandIcon}
     maskKey="_"
     type="number"
-    bind:value={newCardObject.number}
-    bind:isValid={newCardObjectValidation.number}
+    bind:value={newCreditCardObject.number}
+    bind:isValid={newCreditCardObjectValidation.number}
     placeHolder="Número do cartão"
     min={cardInfo?.lengths?.[0]}
     max={cardInfo?.lengths?.[0]}
@@ -118,9 +118,9 @@
 <Views.TextEdit
     type="name"
     placeHolder="Nome impresso no cartão"
-    bind:value={newCardObject.holder}
-    bind:isValid={newCardObjectValidation.holder}
-    initialValue={newCardObject.holder}
+    bind:value={newCreditCardObject.holder}
+    bind:isValid={newCreditCardObjectValidation.holder}
+    initialValue={newCreditCardObject.holder}
     min="3"
     max="255"
 />
@@ -129,8 +129,8 @@
     maskKey="_"
     type="number"
     placeHolder="Validade do cartão"
-    bind:value={newCardObject.validity}
-    bind:isValid={newCardObjectValidation.validity}
+    bind:value={newCreditCardObject.validity}
+    bind:isValid={newCreditCardObjectValidation.validity}
     min="4"
     max="4"
     error="Por favor preencha uma data válida usando este formato dd/YY."
@@ -140,8 +140,8 @@
     maskKey="_"
     type="number"
     placeHolder="Código de segurança do cartão"
-    bind:value={newCardObject.code}
-    bind:isValid={newCardObjectValidation.code}
+    bind:value={newCreditCardObject.code}
+    bind:isValid={newCreditCardObjectValidation.code}
     min={cardInfo?.code?.size}
     max={cardInfo?.code?.size}
 />
@@ -156,7 +156,7 @@
         closeCallBack={closeNewMethodAlert}
         buttons={[
             { name: "Não", callback: closeNewMethodAlert },
-            { name: "Sim", callback: newCard, principal: true },
+            { name: "Sim", callback: newCreditCard, principal: true },
         ]}
     />
 {/if}

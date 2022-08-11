@@ -66,8 +66,11 @@
 <div class="status">
   {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status)}
     {#if new Date(new Date(order?.createdAt).getTime() + ((order?.preparation?.max ?? 0) + (order?.address?.duration ?? 0)) * 1000) < new Date()}
-      <span class="lateOrder">Pedido atrasado</span>
+      <span class="status lateOrder">ATRAZADO</span>
     {/if}
+    <span class="status">
+      Pedido {OrderStatus(order?.status)}
+    </span>
     <span class="deliveryForecast">Previsão de entrega</span>
     <span class="deliveryForecastValue">
       entre
@@ -81,14 +84,21 @@
             1000
       )}</span
     >
-    Seu pedido está
-    <span class="open">{OrderStatus(order?.status)}</span>
+  {:else if [Types.OrderStatusType.DELIVERED].includes(order?.status)}
+    <span class="status delivered">Pedido {OrderStatus(order?.status)}</span>
+  {:else if [Types.OrderStatusType.CANCELED].includes(order?.status)}
+    <span class="status canceled">Pedido {OrderStatus(order?.status)}</span>
   {:else}
-    Pedido {OrderStatus(order?.status)} em
+    <span class="status">
+      Pedido {OrderStatus(order?.status)}
+    </span>
+  {/if}
+  {#if [Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order?.status)}
+    Pedido finalizado
     <span class="open">{Utils.Strings.dateToString(order?.finishedAt)}</span>
   {/if}
 </div>
-{#each order.products as { title, price, discount, discountType, quantity }, index}
+{#each order.products as { title, price, discount, discountType, quantity }}
   <div class="product">
     <span class="quantity">{quantity}</span><span class="title">{title}</span
     ><span class="price"
@@ -273,5 +283,27 @@
   }
   .buttonGroup > :global(*):last-child {
     margin-left: 5px;
+  }
+  .status > .status {
+    border-radius: 6px;
+    padding: 4px 20px;
+    align-self: center;
+    margin-bottom: 10px;
+    color: #4c0708;
+    border: 1px solid #4c0708;
+  }
+  .status > .lateOrder {
+    background-color: #4c0708;
+    color: white;
+    border: none;
+  }
+  .status > .delivered {
+    background-color: rgb(0, 177, 0);
+    color: white;
+    border: none;
+  }
+  .status > .canceled {
+    background-color: rgb(255, 255, 0);
+    border: none;
   }
 </style>
