@@ -57,80 +57,76 @@
 </script>
 
 {#if userInfo}
-  <div class="profil">
-    <div class="avatar">
-      {#if userInfo.avatar}
-        <img class="avatarCircle" src={userInfo.avatar} alt={userInfo.name} />
-      {:else}
-        <div class="avatarCircle">
-          {userInfo.name[0]}{userInfo.lastName[0]}
-        </div>
-      {/if}
-    </div>
-    <div class="data">
-      <h2>{userInfo.name} {userInfo.lastName}</h2>
-      <Views.Divider />
-      <Views.TextValue
-        {Layout}
-        text="CPF:"
-        value={Utils?.Strings?.formatString(
-          /\d/gi,
-          "___.___.___-__",
-          "_",
-          userInfo?.identity
-        )}
-        fontSize="1.3em"
-        leftMargin="30"
-      />
-      <Views.TextValue
-        {Layout}
-        text="Telefone:"
-        value={Utils?.Strings?.formatString(
-          /\d/gi,
-          "(__) _____-____",
-          "_",
-          userInfo?.phone
-        )}
-        fontSize="1.3em"
-        leftMargin="30"
-      />
-      <Views.TextValue
-        {Layout}
-        text="mail:"
-        value={userInfo.email}
-        fontSize="1.3em"
-        leftMargin="30"
-      />
-      <Views.Divider />
-      <h2>Senha</h2>
-      <Views.TextEdit
-        type="password"
-        placeHolder="Senha atual"
-        bind:value={passwordObject.oldPass}
-      />
-      <Views.TextEdit
-        type="password"
-        placeHolder="Nova senha"
-        bind:value={passwordObject.newPass}
-        bind:isValid={passwordValidationObject.newPass}
-        error="A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
+  <Views.UploadablePhoto
+    type="profile"
+    image={userInfo?.avatar}
+    name={userInfo.name[0]}
+    lastName={userInfo.lastName[0]}
+  />
+  <Views.Divider />
+  <div class="data">
+    <h2>{userInfo.name} {userInfo.lastName}</h2>
+    <Views.Divider />
+    <Views.TextValue
+      {Layout}
+      text="CPF:"
+      value={Utils?.Strings?.formatString(
+        /\d/gi,
+        "___.___.___-__",
+        "_",
+        userInfo?.identity
+      )}
+      fontSize="1.3em"
+      leftMargin="30"
+    />
+    <Views.TextValue
+      {Layout}
+      text="Telefone:"
+      value={Utils?.Strings?.formatString(
+        /\d/gi,
+        "(__) _____-____",
+        "_",
+        userInfo?.phone
+      )}
+      fontSize="1.3em"
+      leftMargin="30"
+    />
+    <Views.TextValue
+      {Layout}
+      text="mail:"
+      value={userInfo.email}
+      fontSize="1.3em"
+      leftMargin="30"
+    />
+    <Views.Divider />
+    <h2>Senha</h2>
+    <Views.TextEdit
+      type="password"
+      placeHolder="Senha atual"
+      bind:value={passwordObject.oldPass}
+    />
+    <Views.TextEdit
+      type="password"
+      placeHolder="Nova senha"
+      bind:value={passwordObject.newPass}
+      bind:isValid={passwordValidationObject.newPass}
+      error="A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
         uma letra maiúscula, uma letra minúscula, um número e um símbolo"
-      />
-      <Views.TextEdit
-        type="password"
-        placeHolder="Confirmação"
-        bind:value={passwordObject.reNewPass}
-        bind:isValid={passwordValidationObject.reNewPass}
-        validation={(password) => passwordObject.newPass === password}
-        error="A confirmação da senha não é válida"
-      />
-      <Views.Divider />
-    </div>
-    <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
-    <Views.Button {Layout} type="transparent" on:click={logout}
-      >Logout</Views.Button
-    >
+    />
+    <Views.TextEdit
+      type="password"
+      placeHolder="Confirmação"
+      bind:value={passwordObject.reNewPass}
+      bind:isValid={passwordValidationObject.reNewPass}
+      validation={(password) => passwordObject.newPass === password}
+      error="A confirmação da senha não é válida"
+    />
+    <Views.Divider />
   </div>
+  <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
+  <Views.Button {Layout} type="transparent" on:click={logout}
+    >Logout</Views.Button
+  >
   <Views.GTerms />
   <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 {/if}
@@ -142,41 +138,7 @@
 {/if}
 
 <style>
-  .profil {
-    padding-bottom: 50px;
-  }
-  .profil > div {
-    width: 100%;
-  }
-  .profil > .avatar {
-    margin-top: 20px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-  }
-  /* .profil > div > h2 {
-    margin-left: 20px;
-  } */
-  .profil > .data {
-    width: 100%;
-    float: left;
-    margin-top: 20px;
-  }
-  .profil > .data > h2 {
+  h2 {
     text-align: center;
-  }
-  .avatarCircle {
-    font-size: 3em;
-    height: 90px;
-    width: 90px;
-    background: #ccc;
-    border-radius: 45px;
-    float: left;
-    line-height: 90px;
-    text-align: center;
-    vertical-align: middle;
-    display: table-cell;
-    overflow: hidden;
-    margin-right: 10px;
   }
 </style>

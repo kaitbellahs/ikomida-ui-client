@@ -2,8 +2,8 @@ import {
     writable
 } from 'svelte/store';
 import {
-    Storage
-} from '@capacitor/storage';
+    Preferences
+} from '@capacitor/preferences';
 
 function _store() {
     const {
@@ -23,14 +23,14 @@ function _store() {
 export const Store = _store();
 
 const reset = async () => {
-    await Storage.set({
+    await Preferences.set({
         key: 'Cart',
         value: JSON.stringify([])
     });
     Store.reset();
 }
 const update = async (object) => {
-    await Storage.set({
+    await Preferences.set({
         key: 'Cart',
         value: JSON.stringify(object)
     });
@@ -40,7 +40,7 @@ const update = async (object) => {
 const items = async () => {
     let _items = [];
     try {
-        const ret = await Storage.get({
+        const ret = await Preferences.get({
             key: 'Cart'
         });
         _items = JSON.parse(ret.value);
@@ -62,7 +62,7 @@ const addItem = async (item) => {
     }
     const update = [...new Set([...oldItems, item])]
     Store.updateItems(oldItems == null ? [item] : update);
-    await Storage.set({
+    await Preferences.set({
         key: 'Cart',
         value: JSON.stringify(update)
     });

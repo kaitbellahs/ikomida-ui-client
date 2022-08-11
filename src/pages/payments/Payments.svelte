@@ -62,7 +62,10 @@
   onMount(async () => {
     const response = await GetPaymentMethods();
     if (response?.success) {
-      payments = response?.data || [];
+      payments =
+        response?.data?.sort(
+          (i1, i2) => new Date(i2?.createdAt) - new Date(i1?.createdAt)
+        ) || [];
     }
   });
 

@@ -3,7 +3,7 @@
   import { App } from "@capacitor/app";
   import { CAPNativeLog } from "capacitor-native-log";
   import { Network } from "@capacitor/network";
-  import { StatusBar } from "@capacitor/status-bar";
+  import { StatusBar } from "@ikomida/capacitor-plugin-status-bar";
   import { Utils, PushNotification, Views } from "@ikomida/components";
 
   import { Auth, PushNotificationToken } from "./stores/Auth";
