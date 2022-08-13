@@ -22,10 +22,14 @@ export async function NewOrders(payload) {
 }
 
 export async function ChangeOrderStatus(id, status) {
-    return Network.instance.put("/order", get(Auth), {
+    const response = Network.instance.put("/order", get(Auth), {
         id,
         status
     }, "editOrder");
+    if (response?.success) {
+        await Network.instance.clearCache(Network.cacheTypes.ORDERS)
+    }
+    return response
 }
 
 export function OrderStatus(status) {

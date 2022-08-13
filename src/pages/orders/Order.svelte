@@ -39,7 +39,6 @@
     ) {
       order.status = orderStatus?.status;
       order.finishedAt = orderStatus?.finishedAt;
-      Cache.setObject(CACHE_NAME, null);
       toggleErrorAlert("O pedido foi atualizado com sucesso!");
     } else {
       toggleErrorAlert(response?.data);
