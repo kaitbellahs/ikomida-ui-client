@@ -9,16 +9,16 @@ import {
     Auth
 } from '../stores/Auth';
 
-export async function getOrders(history, timestamp = 0) {
-    let response = await Network.instance.get(`/orders/${timestamp}${history ? '/history' : ''}`, get(Auth));
-    if (response?.success) {
-        return response?.data || [];
-    }
-    return null;
+export async function getOrders(refresh = false) {
+    return await Network.instance.loadMore(Network.cacheTypes.ORDERS, '/orders', get(Auth), refresh)
 }
 
 export async function NewOrders(payload) {
-    return Network.instance.post("/order", get(Auth), payload, "newOrder");
+    const response = await Network.instance.post("/order", get(Auth), payload, "newOrder");
+    if (response?.success) {
+        await Network.instance.clearCache(Network.cacheTypes.ORDERS)
+    }
+    return response
 }
 
 export async function ChangeOrderStatus(id, status) {
@@ -37,7 +37,7 @@ export function OrderStatus(status) {
         case Types.OrderStatusType.ACCEPTED:
             return "em preparação";
         case Types.OrderStatusType.WAITING_DELIVERY:
-            return "esperando para sair para delivery";
+            return "esperando o entregador";
         case Types.OrderStatusType.IN_DELIVERY:
             return "está a caminho até você";
         case Types.OrderStatusType.DELIVERED:

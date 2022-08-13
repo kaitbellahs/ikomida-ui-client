@@ -9,7 +9,6 @@
   import { Auth, PushNotificationToken } from "./stores/Auth";
   import { StatusBar as _StatusBar, Layout, Settings } from "./stores/Setup";
   import { Navigation, Router, Routes } from "./stores/Navigation";
-  import Cache from "./stores/Cache";
 
   import { registerPushNotificationToken } from "./network/PushNotification";
   import { getLayout } from "./network/Layout";
@@ -126,8 +125,7 @@
   async function openNotification(notification) {
     if (logedIn) {
       if (["/order/", "/orders/"].includes(notification?.data?.uri)) {
-        Cache.setObject("ORDERS_HISTORY", null);
-        Cache.setObject("ORDERS", null);
+        await Network.instance.clearCache(Network.cacheTypes.ORDERS);
         Navigation.goTo(Routes.orders, false);
       }
     }

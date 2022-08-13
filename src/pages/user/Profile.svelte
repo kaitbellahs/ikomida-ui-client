@@ -1,7 +1,7 @@
 <script>
   import { Auth } from "../../stores/Auth";
   import { Title } from "../../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Network } from "@ikomida/components";
   import { onMount } from "svelte";
   import { StatusBar, Layout } from "../../stores/Setup";
   import { updatePassword } from "../../network/Auth";
@@ -50,8 +50,9 @@
     isLoading = false;
   }
 
-  function logout() {
+  async function logout() {
     Auth.setToken(null);
+    await Network.instance.clearAllCache();
   }
 
   onMount(async () => {

@@ -9,12 +9,8 @@
   import { GetPaymentMethods, AddCoupon } from "../../network/Payment";
   import { NewOrders } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
-  import { GetAddresses } from "../../network/User";
+  import { GetAddresses, GetSettings } from "../../network/User";
   import { Title, Navigation, Routes } from "../../stores/Navigation";
-  import Cache from "../../stores/Cache";
-
-  const ORDERS_HISTORY = "ORDERS_HISTORY";
-  const ORDERS = "ORDERS";
   let location;
   let coupon;
   let couponObject = null;
@@ -98,8 +94,6 @@
       isLoading = false;
       if (response && response?.success) {
         Cart.reset();
-        Cache.setObject(ORDERS, null);
-        Cache.setObject(ORDERS_HISTORY, null);
         Navigation.goTo(Routes.order, {
           newOrder: true,
           order: response?.data,
@@ -137,7 +131,15 @@
   }
 
   onMount(async () => {
-    let response = await GetAddresses();
+    isLoading = true;
+    let response = await GetSettings();
+    if (response?.success && response?.data) {
+      Settings.set({ ...$Settings, ...response?.data });
+    } else {
+      toggleErrorAlert(response?.data);
+    }
+    isLoading = false;
+    response = await GetAddresses();
     if (response?.success) {
       const addresses = response?.data?.filter((item) => item.selected);
       address = (addresses?.length ?? 0) === 1 ? addresses[0] : null;
