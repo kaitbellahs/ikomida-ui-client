@@ -159,22 +159,25 @@
 {#if !addresses}
   <Views.LocalLoading size="2" />
 {:else if (addresses?.length ?? 0) > 0}
+  <Views.Divider />
   <h3>Selecione seu endereço principal</h3>
   <small>Esse endereço será usado para entregar seus pedidos</small>
-  {#each addresses as { id, postalCode, street, number, complement, neighborhood, city, stat, selected }}
+  {#each addresses as address}
     <div class="address">
-      <Views.FloatRemove callback={() => onRemoveClick(id)} />
+      <Views.FloatRemove callback={() => onRemoveClick(address?.id)} />
       <div class="content">
         <span class="street"
-          >{street}, {number}{address?.complement
+          >{address?.street}, {address?.number}{address?.complement
             ? ` - ${address?.complement}`
             : ""}</span
         >
-        <span class="neighborhood">{neighborhood}</span>
-        <span class="city">{city}/{stat} CEP: {postalCode}</span>
+        <span class="neighborhood">{address?.neighborhood}</span>
+        <span class="city"
+          >{address?.city}/{address?.stat} CEP: {address?.postalCode}</span
+        >
       </div>
-      <div class="checkbox" on:click={updateAddress(id)}>
-        <Views.Checkbox bind:checked={selected} />
+      <div class="checkbox" on:click={updateAddress(address?.id)}>
+        <Views.Checkbox bind:checked={address.selected} />
       </div>
     </div>
   {/each}

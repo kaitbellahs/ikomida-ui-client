@@ -46,7 +46,8 @@
     const response = await DeleteCreditCard(id);
     if (response?.success) {
       payments = payments?.filter((item) => item.id !== id);
-      if ((payments?.length ?? 0) === 1) {
+      const length = payments?.length ?? 0;
+      if (length <= 3 && length > 0) {
         payments[0].selected = true;
         payments = payments;
       }
@@ -78,6 +79,7 @@
     text="Não há cartões de crédito cadastrados para exibir, cadastre agora uma para fazer seu pedido com segurança!"
   />
 {:else}
+  <Views.Divider />
   <h3>Selecione seu meio de pagamento principal</h3>
   <small
     >Esse meio de pagamento será usado para realizar cobranças do seus pedidos</small
