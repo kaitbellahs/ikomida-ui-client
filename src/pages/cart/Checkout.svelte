@@ -5,10 +5,9 @@
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
   import { Store, Cart } from "../../stores/Cart";
-  import { Layout, Settings } from "../../stores/Setup";
+  import { Layout, Settings, StatusBar } from "../../stores/Setup";
   import { GetPaymentMethods, AddCoupon } from "../../network/Payment";
   import { NewOrders } from "../../network/Orders";
-  import { StatusBar } from "../../stores/Setup";
   import { GetAddresses, GetSettings } from "../../network/User";
   import { Title, Navigation, Routes } from "../../stores/Navigation";
   let location;
@@ -221,6 +220,7 @@
   >
 {:else}
   <Views.TextEdit
+    {Layout}
     bind:value={coupon}
     placeHolder="Adicionar cupom"
     buttonName="Adicionar"

@@ -7,15 +7,14 @@
     Router,
   } from "../../stores/Navigation";
   import { Views, Utils } from "@ikomida/components";
-  import { StatusBar } from "../../stores/Setup";
-  import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
+  import { Layout, StatusBar } from "../../stores/Setup";
+  import { faUnlock } from "@fortawesome/free-solid-svg-icons";
   import {
     requestPhoneValidation,
     validatePhoneValidationCode,
     subscribe,
   } from "../../network/Auth";
   import { getTermOfUse } from "../../network/Terms";
-  import { Layout } from "../../stores/Setup";
   import { onDestroy, onMount } from "svelte";
 
   const countdownWaitTime = 60;
@@ -160,6 +159,7 @@
     >clique em "<b>Solicitar</b>" para solicitar o código de validação</small
   >
   <Views.TextEdit
+    {Layout}
     type="phone"
     bind:value={subscribeObject.phone}
     buttonName="Solicitar"
@@ -174,6 +174,7 @@
     >
   {/if}
   <Views.TextEdit
+    {Layout}
     type="number"
     bind:value={subscribeObject.phoneValidationCode}
     icon={faUnlock}

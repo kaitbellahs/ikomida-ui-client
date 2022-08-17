@@ -70,7 +70,12 @@
 
 <div class="product">
   {#if item.image && showImage}
-    <img on:error={erroLoadImage} src={item.image} alt={item.title} />
+    <img
+      class="image"
+      on:error={erroLoadImage}
+      src={item.image}
+      alt={item.title}
+    />
   {/if}
   <h2>{item.title}</h2>
   <p>{item.description}</p>
@@ -116,6 +121,9 @@
 <style>
   .product {
     padding-bottom: 50px;
+  }
+  .product > img.image {
+    margin-bottom: 10px;
   }
   .quantity {
     margin-top: 10px;

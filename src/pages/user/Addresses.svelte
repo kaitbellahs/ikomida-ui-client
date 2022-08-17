@@ -1,8 +1,7 @@
 <script>
   import { Title } from "../../stores/Navigation";
-  import Fa from "svelte-fa";
-  import { faTrashAlt, faSearch } from "@fortawesome/free-solid-svg-icons";
-  import { StatusBar } from "../../stores/Setup";
+  import { faSearch } from "@fortawesome/free-solid-svg-icons";
+  import { Layout, StatusBar } from "../../stores/Setup";
   import { Views, Utils } from "@ikomida/components";
   import {
     GetAddresses,
@@ -12,7 +11,6 @@
     DeleteAddress,
   } from "../../network/User";
   import { onMount } from "svelte";
-  import { Layout } from "../../stores/Setup";
 
   let addresses;
   let currentPostalCode;
@@ -205,6 +203,7 @@ mesmo!"
     ]}
   >
     <Views.TextEdit
+      {Layout}
       type="cep"
       callback={findAddress}
       buttonIcon={faSearch}
@@ -214,6 +213,7 @@ mesmo!"
       placeHolder="CEP"
     />
     <Views.TextEdit
+      {Layout}
       disabled={true}
       placeHolder="Endereço"
       bind:value={newAddressObject.street}
@@ -223,6 +223,7 @@ mesmo!"
       max="255"
     />
     <Views.TextEdit
+      {Layout}
       placeHolder="Número"
       bind:value={newAddressObject.number}
       bind:this={newAddressObjectInputs.number}
@@ -232,11 +233,13 @@ mesmo!"
       empty={!newAddressObjectValidation.postalCode}
     />
     <Views.TextEdit
+      {Layout}
       placeHolder="Complemento"
       bind:value={newAddressObject.complement}
       bind:this={newAddressObjectInputs.complement}
     />
     <Views.TextEdit
+      {Layout}
       disabled={true}
       placeHolder="Bairro"
       bind:value={newAddressObject.neighborhood}
@@ -246,6 +249,7 @@ mesmo!"
       max="255"
     />
     <Views.TextEdit
+      {Layout}
       disabled={true}
       placeHolder="Cidade"
       bind:value={newAddressObject.city}
@@ -255,6 +259,7 @@ mesmo!"
       max="255"
     />
     <Views.TextEdit
+      {Layout}
       disabled={true}
       placeHolder="UF"
       bind:value={newAddressObject.stat}

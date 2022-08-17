@@ -86,6 +86,7 @@
     > é rápido e fácil.
   </h3>
   <Views.TextEdit
+    {Layout}
     bind:value={phone}
     icon={faPhone}
     type="phone"
@@ -93,6 +94,7 @@
     bind:isValid={isValidPhone}
   />
   <Views.TextEdit
+    {Layout}
     bind:value={password}
     icon={faUnlock}
     placeHolder="Senha"

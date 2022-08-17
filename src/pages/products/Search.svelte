@@ -3,7 +3,7 @@
   import { search } from "../../network/Products";
   import { Views, Utils } from "@ikomida/components";
   import { faSearch } from "@fortawesome/free-solid-svg-icons";
-  import { StatusBar, Settings } from "../../stores/Setup";
+  import { Layout, StatusBar, Settings } from "../../stores/Setup";
 
   let items = [];
   let value = "";
@@ -37,6 +37,7 @@
 {/if}
 
 <Views.TextEdit
+  {Layout}
   marginTop="-"
   icon={faSearch}
   bind:value

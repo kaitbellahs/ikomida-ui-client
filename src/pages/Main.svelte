@@ -8,6 +8,7 @@
     faMoneyBill1Wave,
     faAddressCard,
     faHourglass,
+    faPhone,
   } from "@fortawesome/free-solid-svg-icons";
   import {
     Router,
@@ -32,6 +33,7 @@
   import Addresses from "./user/Addresses.svelte";
   import Payments from "./payments/Payments.svelte";
   import NewMethod from "./payments/NewMethod.svelte";
+  import Contact from "./unlogged/Contact.svelte";
 
   const tabs = [
     {
@@ -75,6 +77,11 @@
       name: "Horario de funcionamento",
       callback: () => Navigation.goTo(Routes.businessHours),
       icon: faHourglass,
+    },
+    {
+      name: "Contato",
+      callback: () => Navigation.goTo(Routes.contact),
+      icon: faPhone,
     },
   ];
 
@@ -169,6 +176,8 @@
     <BusinessHours />
   {:else if route == Routes.newMethod}
     <NewMethod />
+  {:else if route == Routes.contact}
+    <Contact />
   {:else}
     <Home />
   {/if}

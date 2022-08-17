@@ -39,7 +39,16 @@
     ) {
       order.status = orderStatus?.status;
       order.finishedAt = orderStatus?.finishedAt;
-      toggleErrorAlert("O pedido foi atualizado com sucesso!");
+      toggleErrorAlert(
+        orderStatus?.status === Types.OrderStatusType.CANCELED
+          ? `Seu pedido foi cancelado com sucesso${
+              order?.payment.type ===
+              Types?.PaymentMethodType.CREDIT_CARD_ONLINE
+                ? ", e o seu pagamento será estornado no próximo fechamento da fatura do seu cartão de crédito."
+                : "!"
+            }`
+          : "Obrigado por nos avisar a entrega do seu pedido"
+      );
     } else {
       toggleErrorAlert(response?.data);
     }

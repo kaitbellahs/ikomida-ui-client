@@ -1,13 +1,12 @@
 <script>
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
   import { Views, Utils } from "@ikomida/components";
-  import { StatusBar } from "../../stores/Setup";
+  import { Layout, StatusBar } from "../../stores/Setup";
   import {
     requestPasswordPhoneValidation,
     validatePasswordPhoneValidationCode,
     requestPassword,
   } from "../../network/Auth";
-  import { Layout } from "../../stores/Setup";
   import { onDestroy } from "svelte";
 
   const countdownWaitTime = 60;
@@ -129,6 +128,7 @@
     >clique em "<b>Solicitar</b>" para solicitar o código de validação</small
   >
   <Views.TextEdit
+    {Layout}
     type="phone"
     bind:value={requestPasswordObject.phone}
     buttonName="Solicitar"
@@ -144,6 +144,7 @@
   {/if}
   <Views.Divider />
   <Views.TextEdit
+    {Layout}
     type="number"
     bind:value={requestPasswordObject.phoneValidationCode}
     mask="_ _ _ _"

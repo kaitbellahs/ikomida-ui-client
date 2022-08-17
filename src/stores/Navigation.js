@@ -11,6 +11,7 @@ export const Routes = {
     orders: Symbol("/orders"),
     order: Symbol("/order"),
     profile: Symbol("/profile"),
+    contact: Symbol("/contact"),
     search: Symbol("/search"),
     product: Symbol("/product"),
     cart: Symbol("/cart"),

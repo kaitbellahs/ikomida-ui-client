@@ -1,9 +1,8 @@
 <script>
     import { Title, Navigation } from "../../stores/Navigation";
-    import { StatusBar } from "../../stores/Setup";
+    import { Layout, StatusBar } from "../../stores/Setup";
     import { Views } from "@ikomida/components";
     import { NewCreditCard } from "../../network/Payment";
-    import { Layout } from "../../stores/Setup";
     import creditCardType from "credit-card-type";
 
     let isLoading = false;
@@ -105,6 +104,7 @@
 <h2>Preencha aqui os dados do seu cartão</h2>
 <Views.Divider />
 <Views.TextEdit
+    {Layout}
     mask={cardNumberMask}
     icon={cardBrandIcon}
     maskKey="_"
@@ -116,6 +116,7 @@
     max={cardInfo?.lengths?.[0]}
 />
 <Views.TextEdit
+    {Layout}
     type="name"
     placeHolder="Nome impresso no cartão"
     bind:value={newCreditCardObject.holder}
@@ -125,6 +126,7 @@
     max="255"
 />
 <Views.TextEdit
+    {Layout}
     mask="__/__"
     maskKey="_"
     type="number"
@@ -136,6 +138,7 @@
     error="Por favor preencha uma data válida usando este formato dd/YY."
 />
 <Views.TextEdit
+    {Layout}
     mask={cardCodeMask}
     maskKey="_"
     type="number"

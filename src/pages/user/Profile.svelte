@@ -64,14 +64,15 @@
 
 {#if userInfo}
   <Views.UploadablePhoto
+    {Layout}
     type="profile"
     image={userInfo?.avatar}
     name={userInfo.name[0]}
     lastName={userInfo.lastName[0]}
   />
   <Views.Divider />
-  <div class="data">
-    <h2>{userInfo.name} {userInfo.lastName}</h2>
+  <div class="data" style="--color:{$Layout?.button?.background ?? '#4c0708'};">
+    <h2 class="name">{userInfo.name} {userInfo.lastName}</h2>
     <Views.Divider />
     <Views.TextValue
       {Layout}
@@ -107,11 +108,13 @@
     <Views.Divider />
     <h2>Senha</h2>
     <Views.TextEdit
+      {Layout}
       type="password"
       placeHolder="Senha atual"
       bind:value={passwordObject.oldPass}
     />
     <Views.TextEdit
+      {Layout}
       type="password"
       placeHolder="Nova senha"
       bind:value={passwordObject.newPass}
@@ -120,6 +123,7 @@
         uma letra maiúscula, uma letra minúscula, um número e um símbolo"
     />
     <Views.TextEdit
+      {Layout}
       type="password"
       placeHolder="Confirmação"
       bind:value={passwordObject.reNewPass}
@@ -146,5 +150,8 @@
 <style>
   h2 {
     text-align: center;
+  }
+  h2.name {
+    color: var(--color);
   }
 </style>

@@ -2,12 +2,7 @@
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
   import { Views } from "@ikomida/components";
   import { StatusBar, Layout } from "../../stores/Setup";
-  import {
-    faUser,
-    faIdCard,
-    faPhone,
-    faUnlock,
-  } from "@fortawesome/free-solid-svg-icons";
+  import { faUser } from "@fortawesome/free-solid-svg-icons";
 
   let isLoading = false;
   let subscribeObject = {
@@ -54,6 +49,7 @@
   style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;background: {$Layout.background};height: 100%;"
 >
   <Views.TextEdit
+    {Layout}
     icon={faUser}
     bind:value={subscribeObject.name}
     initialValue={subscribeObject.name}
@@ -61,6 +57,7 @@
     placeHolder="Nome"
   />
   <Views.TextEdit
+    {Layout}
     icon={faUser}
     bind:value={subscribeObject.lastName}
     initialValue={subscribeObject.lastName}
@@ -68,18 +65,21 @@
     placeHolder="Sobre nome"
   />
   <Views.TextEdit
+    {Layout}
     bind:value={subscribeObject.identity}
     type="cpf"
     placeHolder="CPF"
     bind:isValid={isValidCPF}
   />
   <Views.TextEdit
+    {Layout}
     type="email"
     bind:value={subscribeObject.email}
     placeHolder="E-mail"
     bind:isValid={isValidEmail}
   />
   <Views.TextEdit
+    {Layout}
     type="password"
     bind:value={subscribeObject.password}
     placeHolder="Senha"
