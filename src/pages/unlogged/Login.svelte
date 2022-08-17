@@ -143,6 +143,7 @@
     line-height: 90px;
     vertical-align: middle;
     display: table-cell;
+    border-radius: 50px;
     overflow: hidden;
   }
   .avatar > .avatarCircle {
