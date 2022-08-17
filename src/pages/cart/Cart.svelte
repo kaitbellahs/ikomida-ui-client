@@ -23,7 +23,7 @@
   $: subtotal =
     subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: calcDelivery = address
-    ? ((address?.distance || 0) / 1000) * ($Settings?.delivery?.value || 0)
+    ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0)
     : 0;
   $: delivery = $Settings?.delivery?.free
     ? 0

@@ -20,12 +20,17 @@
   let isLoading = false;
   let screenShot = false;
   let showImage = true;
+  let showCardBrand = true;
   let orderScreen;
 
   $: if (newOrder) {
     Navigation.backCallBack = () => {
       Navigation.reset(Routes.orders);
     };
+  }
+
+  function hideCardBrand() {
+    showCardBrand = false;
   }
 
   async function changeOrderStatus(status) {
@@ -191,16 +196,16 @@
   <div class="address">
     Endereço:
     <span class="street"
-      >{order?.address?.street}, {order?.address?.number}{order?.address
-        ?.complement
+      >{order?.address?.street ?? "-"}, {order?.address?.number ?? "-"}{order
+        ?.address?.complement
         ? ` - ${order?.address?.complement}`
         : ""}</span
     ><br />
     <span class="neighborhood"
-      >{order?.address?.neighborhood}<br />
+      >{order?.address?.neighborhood ?? "-"}<br />
       <span class="city"
-        >{order?.address?.city}/{order?.address?.stat} CEP: {order?.address
-          ?.postalCode}</span
+        >{order?.address?.city ?? "-"}/{order?.address?.stat ?? "-"} CEP: {order
+          ?.address?.postalCode ?? "-"}</span
       >
     </span>
   </div>
@@ -216,10 +221,13 @@
     >
     <span class="brand">
       {#if order?.payment.type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
-        <img
-          src="/Assets/cardBrand/{order?.payment.brand}.svg"
-          alt={order?.payment.brand}
-        />
+        {#if showCardBrand}
+          <img
+            on:error={hideCardBrand}
+            src="/assets/cardBrand/{order?.payment.brand}.svg"
+            alt={order?.payment.brand}
+          />
+        {/if}
         **** {order?.payment.lastDigits}
       {/if}
     </span>

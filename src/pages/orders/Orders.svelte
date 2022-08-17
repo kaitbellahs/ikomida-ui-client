@@ -96,7 +96,9 @@
             </div>
           {/if}
           <Views.Divider height="5" />
-          <div class="address">Entregua na: <b>{order?.address.street}</b></div>
+          <div class="address">
+            Entregua na: <b>{order?.address.street ?? "-"}</b>
+          </div>
           <div class="paymentMethod">
             Forma de pagamento: <b
               >{new Types.PaymentMethodType(order?.payment.type).name}
