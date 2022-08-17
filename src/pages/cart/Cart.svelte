@@ -2,7 +2,7 @@
   import { Cart, Store } from "../../stores/Cart";
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
   import { faTrash } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Logics } from "@ikomida/components";
   import { Layout, Settings } from "../../stores/Setup";
   import { GetAddresses } from "../../network/User";
   import { onMount } from "svelte";
@@ -14,7 +14,7 @@
     (item) =>
       item.quantity *
       (item?.price -
-        Utils.Numbers.calcDiscount(
+        Logics.Finances.calcDiscount(
           item.price,
           item.discount,
           item.discountType

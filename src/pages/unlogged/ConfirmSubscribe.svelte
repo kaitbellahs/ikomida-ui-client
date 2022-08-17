@@ -6,7 +6,7 @@
     Menu,
     Router,
   } from "../../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Logics } from "@ikomida/components";
   import { Layout, StatusBar } from "../../stores/Setup";
   import { faUnlock } from "@fortawesome/free-solid-svg-icons";
   import {
@@ -22,7 +22,7 @@
   let showRequestValidatingCodeAlert = false;
   let isLoading = false;
   let subscribeObject = {
-    ...Utils.Objects.copy($Router.options),
+    ...Logics.Objects.deepCopy($Router.options),
     ...{ phone: null, phoneValidationCode: null, signature: null },
     areaCode: 55,
   };

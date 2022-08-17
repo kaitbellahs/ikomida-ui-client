@@ -9,7 +9,7 @@
     faCartPlus,
   } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils, Network, Types } from "@ikomida/components";
+  import { Views, Utils, Logics, Types } from "@ikomida/components";
   import { Layout } from "../../stores/Setup";
 
   const item = $Router.options;
@@ -19,7 +19,7 @@
   $: total = Utils.Strings.currency(
     quantity *
       (item.price -
-        Utils.Numbers.calcDiscount(
+        Logics.Finances.calcDiscount(
           item.price,
           item.discount,
           item.discountType
@@ -80,7 +80,7 @@
   <h2>{item.title}</h2>
   <p>{item.description}</p>
   <span class="serves"
-    >Aproximadamente {Utils.Numbers.formatWeight(item.weight)}</span
+    >Aproximadamente {Logics.Finances.formatWeight(item.weight)}</span
   >
 
   <div class="price">
@@ -90,7 +90,7 @@
     <span class="current"
       >{Utils.Strings.currency(
         item.price -
-          Utils.Numbers.calcDiscount(
+          Logics.Finances.calcDiscount(
             item.price,
             item.discount,
             item.discountType

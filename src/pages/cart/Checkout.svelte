@@ -1,5 +1,5 @@
 <script>
-  import { Views, Utils, Types } from "@ikomida/components";
+  import { Views, Utils, Types, Logics } from "@ikomida/components";
   import { Capacitor } from "@capacitor/core";
   import { Auth } from "../../stores/Auth";
   import { Geolocation } from "@capacitor/geolocation";
@@ -29,7 +29,7 @@
     (item) =>
       item.quantity *
       (item?.price -
-        Utils.Numbers.calcDiscount(
+        Logics.Finances.calcDiscount(
           item.price,
           item.discount,
           item.discountType
@@ -47,7 +47,7 @@
     : calcDelivery;
   $: netTotal = subtotal + delivery;
   $: discount = couponObject
-    ? Utils.Numbers.calcDiscount(
+    ? Logics.Finances.calcDiscount(
         subtotal,
         couponObject.value,
         couponObject.type
@@ -55,7 +55,7 @@
     : 0;
   $: total = netTotal - discount;
   $: validate = address && payment;
-  $: businessTime = Utils.Numbers.isBusinessTime($Settings.business);
+  $: businessTime = Logics.DateTime.isBusinessTime($Settings.business);
 
   function addMoreItems() {
     Navigation.pop(3);

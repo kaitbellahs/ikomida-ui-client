@@ -18,7 +18,7 @@
     Routes,
     MenuHamburger,
   } from "../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Logics } from "@ikomida/components";
   import { Cart as CartStore, Store } from "../stores/Cart";
   import { StatusBar, Layout, Settings } from "../stores/Setup";
   import Home from "./products/Home.svelte";
@@ -91,7 +91,7 @@
     (item) =>
       item.quantity *
       (item.price -
-        Utils.Numbers.calcDiscount(
+        Logics.Finances.calcDiscount(
           item.price,
           item.discount,
           item.discountType

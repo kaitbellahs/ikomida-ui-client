@@ -2,7 +2,7 @@
   import { Share } from "@capacitor/share";
   import { onMount } from "svelte";
   import html2canvas from "html2canvas";
-  import { Views, Utils, Types } from "@ikomida/components";
+  import { Views, Utils, Types, Logics } from "@ikomida/components";
   import { faShare } from "@fortawesome/free-solid-svg-icons";
   import { Filesystem, Directory } from "@capacitor/filesystem";
   import {
@@ -180,7 +180,8 @@
       ><span class="price"
         >{Utils.Strings.currency(
           quantity *
-            (price - Utils.Numbers.calcDiscount(price, discount, discountType))
+            (price -
+              Logics.Finances.calcDiscount(price, discount, discountType))
         )}</span
       >
     </div>
