@@ -50,7 +50,7 @@
 {/if}
 {#if items && items.length > 0}
   <section>
-    {#each items as order}
+    {#each items as order (order?.id)}
       <div class="leftShadow orderContainer">
         <div on:click={goToOrder(order)}>
           <h3 class="title">Pedido N˚: {order?.customID}</h3>

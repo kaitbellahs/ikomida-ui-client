@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:981415290588:android:6156e9cd478bb5505d3619",
+        "mobilesdk_app_id": "${{firebaseAppId}}$",
         "android_client_info": {
-          "package_name": "com.ikomida.br.tialtonivel"
+          "package_name": "${{bundleId}}$"
         }
       },
       "oauth_client": [

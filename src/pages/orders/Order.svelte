@@ -179,7 +179,7 @@
   >
   <Views.Divider />
   <h3>Itens a entregar</h3>
-  {#each order?.products as { id, title, price, quantity, discount, discountType }, index}
+  {#each order?.products as { id, title, price, quantity, discount, discountType }, index (id)}
     <div class="product">
       <span class="quantity">{quantity}</span><span class="title">{title}</span
       ><span class="price"

@@ -5,7 +5,8 @@
   "author": "Khalid Ait Bellahs",
   "license": "UNLICENSED",
   "scripts": {
-    "build": "yarn upgrade && rollup -c --environment ENV:prod && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./build.ps1",
+    "build:windows": "yarn install && rollup -c --environment ENV:prod && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./build.ps1",
+    "build:unix": "yarn install && rollup -c --environment ENV:prod && ./build.sh",
     "dev": "rollup -c -w",
     "prod": "rollup -c -w --environment ENV:prod",
     "start": "sirv public --no-clear",

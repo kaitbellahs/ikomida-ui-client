@@ -84,7 +84,7 @@
   <small
     >Esse meio de pagamento será usado para realizar cobranças do seus pedidos</small
   >
-  {#each payments as { id, type, brand, lastDigits, selected }}
+  {#each payments as { id, type, brand, lastDigits, selected } (id)}
     <div class="paymentCard">
       {#if type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
         <Views.FloatRemove callback={() => onRemoveClick(id)} />

@@ -110,7 +110,7 @@
   />
 {/if}
 
-{#each $Store as item}
+{#each $Store as item (item?.id)}
   <Views.CartItem
     {Layout}
     {onRemoveClick}

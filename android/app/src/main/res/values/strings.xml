@@ -1,10 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Ti Alto Nivel</string>
-    <string name="title_activity_main">Ti Alto Nivel</string>
-    <string name="package_name">com.ikomida.br.tialtonivel</string>
-    <string name="custom_url_scheme">ikomida</string>
-    <string name="filter_view">iKomida</string>
-    <string name="url_scheme">com.ikomida.br.tialtonivel</string>
-    <string name="url_host">pagseguro.integration.callback</string>
+    <string name="app_name">${{appName}}$</string>
+    <string name="title_activity_main">${{appName}}$</string>
+    <string name="package_name">${{bundleId}}$</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.ikomida.vendor;
+package com.ikomida.client;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -160,7 +160,7 @@
   <Views.Divider />
   <h3>Selecione seu endereço principal</h3>
   <small>Esse endereço será usado para entregar seus pedidos</small>
-  {#each addresses as address}
+  {#each addresses as address (address?.id)}
     <div class="address">
       <Views.FloatRemove callback={() => onRemoveClick(address?.id)} />
       <div class="content">
