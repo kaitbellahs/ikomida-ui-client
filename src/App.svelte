@@ -1,7 +1,6 @@
 <script>
   import { onMount } from "svelte";
   import { App } from "@capacitor/app";
-  import { CAPNativeLog } from "capacitor-native-log";
   import { Network } from "@capacitor/network";
   import { StatusBar } from "@ikomida/capacitor-plugin-status-bar";
   import { Utils, PushNotification, Views } from "@ikomida/components";
@@ -75,19 +74,19 @@
 
   async function hasErrorCallBack(error) {
     //TODO: -- handle and report error
-    CAPNativeLog.log({ level: "error", message: JSON.stringify(error) });
+    console.log({ level: "error", message: JSON.stringify(error) });
   }
 
   async function permissionStatus(permissionStatus) {
     //TODO: -- handle and report permissions
-    CAPNativeLog.log({
+    console.log({
       level: "info",
       message: `permissionStatusObject: ${JSON.stringify(permissionStatus)}`,
     });
   }
 
   function receivedCallBack(notification) {
-    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+    console.log({ level: "info", message: JSON.stringify(notification) });
     if (
       !notificationIds.includes(notification?.id) &&
       (logedIn || !((notification?.data?.logon ?? "true") === "true"))
@@ -112,13 +111,13 @@
         });
       }
       notificationPopup = notificationPopup;
-      CAPNativeLog.log({ level: "info", message: "Inside" });
+      console.log({ level: "info", message: "Inside" });
       togglePushNotificationPopup();
     }
   }
 
   function actionPerformedCallBack(notification) {
-    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+    console.log({ level: "info", message: JSON.stringify(notification) });
     openNotification(notification?.notification);
   }
 

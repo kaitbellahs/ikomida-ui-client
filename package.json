@@ -55,7 +55,6 @@
     "@fortawesome/free-solid-svg-icons": "^6.0.0",
     "@ikomida/capacitor-plugin-status-bar": "github:TIAltoNivel/capacitor-plugin-statusbar",
     "@ikomida/components": "github:TIAltoNivel/ikomida-components",
-    "capacitor-native-log": "^0.2.0",
     "credit-card-type": "^9.1.0",
     "html2canvas": "^1.4.1",
     "sirv-cli": "^2.0.2",
