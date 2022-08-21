@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "${{firebaseAppId}}$",
         "android_client_info": {
-          "package_name": "${{bundleId}}$"
+          "package_name": "${{iKomidaId}}$"
         }
       },
       "oauth_client": [

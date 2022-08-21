@@ -7,7 +7,7 @@ try {
 } catch (error) {
 }
 
-Network.createInstance(isProd ? "https://api.ikomida.com" : "http://192.168.1.200", "${{bundleId}}$", "client", "6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS");
+Network.createInstance(isProd ? "https://api.ikomida.com" : "http://192.168.1.200", "${{iKomidaId}}$", "client", "6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS");
 
 const app = new App({
     target: document.body

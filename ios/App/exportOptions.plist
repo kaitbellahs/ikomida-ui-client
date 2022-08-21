@@ -8,7 +8,7 @@
   <string>app-store</string>
   <key>provisioningProfiles</key>
   <dict>
-    <key>${{bundleId}}$</key>
+    <key>${{iKomidaId}}$</key>
     <string>${{profile}}$</string>
   </dict>
   <key>signingCertificate</key>

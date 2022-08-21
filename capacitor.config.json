@@ -1,5 +1,5 @@
 {
-  "appId": "${{bundleId}}$",
+  "appId": "${{iKomidaId}}$",
   "appName": "${{appName}}$",
   "webDir": "public",
   "bundledWebRuntime": false,

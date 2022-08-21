@@ -2,5 +2,5 @@
 <resources>
     <string name="app_name">${{appName}}$</string>
     <string name="title_activity_main">${{appName}}$</string>
-    <string name="package_name">${{bundleId}}$</string>
+    <string name="package_name">${{iKomidaId}}$</string>
 </resources>
