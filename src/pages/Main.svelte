@@ -22,8 +22,8 @@
   import { Cart as CartStore, Store } from "../stores/Cart";
   import { StatusBar, Layout, Settings } from "../stores/Setup";
   import Home from "./products/Home.svelte";
-  import Orders from "./Orders/Orders.svelte";
-  import Order from "./Orders/Order.svelte";
+  import Orders from "./orders/Orders.svelte";
+  import Order from "./orders/Order.svelte";
   import Search from "./products/Search.svelte";
   import Profile from "./user/Profile.svelte";
   import BusinessHours from "./user/BusinessHours.svelte";

@@ -6,3 +6,6 @@ package-lock.json
 android/.idea
 **/*.lock
 android/app/release
+android/app/src/main/assets/public
+ios/App/App/public
+Pods

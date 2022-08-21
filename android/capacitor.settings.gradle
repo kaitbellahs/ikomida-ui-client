@@ -34,6 +34,3 @@ project(':capacitor-share').projectDir = new File('../node_modules/@capacitor/sh
 
 include ':ikomida-capacitor-plugin-status-bar'
 project(':ikomida-capacitor-plugin-status-bar').projectDir = new File('../node_modules/@ikomida/capacitor-plugin-status-bar/android')
-
-include ':capacitor-native-log'
-project(':capacitor-native-log').projectDir = new File('../node_modules/capacitor-native-log/android')

@@ -42,9 +42,5 @@
 	{
 		"pkg": "@ikomida/capacitor-plugin-status-bar",
 		"classpath": "com.capacitorjs.plugins.statusbar.StatusBarPlugin"
-	},
-	{
-		"pkg": "capacitor-native-log",
-		"classpath": "host.mote.capacitornativelog.CAPNativeLog"
 	}
 ]
