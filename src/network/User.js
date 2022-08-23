@@ -1,31 +1,25 @@
 import {
     get
 } from 'svelte/store';
-import {
-    Auth
-} from '../stores/Auth';
-import {
-    Network
-} from "@ikomida/components";
 
 export async function GetAddresses() {
-    return Network.instance.get("/addresses", get(Auth));
+    return Network.instance.get("/addresses", true);
 }
 
 export async function GetAddressByCep(cep) {
-    return Network.instance.get(`/cep/${cep}`, get(Auth));
+    return Network.instance.get(`/cep/${cep}`, true);
 }
 
 export async function NewAddress(address) {
-    return Network.instance.post(`/address`, get(Auth), address);
+    return Network.instance.post(`/address`, true, address);
 }
 
 export async function UpdateAddress(id) {
-    return Network.instance.put(`/address/${id}`, get(Auth));
+    return Network.instance.put(`/address/${id}`, true);
 }
 
 export async function DeleteAddress(id) {
-    return Network.instance.remove(`/address/${id}`, get(Auth));
+    return Network.instance.remove(`/address/${id}`, true);
 }
 
 export async function GetSettings() {

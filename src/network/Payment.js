@@ -2,29 +2,23 @@ import {
     Network,
     Types
 } from "@ikomida/components";
-import {
-    get
-} from 'svelte/store';
-import {
-    Auth
-} from '../stores/Auth';
 
 export async function GetPaymentMethods() {
-    return Network.instance.get("/payments", get(Auth));
+    return Network.instance.get("/payments", true);
 }
 
 export async function NewCreditCard(method) {
-    return Network.instance.post(`/payment`, get(Auth), method, "newCreditCard");
+    return Network.instance.post(`/payment`, true, method, "newCreditCard");
 }
 
 export async function UpdateCreditCard(id) {
-    return Network.instance.put(`/payment/${id}`, get(Auth));
+    return Network.instance.put(`/payment/${id}`, true);
 }
 
 export async function DeleteCreditCard(id) {
-    return Network.instance.remove(`/payment/${id}`, get(Auth));
+    return Network.instance.remove(`/payment/${id}`, true);
 }
 
 export async function AddCoupon(coupon) {
-    return Network.instance.post(`/coupon`, get(Auth), { coupon });
+    return Network.instance.post(`/coupon`, true, { coupon });
 }

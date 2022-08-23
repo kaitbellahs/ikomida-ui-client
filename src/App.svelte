@@ -3,11 +3,16 @@
   import { App } from "@capacitor/app";
   import { Network } from "@capacitor/network";
   import { StatusBar } from "@ikomida/capacitor-plugin-status-bar";
-  import { Utils, PushNotification, Views } from "@ikomida/components";
+  import {
+    Utils,
+    PushNotification,
+    Views,
+    Network as iKomidaNetwork,
+    Stores,
+  } from "@ikomida/components";
 
-  import { Auth, PushNotificationToken } from "./stores/Auth";
   import { StatusBar as _StatusBar, Layout, Settings } from "./stores/Setup";
-  import { Navigation, Router, Routes } from "./stores/Navigation";
+  import Routes from "./stores/Routes";
 
   import { registerPushNotificationToken } from "./network/PushNotification";
   import { getLayout } from "./network/Layout";
@@ -32,14 +37,16 @@
     body: null,
     buttons: [],
   };
+  let auth;
+  let router = Stores.Navigation.instance.router;
 
-  $: route = $Router.route;
+  $: route = $router.route;
 
   $: isActive = $Settings?.isActive ?? true;
 
-  $: if ($Auth && isActive) {
+  $: if ($auth && isActive) {
     logedIn = false;
-    Utils.Jws.extractToken($Auth).then((token) => {
+    Utils.Jws.extractToken($auth).then((token) => {
       logedIn = token !== null;
     });
   } else {
@@ -68,7 +75,7 @@
 
   async function hasRegisteredCallBack(token, platform) {
     const tokenObject = { platform, token };
-    PushNotificationToken.setToken(tokenObject);
+    Stores.PushNotificationToken.setToken(tokenObject);
     const response = await registerPushNotificationToken(tokenObject);
   }
 
@@ -124,8 +131,8 @@
   async function openNotification(notification) {
     if (logedIn) {
       if (["/order/", "/orders/"].includes(notification?.data?.uri)) {
-        await Network.instance.clearCache(Network.cacheTypes.ORDERS);
-        Navigation.goTo(Routes.orders, false);
+        await iKomidaNetwork.instance.clearCache(Stores.Cache.Types.ORDERS);
+        Stores.Navigation.instance.goTo(Routes.orders, false);
       }
     }
   }
@@ -139,6 +146,7 @@
   );
 
   onMount(async () => {
+    auth = await Stores.Auth.instance.store();
     let response = await GetSettings();
     if (response?.success && response?.data) {
       Settings.set({ ...$Settings, ...response?.data });
@@ -159,14 +167,6 @@
   Network.addListener("networkStatusChange", (status) => {
     networkStatus = status;
   });
-  $: console.log(
-    "Settings:",
-    $Settings,
-    "isActive:",
-    $Settings?.isActive,
-    "isActive:",
-    isActive
-  );
 </script>
 
 <Views.LoadJS

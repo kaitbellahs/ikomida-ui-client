@@ -1,14 +1,15 @@
 <script>
-  import { Auth, PushNotificationToken } from "../../stores/Auth";
   import * as AuthNetwork from "../../network/Auth";
   import { Views } from "@ikomida/components";
-  import { Routes, Navigation } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
-  import { Utils } from "@ikomida/components";
+  import { Utils, Stores } from "@ikomida/components";
   import { registerPushNotificationToken } from "../../network/PushNotification";
   import { Layout, Settings } from "../../stores/Setup";
+  import { onMount } from "svelte";
 
-  let isLoading = false;
+  let pushNotificationToken = Stores.PushNotificationToken.instance?.store();
+  let isLoading = true;
   let phone;
   let password;
   let isValidPhone = false;
@@ -24,11 +25,11 @@
   }
 
   async function doSubscribe() {
-    Navigation.goTo(Routes.subscribe);
+    Stores.Navigation.instance.goTo(Routes.subscribe);
   }
 
   async function forgotPassword() {
-    Navigation.goTo(Routes.forgotPassword);
+    Stores.Navigation.instance.goTo(Routes.forgotPassword);
   }
 
   async function doLogin() {
@@ -37,11 +38,11 @@
     if (response?.success) {
       const token = await Utils.Jws.extractToken(response?.data);
       if (token !== null) {
-        Auth.setToken(response?.data);
-        if ($PushNotificationToken && $PushNotificationToken !== {}) {
-          await registerPushNotificationToken($PushNotificationToken);
+        Stores.Auth.instance.setToken(response?.data);
+        if ($pushNotificationToken && $pushNotificationToken !== {}) {
+          await registerPushNotificationToken($pushNotificationToken);
         }
-        Navigation.reset(Routes.home);
+        Stores.Navigation.instance.reset(Routes.home);
       } else {
         toggleErrorAlert("O token de acesso não é válido");
       }
@@ -54,6 +55,9 @@
   function erroLoadImage(event) {
     showImage = false;
   }
+  onMount(() => {
+    isLoading = false;
+  });
 </script>
 
 {#if isLoading}

@@ -1,18 +1,11 @@
 <script>
-  import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
-  import { Views } from "@ikomida/components";
+  import { Views, Stores } from "@ikomida/components";
   import { StatusBar, Layout } from "../../stores/Setup";
 
-  Title.set("Sem serviço");
+  Stores.Title.instance.set("Sem serviço");
 </script>
 
-<Views.NavigationBar
-  {Layout}
-  {Menu}
-  {Title}
-  paddingTop={$StatusBar.height}
-  {Navigation}
-/>
+<Views.NavigationBar {Layout} paddingTop={$StatusBar.height} />
 <main style="background: {$Layout.background};height: 100%;">
   <img src="assets/icons/transparent-logo-1.svg" alt="iKomida" />
   <h3>Carregando...</h3>

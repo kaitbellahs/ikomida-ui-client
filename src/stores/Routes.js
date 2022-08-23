@@ -1,0 +1,20 @@
+export default {
+    home: Symbol("/home"),
+    orders: Symbol("/orders"),
+    order: Symbol("/order"),
+    profile: Symbol("/profile"),
+    contact: Symbol("/contact"),
+    search: Symbol("/search"),
+    product: Symbol("/product"),
+    cart: Symbol("/cart"),
+    checkout: Symbol("/checkout"),
+    confirmSubscribe: Symbol("/confirmSubscribe"),
+    subscribe: Symbol("/subscribe"),
+    forgotPassword: Symbol("/forgotPassword"),
+    tac: Symbol("/tac"),
+    addresses: Symbol("/addresses"),
+    payments: Symbol("/payments"),
+    businessHours: Symbol("businessHours"),
+    pp: Symbol("privacyPolicy"),
+    newMethod: Symbol("newMethod")
+};

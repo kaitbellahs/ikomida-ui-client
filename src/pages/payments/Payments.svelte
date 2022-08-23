@@ -1,7 +1,7 @@
 <script>
-  import { Title, Navigation, Routes } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Types, Utils } from "@ikomida/components";
+  import { Views, Types, Utils, Stores } from "@ikomida/components";
   import {
     GetPaymentMethods,
     UpdateCreditCard,
@@ -11,7 +11,7 @@
   import { Layout } from "../../stores/Setup";
 
   let payments;
-  let isLoading = false;
+  let isLoading = true;
   let errorAlert;
   let showAlert = false;
 
@@ -21,7 +21,7 @@
   }
 
   function toggleNewCreditCard() {
-    Navigation.goTo(Routes.newMethod);
+    Stores.Navigation.instance.goTo(Routes.newMethod);
   }
 
   async function updateCreditCard(id) {
@@ -65,9 +65,10 @@
           (i1, i2) => new Date(i2?.createdAt) - new Date(i1?.createdAt)
         ) || [];
     }
+    isLoading = false;
   });
 
-  Title.set("Meios de pagamento");
+  Stores.Title.instance.set("Meios de pagamento");
 </script>
 
 <Views.Divider />

@@ -1,15 +1,16 @@
 <script>
-  import { Title, Navigation, Routes } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import { search } from "../../network/Products";
   import { Views, Utils } from "@ikomida/components";
   import { faSearch } from "@fortawesome/free-solid-svg-icons";
-  import { Layout, StatusBar, Settings } from "../../stores/Setup";
+  import { Layout, StatusBar, Settings, Stores } from "../../stores/Setup";
+  import { onMount } from "svelte";
 
   let items = [];
   let value = "";
   let oldValue;
   let error = false;
-  let isLoading = false;
+  let isLoading = true;
 
   $: if (value != oldValue) {
     isLoading = true;
@@ -25,8 +26,11 @@
     }
     isLoading = false;
   }
+  onMount(() => {
+    isLoading = false;
+  });
 
-  Title.set("Pesquisar produtos");
+  Stores.Title.instance.set("Pesquisar produtos");
 </script>
 
 {#if isLoading}
@@ -51,7 +55,7 @@
       $Settings?.preparation?.max * 60
     )}
   </div>
-  <Views.ItemsList {items} productPage={Routes.product} {Navigation} />
+  <Views.ItemsList {items} productPage={Routes.product} />
 {:else}
   <Views.CentredMessage text="Nenhum produto foi encontrad">
     <h3>Tente usar outro termo para pequisar</h3>

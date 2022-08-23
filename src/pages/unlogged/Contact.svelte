@@ -1,7 +1,6 @@
 <script>
-  import { Title } from "../../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
-  import { Layout, Settings, StatusBar } from "../../stores/Setup";
+  import { Views, Utils, Stores } from "@ikomida/components";
+  import { Settings, StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
   let isLoading = true;
   let showImage = true;
@@ -16,7 +15,7 @@
     isLoading = false;
   });
 
-  Title.set("Contato");
+  Stores.Title.instance.set("Contato");
 </script>
 
 <div class="settings">

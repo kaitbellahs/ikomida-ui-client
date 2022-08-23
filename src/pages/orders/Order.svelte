@@ -2,31 +2,26 @@
   import { Share } from "@capacitor/share";
   import { onMount } from "svelte";
   import html2canvas from "html2canvas";
-  import { Views, Utils, Types, Logics } from "@ikomida/components";
+  import { Views, Utils, Types, Logics, Stores } from "@ikomida/components";
   import { faShare } from "@fortawesome/free-solid-svg-icons";
   import { Filesystem, Directory } from "@capacitor/filesystem";
-  import {
-    Navigation,
-    Title,
-    Router,
-    Routes,
-    Menu,
-  } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
   import { Layout, Settings } from "../../stores/Setup";
 
-  const { newOrder, order } = $Router.options;
-  let isLoading = false;
+  const router = Stores.Navigation.instance.router;
+  const { newOrder, order } = $router.options;
+  let isLoading = true;
   let screenShot = false;
   let showImage = true;
   let showCardBrand = true;
   let orderScreen;
 
   $: if (newOrder) {
-    Navigation.backCallBack = () => {
-      Navigation.reset(Routes.orders);
-    };
+    Stores.Navigation.instance.setBack(() => {
+      Stores.Navigation.instance.reset(Routes.orders);
+    });
   }
 
   function hideCardBrand() {
@@ -81,17 +76,6 @@
     async function sleep(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms));
     }
-    // const checkPermissions = await Filesystem.checkPermissions();
-    // console.log(checkPermissions);
-    // if (checkPermissions === "denied") {
-    //   return;
-    // }
-    // if (
-    //   checkPermissions !== "granted" &&
-    //   (await Filesystem.requestPermissions()) !== "granted"
-    // ) {
-    //   return;
-    // }
     isLoading = true;
     screenShot = true;
     await sleep(1);
@@ -118,13 +102,18 @@
   }
   onMount(async () => {
     if (await Share.canShare()) {
-      Menu.addItem({ name: "Compartilhar", icon: faShare, callback: share });
+      Stores.Menu.instance.addItem({
+        name: "Compartilhar",
+        icon: faShare,
+        callback: share,
+      });
     }
+    isLoading = false;
   });
   function erroLoadImage(event) {
     showImage = false;
   }
-  Title.set("Detalhes do predido");
+  Stores.Title.instance.set("Detalhes do predido");
 </script>
 
 <div class="order {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>

@@ -10,16 +10,9 @@
     faHourglass,
     faPhone,
   } from "@fortawesome/free-solid-svg-icons";
-  import {
-    Router,
-    Navigation,
-    Title,
-    Menu,
-    Routes,
-    MenuHamburger,
-  } from "../stores/Navigation";
-  import { Views, Utils, Logics } from "@ikomida/components";
-  import { Cart as CartStore, Store } from "../stores/Cart";
+  import Routes from "../stores/Routes";
+  import { Views, Utils, Logics, Stores } from "@ikomida/components";
+  import { Store } from "../stores/Cart";
   import { StatusBar, Layout, Settings } from "../stores/Setup";
   import Home from "./products/Home.svelte";
   import Orders from "./orders/Orders.svelte";
@@ -35,6 +28,7 @@
   import NewMethod from "./payments/NewMethod.svelte";
   import Contact from "./unlogged/Contact.svelte";
 
+  let router = Stores.Navigation.instance.router;
   const tabs = [
     {
       name: "Home",
@@ -55,38 +49,38 @@
   const menuHamburgerItems = [
     {
       name: "Home",
-      callback: () => Navigation.reset(Routes.home),
+      callback: () => Stores.Navigation.instance.reset(Routes.home),
       icon: faHome,
     },
     {
       name: "Perfil",
-      callback: () => Navigation.goTo(Routes.profile),
+      callback: () => Stores.Navigation.instance.goTo(Routes.profile),
       icon: faUser,
     },
     {
       name: "Endereços",
-      callback: () => Navigation.goTo(Routes.addresses),
+      callback: () => Stores.Navigation.instance.goTo(Routes.addresses),
       icon: faAddressCard,
     },
     {
       name: "Meios de pagamento",
-      callback: () => Navigation.goTo(Routes.payments),
+      callback: () => Stores.Navigation.instance.goTo(Routes.payments),
       icon: faMoneyBill1Wave,
     },
     {
       name: "Horario de funcionamento",
-      callback: () => Navigation.goTo(Routes.businessHours),
+      callback: () => Stores.Navigation.instance.goTo(Routes.businessHours),
       icon: faHourglass,
     },
     {
       name: "Contato",
-      callback: () => Navigation.goTo(Routes.contact),
+      callback: () => Stores.Navigation.instance.goTo(Routes.contact),
       icon: faPhone,
     },
   ];
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
-  $: route = $Router.route;
+  $: route = $router.route;
   $: subtotalArray = $Store.map(
     (item) =>
       item.quantity *
@@ -110,15 +104,17 @@
     route !== Routes.order &&
     route !== Routes.profile;
 
-  MenuHamburger.reset();
-  menuHamburgerItems.forEach((page) => MenuHamburger.addItem(page));
+  Stores.MenuHamburger.instance.reset();
+  menuHamburgerItems.forEach((page) =>
+    Stores.MenuHamburger.instance.addItem(page)
+  );
 
   function handler(event) {
     direction = event.detail.direction;
   }
 
   function goToCart() {
-    Navigation.goTo(Routes.cart);
+    Stores.Navigation.instance.goTo(Routes.cart);
   }
   $: if (style)
     if (showCart) {
@@ -194,16 +190,7 @@
   logo={$Settings?.profile?.mainPicture ||
     "assets/icons/transparent-logo-1.svg"}
   {Layout}
-  {MenuHamburger}
-  {Menu}
-  {Title}
   paddingTop={$StatusBar.height}
   topMargin={$StatusBar.topMargin}
-  {Navigation}
 />
-<Views.Tabs
-  {Layout}
-  {tabs}
-  {Navigation}
-  bottomPadding={$StatusBar.bottomPadding}
-/>
+<Views.Tabs {Layout} {tabs} bottomPadding={$StatusBar.bottomPadding} />

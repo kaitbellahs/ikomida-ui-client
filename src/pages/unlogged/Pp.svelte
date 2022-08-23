@@ -1,34 +1,26 @@
 <script>
-  import { Title, Navigation, Menu } from "../../stores/Navigation";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { onMount } from "svelte";
   import { getPrivacyPolicy } from "../../network/Terms";
   import { Layout } from "../../stores/Setup";
 
-  Title.set("Política de privacidade");
+  Stores.Title.instance.set("Política de privacidade");
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   let term;
-  let isLoading = false;
+  let isLoading = true;
 
   onMount(async () => {
-    isLoading = true;
     term = await getPrivacyPolicy();
     if (term) {
-      Title.set(term?.name);
+      Stores.Title.instance.set(term?.name);
     }
     isLoading = false;
   });
 </script>
 
-<Views.NavigationBar
-  {Layout}
-  {Menu}
-  {Title}
-  paddingTop={$StatusBar.height}
-  {Navigation}
-/>
+<Views.NavigationBar {Layout} paddingTop={$StatusBar.height} />
 <main
   style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;"
 >

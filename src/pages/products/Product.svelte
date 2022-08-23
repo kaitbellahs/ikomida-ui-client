@@ -1,6 +1,6 @@
 <script>
   import { Cart, Store } from "../../stores/Cart";
-  import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import Fa from "svelte-fa";
   import { v4 as uuidV4 } from "uuid";
   import {
@@ -9,10 +9,11 @@
     faCartPlus,
   } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils, Logics, Types } from "@ikomida/components";
+  import { Views, Utils, Logics, Types, Stores } from "@ikomida/components";
   import { Layout } from "../../stores/Setup";
 
-  const item = $Router.options;
+  const router = Stores.Navigation.instance.router;
+  const item = $router.options;
   let quantity = 1;
   let showImage = true;
 
@@ -58,14 +59,14 @@
       item.uuid = uuidV4();
       await Cart.addItem(item);
     }
-    Navigation.goTo(Routes.cart);
+    Stores.Navigation.instance.goTo(Routes.cart);
   };
 
   function erroLoadImage(event) {
     showImage = false;
   }
 
-  Title.set(item.title);
+  Stores.Title.instance.set(item.title);
 </script>
 
 <div class="product">

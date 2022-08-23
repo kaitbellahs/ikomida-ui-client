@@ -1,8 +1,7 @@
 <script>
-  import { Title } from "../../stores/Navigation";
   import { faSearch } from "@fortawesome/free-solid-svg-icons";
   import { Layout, StatusBar } from "../../stores/Setup";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import {
     GetAddresses,
     GetAddressByCep,
@@ -15,7 +14,7 @@
   let addresses;
   let currentPostalCode;
   let showNewAddress = false;
-  let isLoading = false;
+  let isLoading = true;
   let newAddressObject = {
     postalCode: null,
     street: null,
@@ -147,9 +146,10 @@
     if (response?.success) {
       addresses = response?.data;
     }
+    isLoading = false;
   });
 
-  Title.set("Endereços");
+  Stores.Title.instance.set("Endereços");
 </script>
 
 <Views.Divider />

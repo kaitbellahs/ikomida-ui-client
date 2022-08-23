@@ -1,8 +1,8 @@
 <script>
   import { Cart, Store } from "../../stores/Cart";
-  import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import { faTrash } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils, Logics } from "@ikomida/components";
+  import { Views, Utils, Logics, Stores } from "@ikomida/components";
   import { Layout, Settings } from "../../stores/Setup";
   import { GetAddresses } from "../../network/User";
   import { onMount } from "svelte";
@@ -33,12 +33,12 @@
   $: total = subtotal + delivery;
 
   function addMoreItems() {
-    Navigation.pop(2);
+    Stores.Navigation.instance.pop(2);
   }
 
   function resetCart() {
     Cart.reset();
-    Navigation.reset(Routes.home);
+    Stores.Navigation.instance.reset(Routes.home);
   }
 
   function toggleAlert() {
@@ -46,7 +46,7 @@
   }
 
   function forward() {
-    Navigation.goTo(Routes.checkout);
+    Stores.Navigation.instance.goTo(Routes.checkout);
   }
 
   async function onRemoveClick(uuid) {
@@ -93,8 +93,12 @@
     }
   });
 
-  Title.set("Sacola de compras");
-  Menu.addItem({ name: "Limpar", icon: faTrash, callback: toggleAlert });
+  Stores.Title.instance.set("Sacola de compras");
+  Stores.Menu.instance.addItem({
+    name: "Limpar",
+    icon: faTrash,
+    callback: toggleAlert,
+  });
 </script>
 
 {#if showAlert}

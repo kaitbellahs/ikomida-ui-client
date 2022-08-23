@@ -1,21 +1,21 @@
 <script>
-  import { Views, Utils, Types, Logics } from "@ikomida/components";
+  import { Views, Utils, Types, Logics, Stores } from "@ikomida/components";
   import { Capacitor } from "@capacitor/core";
-  import { Auth } from "../../stores/Auth";
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
-  import { Store, Cart } from "../../stores/Cart";
+  import { Stores, Cart } from "../../stores/Cart";
   import { Layout, Settings, StatusBar } from "../../stores/Setup";
   import { GetPaymentMethods, AddCoupon } from "../../network/Payment";
   import { NewOrders } from "../../network/Orders";
   import { GetAddresses, GetSettings } from "../../network/User";
-  import { Title, Navigation, Routes } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   let location;
   let coupon;
   let couponObject = null;
-  let isLoading = false;
+  let isLoading = true;
   let address;
   let payment;
+  let auth;
 
   let errorAlert;
   let showAlert = false;
@@ -58,7 +58,7 @@
   $: businessTime = Logics.DateTime.isBusinessTime($Settings.business);
 
   function addMoreItems() {
-    Navigation.pop(3);
+    Stores.Navigation.instance.pop(3);
   }
 
   async function getLocation() {
@@ -79,10 +79,10 @@
   }
 
   async function forward() {
-    if ($Auth !== null && $Auth !== undefined && $Auth !== "null") {
+    if ($auth !== null && $auth !== undefined && $auth !== "null") {
       isLoading = true;
       const payload = {
-        items: $Store,
+        items: $Stores,
         address,
         payment,
         delivery,
@@ -93,7 +93,7 @@
       isLoading = false;
       if (response && response?.success) {
         Cart.reset();
-        Navigation.goTo(Routes.order, {
+        Stores.Navigation.instance.goTo(Routes.order, {
           newOrder: true,
           order: response?.data,
         });
@@ -101,7 +101,7 @@
         toggleErrorAlert(response?.data);
       }
     } else {
-      Navigation.reset(Routes.login);
+      Stores.Navigation.instance.reset(Routes.login);
     }
   }
 
@@ -122,15 +122,15 @@
   }
 
   function manageCard() {
-    Navigation.goTo(Routes.payments);
+    Stores.Navigation.instance.goTo(Routes.payments);
   }
 
   function manageAddress() {
-    Navigation.goTo(Routes.addresses);
+    Stores.Navigation.instance.goTo(Routes.addresses);
   }
 
   onMount(async () => {
-    isLoading = true;
+    auth = await Stores.Auth.instance.store();
     let response = await GetSettings();
     if (response?.success && response?.data) {
       Settings.set({ ...$Settings, ...response?.data });
@@ -172,7 +172,7 @@
     }
   });
 
-  Title.set("Resumo e pagamento");
+  Stores.Title.instance.set("Resumo e pagamento");
 </script>
 
 <table>

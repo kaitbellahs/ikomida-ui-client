@@ -1,11 +1,11 @@
 <script>
-    import { Title, Navigation } from "../../stores/Navigation";
     import { Layout, StatusBar } from "../../stores/Setup";
-    import { Views } from "@ikomida/components";
+    import { Views, Stores } from "@ikomida/components";
     import { NewCreditCard } from "../../network/Payment";
     import creditCardType from "credit-card-type";
+    import { onMount } from "svelte";
 
-    let isLoading = false;
+    let isLoading = true;
     let newCreditCardObject = {
         holder: null,
         validity: null,
@@ -91,13 +91,16 @@
         };
         const response = await NewCreditCard(newCreditCard);
         if (response?.success) {
-            Navigation.pop();
+            Stores.Navigation.instance.pop();
         } else {
             toggleErrorAlert(response?.data);
         }
         isLoading = false;
     }
-    Title.set("Novo cartão");
+    onMount(() => {
+        isLoading = false;
+    });
+    Stores.Title.instance.set("Novo cartão");
 </script>
 
 <Views.Divider />

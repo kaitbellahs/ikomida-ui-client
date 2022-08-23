@@ -1,17 +1,17 @@
 <script>
-  import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
+  import Routes from "../../stores/Routes";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { Layout, StatusBar } from "../../stores/Setup";
   import {
     requestPasswordPhoneValidation,
     validatePasswordPhoneValidationCode,
     requestPassword,
   } from "../../network/Auth";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   const countdownWaitTime = 60;
 
-  let isLoading = false;
+  let isLoading = true;
   let requestPasswordObject = {
     phone: null,
     phoneValidationCode: null,
@@ -110,13 +110,17 @@
     isLoading = false;
   }
 
+  onMount(() => {
+    isLoading = false;
+  });
+
   onDestroy(() => {
     if (timer) {
       clearInterval(timer);
     }
   });
 
-  Title.set("Recuperar senha");
+  Stores.Title.instance.set("Recuperar senha");
 </script>
 
 <main
@@ -193,7 +197,7 @@
       buttons={[
         {
           name: "Fazer login",
-          callback: () => Navigation.reset(Routes.login),
+          callback: () => Stores.Navigation.instance.reset(Routes.login),
           principal: true,
         },
       ]}
@@ -201,13 +205,7 @@
   {/if}
 </main>
 
-<Views.NavigationBar
-  {Layout}
-  {Menu}
-  {Title}
-  paddingTop={$StatusBar.height}
-  {Navigation}
-/>
+<Views.NavigationBar {Layout} paddingTop={$StatusBar.height} />
 {#if isLoading}
   <Views.Loading />
 {/if}

@@ -1,12 +1,6 @@
 <script>
-  import {
-    Title,
-    Navigation,
-    Routes,
-    Menu,
-    Router,
-  } from "../../stores/Navigation";
-  import { Views, Utils, Logics } from "@ikomida/components";
+  import Routes from "../../stores/Routes";
+  import { Views, Utils, Logics, Stores } from "@ikomida/components";
   import { Layout, StatusBar } from "../../stores/Setup";
   import { faUnlock } from "@fortawesome/free-solid-svg-icons";
   import {
@@ -20,9 +14,10 @@
   const countdownWaitTime = 60;
 
   let showRequestValidatingCodeAlert = false;
-  let isLoading = false;
+  let isLoading = true;
+  const router = Stores.Navigation.instance.router;
   let subscribeObject = {
-    ...Logics.Objects.deepCopy($Router.options),
+    ...Logics.Objects.deepCopy($router.options),
     ...{ phone: null, phoneValidationCode: null, signature: null },
     areaCode: 55,
   };
@@ -69,7 +64,7 @@
   function closeCallBack() {
     if (callbackId === "doSubscribe") {
       callbackId = null;
-      Navigation.reset(Routes.login);
+      Stores.Navigation.instance.reset(Routes.login);
     }
   }
 
@@ -118,11 +113,11 @@
   }
 
   async function goToTAC() {
-    Navigation.goTo(Routes.tac);
+    Stores.Navigation.instance.goTo(Routes.tac);
   }
 
   async function goToPP() {
-    Navigation.goTo(Routes.pp);
+    Stores.Navigation.instance.goTo(Routes.pp);
   }
 
   onMount(async () => {
@@ -130,6 +125,7 @@
     if (term) {
       subscribeObject.termId = term?.id;
     }
+    isLoading = false;
   });
 
   onDestroy(() => {
@@ -138,16 +134,10 @@
     }
   });
 
-  Title.set("Cadastro");
+  Stores.Title.instance.set("Cadastro");
 </script>
 
-<Views.NavigationBar
-  {Layout}
-  {Menu}
-  {Title}
-  paddingTop={$StatusBar.height}
-  {Navigation}
-/>
+<Views.NavigationBar {Layout} paddingTop={$StatusBar.height} />
 {#if isLoading}
   <Views.Loading />
 {/if}

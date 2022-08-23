@@ -1,10 +1,11 @@
 <script>
-  import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
-  import { Views } from "@ikomida/components";
+  import Routes from "../../stores/Routes";
+  import { Views, Stores } from "@ikomida/components";
   import { StatusBar, Layout } from "../../stores/Setup";
   import { faUser } from "@fortawesome/free-solid-svg-icons";
+  import { onMount } from "svelte";
 
-  let isLoading = false;
+  let isLoading = true;
   let subscribeObject = {
     name: null,
     lastName: null,
@@ -29,19 +30,17 @@
     isValidPassword;
 
   async function doSubscribe() {
-    Navigation.goTo(Routes.confirmSubscribe, subscribeObject);
+    Stores.Navigation.instance.goTo(Routes.confirmSubscribe, subscribeObject);
   }
 
-  Title.set("Criar conta");
+  onMount(() => {
+    isLoading = false;
+  });
+
+  Stores.Title.instance.set("Criar conta");
 </script>
 
-<Views.NavigationBar
-  {Layout}
-  {Menu}
-  {Title}
-  paddingTop={$StatusBar.height}
-  {Navigation}
-/>
+<Views.NavigationBar {Layout} paddingTop={$StatusBar.height} />
 {#if isLoading}
   <Views.Loading />
 {/if}

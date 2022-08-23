@@ -1,6 +1,5 @@
 <script>
-  import { Title } from "../../stores/Navigation";
-  import { Views } from "@ikomida/components";
+  import { Views, Stores } from "@ikomida/components";
   import { Settings, Layout } from "../../stores/Setup";
 
   const days = [
@@ -21,7 +20,7 @@
   function numerToTime(object) {
     return `${object?.substring(0, 2)}h${object?.substring(2, 4)}`;
   }
-  Title.set("Horario de funcionamento");
+  Stores.Title.instance.set("Horario de funcionamento");
 </script>
 
 {#if !$Settings?.business}

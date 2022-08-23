@@ -1,9 +1,11 @@
 {
   "appId": "${{iKomidaId}}$",
   "appName": "${{appName}}$",
-  "webDir": "public",
+  "webDir": "App",
   "bundledWebRuntime": false,
-  "npmClient": "npm",
+  "loggingBehavior": "none",
+  "npmClient": "yarn",
+  "overrideUserAgent": "iKomida",
   "plugins": {
     "PushNotifications": {
       "presentationOptions": [
@@ -12,5 +14,9 @@
         "alert"
       ]
     }
+  },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
   }
 }

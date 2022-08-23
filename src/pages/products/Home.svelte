@@ -1,10 +1,10 @@
 <script>
-  import { Title, Navigation, Routes } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import { all } from "../../network/Products";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { StatusBar, Settings } from "../../stores/Setup";
 
-  $: Title.set($Settings?.profile?.restaurantName ?? "iKomida");
+  $: Stores.Title.instance.set($Settings?.profile?.restaurantName ?? "iKomida");
 </script>
 
 {#await all()}
@@ -21,7 +21,7 @@
         $Settings?.preparation?.max * 60
       )}
     </div>
-    <Views.ItemsList {items} productPage={Routes.product} {Navigation} />
+    <Views.ItemsList {items} productPage={Routes.product} />
   {:else}
     <Views.CentredMessage
       text="Por enquanto estamos ainda organizando o nosso cardápio e ainda não cadastramos nenhum produto, volte a verificar de novo mais tarde!"
