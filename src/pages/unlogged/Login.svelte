@@ -138,18 +138,17 @@
     display: flex;
     align-items: center;
     flex-direction: column;
+    width: 100%;
   }
   .avatar > img {
     font-size: 3em;
     width: 100%;
-    max-width: 100%;
+    max-width: 500px;
+    border-radius: 40px;
     height: 210px;
-    border-radius: 45px;
     line-height: 90px;
-    vertical-align: middle;
-    display: table-cell;
-    border-radius: 50px;
     overflow: hidden;
+    object-fit: cover;
   }
   .avatar > .avatarCircle {
     font-size: 3em;

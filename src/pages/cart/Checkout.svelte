@@ -82,7 +82,7 @@
     if ($auth !== null && $auth !== undefined && $auth !== "null") {
       isLoading = true;
       const payload = {
-        items: $Stores,
+        items: $Store,
         address,
         payment,
         delivery,
@@ -111,6 +111,8 @@
       const response = await AddCoupon(coupon);
       if (response?.success) {
         couponObject = response?.data;
+      } else {
+        toggleErrorAlert(response?.data);
       }
       isLoading = false;
     }
