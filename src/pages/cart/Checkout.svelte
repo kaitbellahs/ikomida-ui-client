@@ -3,7 +3,7 @@
   import { Capacitor } from "@capacitor/core";
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
-  import { Stores, Cart } from "../../stores/Cart";
+  import { Store, Cart } from "../../stores/Cart";
   import { Layout, Settings, StatusBar } from "../../stores/Setup";
   import { GetPaymentMethods, AddCoupon } from "../../network/Payment";
   import { NewOrders } from "../../network/Orders";
