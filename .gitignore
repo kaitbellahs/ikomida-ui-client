@@ -1,5 +1,6 @@
 /node_modules/
 /public/build/
+App/build/
 
 .DS_Store
 package-lock.json
@@ -8,4 +9,6 @@ android/.idea
 android/app/release
 android/app/src/main/assets/public
 ios/App/App/public
+android/app/src/main/assets/App
+ios/App/App/App
 Pods

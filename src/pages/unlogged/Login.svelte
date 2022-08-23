@@ -143,6 +143,7 @@
     font-size: 3em;
     width: 100%;
     max-width: 100%;
+    height: 210px;
     border-radius: 45px;
     line-height: 90px;
     vertical-align: middle;

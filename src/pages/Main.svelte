@@ -12,7 +12,7 @@
   } from "@fortawesome/free-solid-svg-icons";
   import Routes from "../stores/Routes";
   import { Views, Utils, Logics, Stores } from "@ikomida/components";
-  import { Store } from "../stores/Cart";
+  import { Cart as CartStore, Store } from "../stores/Cart";
   import { StatusBar, Layout, Settings } from "../stores/Setup";
   import Home from "./products/Home.svelte";
   import Orders from "./orders/Orders.svelte";

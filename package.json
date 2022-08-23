@@ -9,7 +9,7 @@
     "build:unix": "yarn install && rollup -c --environment ENV:prod && ./build.sh",
     "dev": "rollup -c -w",
     "prod": "rollup -c -w --environment ENV:prod",
-    "start": "sirv public --no-clear",
+    "start": "sirv App --no-clear",
     "build:android": "run-s build:app cap-run:android",
     "build:ios": "run-s build:app cap-run:ios",
     "cap-run:android": "cap sync android && cap open android",

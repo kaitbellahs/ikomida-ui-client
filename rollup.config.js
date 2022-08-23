@@ -43,13 +43,13 @@ export default {
 		sourcemap: !production,
 		format: 'iife',
 		name: 'app',
-		file: 'public/build/bundle.js',
+		file: 'App/build/bundle.js',
 	},
 	plugins: [
-        replace({
+		replace({
 			preventAssignment: true,
-            isProduction: process.env.ENV === 'prod',
-        }),
+			isProduction: process.env.ENV === 'prod',
+		}),
 		svelte({
 			preprocess: [
 				asMarkupPreprocessor([
@@ -84,9 +84,9 @@ export default {
 		// the bundle has been generated
 		!production && serve(),
 
-		// Watch the `public` directory and refresh the
+		// Watch the `App` directory and refresh the
 		// browser on changes when not in production
-		!production && livereload('public'),
+		!production && livereload('App'),
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
