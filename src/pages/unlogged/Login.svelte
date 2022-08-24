@@ -148,7 +148,7 @@
     height: 210px;
     line-height: 90px;
     overflow: hidden;
-    object-fit: cover;
+    object-fit: contain;
   }
   .avatar > .avatarCircle {
     font-size: 3em;
