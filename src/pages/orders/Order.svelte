@@ -163,7 +163,7 @@
   >
   <Views.Divider />
   <h3>Itens a entregar</h3>
-  {#each order?.products as { id, title, price, quantity, discount, discountType }, index (id)}
+  {#each order?.products as { id, title, price, quantity, discount, discountType }, index (id ?? index)}
     <div class="product">
       <span class="quantity">{quantity}</span><span class="title">{title}</span
       ><span class="price"
@@ -224,7 +224,7 @@
     {/if}
     {#if [Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order?.status)}
       <Views.Button multiplier="1" on:click={delivered}
-        >Confirmar entrega</Views.Button
+        >Confirmar<br />a entrega</Views.Button
       >
     {/if}
   </div>

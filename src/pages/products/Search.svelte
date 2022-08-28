@@ -1,9 +1,9 @@
 <script>
   import Routes from "../../stores/Routes";
   import { search } from "../../network/Products";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { faSearch } from "@fortawesome/free-solid-svg-icons";
-  import { Layout, StatusBar, Settings, Stores } from "../../stores/Setup";
+  import { Layout, StatusBar, Settings } from "../../stores/Setup";
   import { onMount } from "svelte";
 
   let items = [];

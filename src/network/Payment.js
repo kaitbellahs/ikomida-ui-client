@@ -1,6 +1,5 @@
 import {
     Network,
-    Types
 } from "@ikomida/components";
 
 export async function GetPaymentMethods() {

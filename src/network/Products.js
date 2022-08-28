@@ -1,6 +1,6 @@
 import {
-    get
-} from 'svelte/store';
+    Network
+} from "@ikomida/components";
 
 let items;
 let updateTime;

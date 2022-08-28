@@ -1,5 +1,5 @@
 import App from './App.svelte';
-import { Network } from '@ikomida/components';
+import { Network, Stores } from '@ikomida/components';
 import Routes from './stores/Routes'
 
 let isProd = false

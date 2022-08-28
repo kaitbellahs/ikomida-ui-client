@@ -3,7 +3,7 @@
   import { Capacitor } from "@capacitor/core";
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
-  import { Stores, Cart } from "../../stores/Cart";
+  import { Store, Cart } from "../../stores/Cart";
   import { Layout, Settings, StatusBar } from "../../stores/Setup";
   import { GetPaymentMethods, AddCoupon } from "../../network/Payment";
   import { NewOrders } from "../../network/Orders";
@@ -74,7 +74,7 @@
     if ($auth !== null && $auth !== undefined && $auth !== "null") {
       Stores.Loading.instance.start();
       const payload = {
-        items: $Stores,
+        items: $Store,
         address,
         payment,
         delivery,
@@ -103,6 +103,8 @@
       const response = await AddCoupon(coupon);
       if (response?.success) {
         couponObject = response?.data;
+      } else {
+        toggleErrorAlert(response?.data);
       }
       Stores.Loading.instance.stop();
     }

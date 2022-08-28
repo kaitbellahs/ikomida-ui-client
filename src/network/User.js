@@ -1,6 +1,6 @@
 import {
-    get
-} from 'svelte/store';
+    Network
+} from '@ikomida/components';
 
 export async function GetAddresses() {
     return Network.instance.get("/addresses", true);
