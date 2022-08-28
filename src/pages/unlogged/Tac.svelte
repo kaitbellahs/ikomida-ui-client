@@ -9,14 +9,13 @@
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   let term;
-  let isLoading = true;
 
   onMount(async () => {
     term = await getTermsOfUse();
     if (term) {
       Stores.Title.instance.set(term?.name);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 </script>
 
@@ -49,10 +48,6 @@
       </h2>
     {/if}
   </div>
-
-  {#if isLoading}
-    <Views.Loading />
-  {/if}
 </main>
 
 <style>

@@ -5,19 +5,14 @@
   import { getPrivacyPolicy } from "../../network/Terms";
   import { Layout } from "../../stores/Setup";
 
-  Stores.Title.instance.set("Política de privacidade");
-
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   let term;
-  let isLoading = true;
 
   onMount(async () => {
     term = await getPrivacyPolicy();
-    if (term) {
-      Stores.Title.instance.set(term?.name);
-    }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
+  $: Stores.Title.instance.set(term?.name ?? "Política de privacidade");
 </script>
 
 <Views.NavigationBar {Layout} paddingTop={$StatusBar.height} />
@@ -49,10 +44,6 @@
       </h2>
     {/if}
   </div>
-
-  {#if isLoading}
-    <Views.Loading />
-  {/if}
 </main>
 
 <style>

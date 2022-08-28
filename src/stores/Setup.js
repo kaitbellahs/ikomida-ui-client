@@ -41,7 +41,7 @@ function createSettings() {
 		profile: {
 			areaCode: 55,
 			mainPicture: null,
-			restaurantName: null,
+			contractName: null,
 			identity: null,
 			phone: null,
 			email: null

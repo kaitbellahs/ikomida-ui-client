@@ -204,6 +204,11 @@
     buttons={notificationPopup?.buttons}
   />
 {/if}
+<Views.Loading
+  topPadding={$_StatusBar.height}
+  bottomPadding={$_StatusBar.bottomPadding}
+/>
+<Views.MessageAlert {Layout} />
 
 <style>
   #internetError {

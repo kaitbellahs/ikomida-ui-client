@@ -12,7 +12,7 @@
 
   const router = Stores.Navigation.instance.router;
   const { newOrder, order } = $router.options;
-  let isLoading = true;
+
   let screenShot = false;
   let showImage = true;
   let showCardBrand = true;
@@ -29,7 +29,7 @@
   }
 
   async function changeOrderStatus(status) {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await ChangeOrderStatus(order?.id, status);
     const orderStatus = response?.data;
     if (
@@ -39,7 +39,7 @@
     ) {
       order.status = orderStatus?.status;
       order.finishedAt = orderStatus?.finishedAt;
-      toggleErrorAlert(
+      Stores.MessageAlert.instance.show(
         orderStatus?.status === Types.OrderStatusType.CANCELED
           ? `Seu pedido foi cancelado com sucesso${
               order?.payment.type ===
@@ -50,9 +50,9 @@
           : "Obrigado por nos avisar a entrega do seu pedido"
       );
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
   async function delivered() {
     await changeOrderStatus(Types.OrderStatusType.DELIVERED);
@@ -67,16 +67,11 @@
     Number(order?.delivery ?? 0) -
     Number(order?.discount ?? 0);
 
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
-
   async function share() {
     async function sleep(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms));
     }
-    isLoading = true;
+    Stores.Loading.instance.start();
     screenShot = true;
     await sleep(1);
     const canvas = await html2canvas(orderScreen, {
@@ -84,7 +79,7 @@
       backgroundColor: "#dfdfdf",
     });
     screenShot = false;
-    isLoading = false;
+    Stores.Loading.instance.stop();
     const data = canvas.toDataURL().split(",");
     const screenShotFile = await Filesystem.writeFile({
       path: `screenshots/order-${order?.customID}.jpg`,
@@ -108,7 +103,7 @@
         callback: share,
       });
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
   function erroLoadImage(event) {
     showImage = false;
@@ -124,13 +119,13 @@
           on:error={erroLoadImage}
           src={$Settings?.profile?.mainPicture ??
             "assets/icons/transparent-logo-1.svg"}
-          alt={$Settings?.profile?.restaurantName ?? "iKomida"}
+          alt={$Settings?.profile?.contractName ?? "iKomida"}
         />
-      {:else if $Settings?.profile?.restaurantName}
-        <h1>{$Settings?.profile?.restaurantName}</h1>
+      {:else if $Settings?.profile?.contractName}
+        <h1>{$Settings?.profile?.contractName}</h1>
       {:else}
         <img src="assets/icons/transparent-logo-1.svg" alt="iKomida" />
-        <h2>{$Settings?.profile?.restaurantName}</h2>
+        <h2>{$Settings?.profile?.contractName}</h2>
       {/if}
     </div>
     <Views.Divider height="30" />
@@ -286,14 +281,6 @@
   </div>
 </div>
 <Views.GTerms />
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
-
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 
 <style>
   .order {

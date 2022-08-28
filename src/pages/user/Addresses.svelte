@@ -14,7 +14,7 @@
   let addresses;
   let currentPostalCode;
   let showNewAddress = false;
-  let isLoading = true;
+
   let newAddressObject = {
     postalCode: null,
     street: null,
@@ -42,9 +42,6 @@
     stat: false,
   };
 
-  let errorAlert;
-  let showAlert = false;
-
   $: canProceed = Utils?.Objects?.validateFields(newAddressObjectValidation);
 
   $: if (
@@ -54,13 +51,8 @@
     findAddress();
   }
 
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
-
   function findAddress() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     currentPostalCode = newAddressObject?.postalCode;
     GetAddressByCep(newAddressObject?.postalCode)
       .then((response) => {
@@ -73,12 +65,12 @@
             newAddressObject
           );
         } else {
-          toggleErrorAlert(response?.data);
+          Stores.MessageAlert.instance.show(response?.data);
         }
-        isLoading = false;
+        Stores.Loading.instance.stop();
       })
       .catch((exception) => {
-        toggleErrorAlert(exception);
+        Stores.MessageAlert.instance.show(exception);
       });
   }
 
@@ -88,17 +80,27 @@
 
   async function newAddress() {
     if ((newAddressObject?.postalCode?.length ?? 0) !== 8) {
-      toggleErrorAlert(`é obrigatorio o preencheemento do CEP`);
+      Stores.MessageAlert.instance.show(
+        `é obrigatorio o preencheemento do CEP`
+      );
     } else if ((newAddressObject?.street?.length ?? 0) < 3) {
-      toggleErrorAlert(`é obrigatorio o preencheemento do nome da rua`);
+      Stores.MessageAlert.instance.show(
+        `é obrigatorio o preencheemento do nome da rua`
+      );
     } else if ((newAddressObject?.neighborhood?.length ?? 0) < 2) {
-      toggleErrorAlert(`é obrigatorio o preencheemento do nome do bairro`);
+      Stores.MessageAlert.instance.show(
+        `é obrigatorio o preencheemento do nome do bairro`
+      );
     } else if ((newAddressObject?.city?.length ?? 0) < 3) {
-      toggleErrorAlert(`é obrigatorio o preencheemento do nome da cidade`);
+      Stores.MessageAlert.instance.show(
+        `é obrigatorio o preencheemento do nome da cidade`
+      );
     } else if ((newAddressObject?.stat?.length ?? 0) !== 2) {
-      toggleErrorAlert(`é obrigatorio o preencheemento do simbolo do estado`);
+      Stores.MessageAlert.instance.show(
+        `é obrigatorio o preencheemento do simbolo do estado`
+      );
     } else {
-      isLoading = true;
+      Stores.Loading.instance.start();
       const response = await NewAddress(newAddressObject);
       if (response?.success) {
         addresses = response?.data;
@@ -106,15 +108,15 @@
           postalCode: null,
         };
       } else {
-        toggleErrorAlert(response?.data);
+        Stores.MessageAlert.instance.show(response?.data);
       }
       showNewAddress = false;
-      isLoading = false;
+      Stores.Loading.instance.stop();
     }
   }
 
   async function updateAddress(id) {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await UpdateAddress(id);
     if (response?.success) {
       for (const item of addresses) {
@@ -125,20 +127,20 @@
       }
       addresses = [...addresses];
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function onRemoveClick(id) {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await DeleteAddress(id);
     if (response?.success) {
       addresses = addresses?.filter((item) => item.id !== id);
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   onMount(async () => {
@@ -146,7 +148,7 @@
     if (response?.success) {
       addresses = response?.data;
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set("Endereços");
@@ -271,13 +273,6 @@ mesmo!"
     <Views.Divider />
   </Views.Alert>
 {/if}
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
-<Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 
 <style>
   .address {

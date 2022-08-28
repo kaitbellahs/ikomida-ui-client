@@ -11,21 +11,13 @@
   import { Layout } from "../../stores/Setup";
 
   let payments;
-  let isLoading = true;
-  let errorAlert;
-  let showAlert = false;
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   function toggleNewCreditCard() {
     Stores.Navigation.instance.goTo(Routes.newMethod);
   }
 
   async function updateCreditCard(id) {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await UpdateCreditCard(id);
     if (response?.success) {
       for (const item of payments) {
@@ -36,13 +28,13 @@
       }
       payments = [...payments];
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function onRemoveClick(id) {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await DeleteCreditCard(id);
     if (response?.success) {
       payments = payments?.filter((item) => item.id !== id);
@@ -52,9 +44,9 @@
         payments = payments;
       }
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   onMount(async () => {
@@ -65,7 +57,7 @@
           (i1, i2) => new Date(i2?.createdAt) - new Date(i1?.createdAt)
         ) || [];
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set("Meios de pagamento");
@@ -109,13 +101,6 @@
     </div>
   {/each}
 {/if}
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
-<Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 
 <style>
   .paymentCard {

@@ -1,8 +1,8 @@
 <script>
   import { Views, Utils, Stores } from "@ikomida/components";
-  import { Settings, StatusBar } from "../../stores/Setup";
+  import { Settings } from "../../stores/Setup";
   import { onMount } from "svelte";
-  let isLoading = true;
+
   let showImage = true;
 
   $: settings = $Settings?.profile;
@@ -12,7 +12,7 @@
   }
 
   onMount(async () => {
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set("Contato");
@@ -23,11 +23,11 @@
     <img
       on:error={hideImage}
       src={settings.mainPicture}
-      alt={settings?.restaurantName}
+      alt={settings?.contractName}
     />
     <Views.Divider />
   {/if}
-  <h2>{settings?.restaurantName}</h2>
+  <h2>{settings?.contractName}</h2>
   <Views.Divider />
   <Views.TextValue
     text="CNPJ:"
@@ -64,13 +64,6 @@
   {settings?.address?.city}/{settings?.address?.stat} CEP: {settings?.address
     ?.postalCode}
 </div>
-
-{#if settings === {} || isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 
 <style>
   .settings {

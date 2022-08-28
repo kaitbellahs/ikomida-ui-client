@@ -9,7 +9,7 @@
   import { onMount } from "svelte";
 
   let pushNotificationToken = Stores.PushNotificationToken.instance?.store();
-  let isLoading = true;
+
   let phone;
   let password;
   let isValidPhone = false;
@@ -18,11 +18,6 @@
   $: canLogin = isValidPhone;
   let errorAlert;
   let showAlert = false;
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   async function doSubscribe() {
     Stores.Navigation.instance.goTo(Routes.subscribe);
@@ -33,7 +28,7 @@
   }
 
   async function doLogin() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await AuthNetwork.doLogin(55, phone, password);
     if (response?.success) {
       const token = await Utils.Jws.extractToken(response?.data);
@@ -44,25 +39,22 @@
         }
         Stores.Navigation.instance.reset(Routes.home);
       } else {
-        toggleErrorAlert("O token de acesso não é válido");
+        Stores.MessageAlert.instance.show("O token de acesso não é válido");
       }
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   function erroLoadImage(event) {
     showImage = false;
   }
   onMount(() => {
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 </script>
 
-{#if isLoading}
-  <Views.Loading />
-{/if}
 <main style="background: {$Layout.background};height: 100%;">
   <div class="avatar">
     {#if $Settings?.profile?.mainPicture && showImage}
@@ -70,17 +62,17 @@
         on:error={erroLoadImage}
         src={$Settings?.profile?.mainPicture ??
           "assets/icons/transparent-logo-1.svg"}
-        alt={$Settings?.profile?.restaurantName ?? "iKomida"}
+        alt={$Settings?.profile?.contractName ?? "iKomida"}
       />
-    {:else if $Settings?.profile?.restaurantName}
+    {:else if $Settings?.profile?.contractName}
       <div class="avatarCircle">
-        {$Settings?.profile?.restaurantName?.[0]}{$Settings?.profile
-          ?.restaurantName?.[1]}
+        {$Settings?.profile?.contractName?.[0]}{$Settings?.profile
+          ?.contractName?.[1]}
       </div>
-      <h2>{$Settings?.profile?.restaurantName}</h2>
+      <h2>{$Settings?.profile?.contractName}</h2>
     {:else}
       <img src="assets/icons/transparent-logo-1.svg" alt="iKomida" />
-      <h2>{$Settings?.profile?.restaurantName}</h2>
+      <h2>{$Settings?.profile?.contractName}</h2>
     {/if}
   </div>
   <h3>
@@ -102,7 +94,6 @@
     bind:value={password}
     icon={faUnlock}
     placeHolder="Senha"
-    secret={true}
     type="password"
   />
   <div />
@@ -116,7 +107,6 @@
     >Recuperar a senha</Views.Button
   >
   <Views.GTerms />
-  <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 </main>
 
 <style>

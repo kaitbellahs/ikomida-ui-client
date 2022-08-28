@@ -5,7 +5,6 @@
   import { faUser } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
 
-  let isLoading = true;
   let subscribeObject = {
     name: null,
     lastName: null,
@@ -34,16 +33,14 @@
   }
 
   onMount(() => {
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set("Criar conta");
 </script>
 
 <Views.NavigationBar {Layout} paddingTop={$StatusBar.height} />
-{#if isLoading}
-  <Views.Loading />
-{/if}
+
 <main
   style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;background: {$Layout.background};height: 100%;"
 >
@@ -82,7 +79,6 @@
     type="password"
     bind:value={subscribeObject.password}
     placeHolder="Senha"
-    secret={true}
     bind:isValid={isValidPassword}
     error="A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
   uma letra maiúscula, uma letra minúscula, um número e um símbolo"

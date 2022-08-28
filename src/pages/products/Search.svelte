@@ -10,10 +10,9 @@
   let value = "";
   let oldValue;
   let error = false;
-  let isLoading = true;
 
   $: if (value != oldValue) {
-    isLoading = true;
+    Stores.Loading.instance.start();
     error = false;
     if ((value?.length ?? 0) > 0) {
       search(value).then((_items) => {
@@ -24,21 +23,14 @@
       items = [];
       oldValue = "";
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
   onMount(() => {
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set("Pesquisar produtos");
 </script>
-
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 
 <Views.TextEdit
   {Layout}

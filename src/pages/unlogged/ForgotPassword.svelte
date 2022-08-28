@@ -11,7 +11,6 @@
 
   const countdownWaitTime = 60;
 
-  let isLoading = true;
   let requestPasswordObject = {
     phone: null,
     phoneValidationCode: null,
@@ -47,29 +46,24 @@
     showPasswordRequistedAlert = !showPasswordRequistedAlert;
   }
 
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
-
   function validateValidationCode(validationValid) {
     return (validationValid?.length ?? 0) == 4;
   }
 
   async function requestNewPassword() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await requestPassword(requestPasswordObject);
     if (response?.success) {
       showPasswordRequistedAlert = true;
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function requestPhoneValidation() {
     showRequestValidatingCodeAlert = false;
-    isLoading = true;
+    Stores.Loading.instance.start();
     requestPasswordObject.phone = requestPasswordObject.phone;
     const response = await requestPasswordPhoneValidation(
       requestPasswordObject
@@ -85,33 +79,33 @@
       timer = setInterval(() => {
         countdown--;
       }, 1000);
-      toggleErrorAlert(
+      Stores.MessageAlert.instance.show(
         `Digite o código que você receberá em instantes no seu celular no campo seguinte `
       );
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function ValidatePhoneCode() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await validatePasswordPhoneValidationCode(
       requestPasswordObject
     );
     if (response?.success) {
       canRequestPassword = true;
-      toggleErrorAlert(
+      Stores.MessageAlert.instance.show(
         `O código inserido é correto!, agora é só clicar no botão “CONTINUAR” para gerar um nova senha aleatória!`
       );
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   onMount(() => {
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   onDestroy(() => {
@@ -168,7 +162,7 @@
     disabled={!canRequestPassword}>Solicitar nova senha</Views.Button
   >
   <Views.GTerms />
-  <Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
+
   {#if showRequestValidatingCodeAlert}
     <Views.Alert
       title="Alerta"
@@ -206,9 +200,6 @@
 </main>
 
 <Views.NavigationBar {Layout} paddingTop={$StatusBar.height} />
-{#if isLoading}
-  <Views.Loading />
-{/if}
 
 <style>
   main {

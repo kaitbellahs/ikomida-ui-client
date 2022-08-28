@@ -4,7 +4,7 @@
   import { Views, Utils, Stores } from "@ikomida/components";
   import { StatusBar, Settings } from "../../stores/Setup";
 
-  $: Stores.Title.instance.set($Settings?.profile?.restaurantName ?? "iKomida");
+  $: Stores.Title.instance.set($Settings?.profile?.contractName ?? "iKomida");
 </script>
 
 {#await all()}

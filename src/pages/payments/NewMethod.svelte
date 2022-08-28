@@ -5,7 +5,6 @@
     import creditCardType from "credit-card-type";
     import { onMount } from "svelte";
 
-    let isLoading = true;
     let newCreditCardObject = {
         holder: null,
         validity: null,
@@ -50,24 +49,21 @@
         }
     }
 
-    function toggleErrorAlert(messageObject) {
-        errorAlert = messageObject;
-        showAlert = true;
-    }
-
     function openNewMethodAlert() {
         if (!newCreditCardObjectValidation?.holder) {
-            toggleErrorAlert(`é obrigatorio o preencheemento do nome`);
+            Stores.MessageAlert.instance.show(
+                `é obrigatorio o preencheemento do nome`
+            );
         } else if (!newCreditCardObjectValidation?.number) {
-            toggleErrorAlert(
+            Stores.MessageAlert.instance.show(
                 `é obrigatorio o preencheemento do Número do cartão`
             );
         } else if (!newCreditCardObjectValidation?.validity) {
-            toggleErrorAlert(
+            Stores.MessageAlert.instance.show(
                 `é obrigatorio o preencheemento da validade do cartão`
             );
         } else if (!newCreditCardObjectValidation?.code) {
-            toggleErrorAlert(
+            Stores.MessageAlert.instance.show(
                 `é obrigatorio o preencheemento do código de segurança`
             );
         } else {
@@ -81,7 +77,7 @@
 
     async function newCreditCard() {
         showNewMethodAlert = false;
-        isLoading = true;
+        Stores.Loading.instance.start();
         const newCreditCard = {
             holder: newCreditCardObject?.holder,
             number: newCreditCardObject?.number,
@@ -93,12 +89,12 @@
         if (response?.success) {
             Stores.Navigation.instance.pop();
         } else {
-            toggleErrorAlert(response?.data);
+            Stores.MessageAlert.instance.show(response?.data);
         }
-        isLoading = false;
+        Stores.Loading.instance.stop();
     }
     onMount(() => {
-        isLoading = false;
+        Stores.Loading.instance.stop();
     });
     Stores.Title.instance.set("Novo cartão");
 </script>
@@ -166,13 +162,6 @@
         ]}
     />
 {/if}
-{#if isLoading}
-    <Views.Loading
-        topPadding={$StatusBar.height}
-        bottomPadding={$StatusBar.bottomPadding}
-    />
-{/if}
-<Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 
 <style>
     h2 {

@@ -14,7 +14,7 @@
   const countdownWaitTime = 60;
 
   let showRequestValidatingCodeAlert = false;
-  let isLoading = true;
+
   const router = Stores.Navigation.instance.router;
   let subscribeObject = {
     ...Logics.Objects.deepCopy($router.options),
@@ -42,23 +42,19 @@
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
 
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
-
   async function doSubscribe() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await subscribe(subscribeObject);
     if (response?.success) {
       callbackId = "doSubscribe";
-      toggleErrorAlert(
-        "Seu cadastro foi concluído com sucesso, agora é só você usar seu número de telefone como usuário e sua senha para acessar a área logada e usufruir dos nossos produtos e serviços."
+      Stores.MessageAlert.instance.show(
+        "Seu cadastro foi concluído com sucesso, agora é só você usar seu número de telefone como usuário e sua senha para acessar a área logada e usufruir dos nossos produtos e serviços.",
+        closeCallBack
       );
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   function closeCallBack() {
@@ -77,7 +73,7 @@
   }
 
   async function RequestPhoneValidation() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     showRequestValidatingCodeAlert = false;
     subscribeObject.phone = subscribeObject.phone;
     const response = await requestPhoneValidation(subscribeObject);
@@ -89,27 +85,27 @@
       timer = setInterval(() => {
         countdown--;
       }, 1000);
-      toggleErrorAlert(
+      Stores.MessageAlert.instance.show(
         `Digite o código que você receberá em instantes no seu celular no campo "Código de validação" e clica no botão “CONFIRMAR”`
       );
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function ValidatePhoneCode() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await validatePhoneValidationCode(subscribeObject);
     if (response?.success) {
       canSubscribe = true;
-      toggleErrorAlert(
+      Stores.MessageAlert.instance.show(
         `O código inserido é correto!, agora é só clicar no botão “CONTINUAR” para finalizar seu cadastro`
       );
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function goToTAC() {
@@ -125,7 +121,7 @@
     if (term) {
       subscribeObject.termId = term?.id;
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   onDestroy(() => {
@@ -138,9 +134,7 @@
 </script>
 
 <Views.NavigationBar {Layout} paddingTop={$StatusBar.height} />
-{#if isLoading}
-  <Views.Loading />
-{/if}
+
 <main
   style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%; background: {$Layout.background};height: 100%;"
 >
@@ -189,12 +183,6 @@
     e nossa <a on:click={goToTAC} href="#/">politica de privacidade</a></small
   >
   <Views.GTerms />
-  <Views.MessageAlert
-    {closeCallBack}
-    {Layout}
-    object={errorAlert}
-    bind:show={showAlert}
-  />
 
   {#if showRequestValidatingCodeAlert}
     <Views.Alert

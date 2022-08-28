@@ -7,9 +7,6 @@
   import { onMount } from "svelte";
 
   let items;
-  let isLoading = true;
-  let errorAlert;
-  let showAlert = false;
   let localLoading = false;
   let canGetMore = true;
 
@@ -30,13 +27,8 @@
       callback: refresh,
     });
     [canGetMore, items] = await getOrders(false);
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   function goToOrder(order) {
     Stores.Navigation.instance.goTo(Routes.order, {
@@ -48,12 +40,6 @@
   Stores.Title.instance.set("Pedidos");
 </script>
 
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 {#if items && items.length > 0}
   <section>
     {#each items as order (order?.id)}
@@ -141,7 +127,6 @@
     >
   </Views.CentredMessage>
 {/if}
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   section {

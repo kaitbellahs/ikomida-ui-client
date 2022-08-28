@@ -12,18 +12,10 @@
   let location;
   let coupon;
   let couponObject = null;
-  let isLoading = true;
+
   let address;
   let payment;
   let auth;
-
-  let errorAlert;
-  let showAlert = false;
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   $: subtotalArray = $Store.map(
     (item) =>
@@ -80,7 +72,7 @@
 
   async function forward() {
     if ($auth !== null && $auth !== undefined && $auth !== "null") {
-      isLoading = true;
+      Stores.Loading.instance.start();
       const payload = {
         items: $Stores,
         address,
@@ -90,7 +82,7 @@
         location,
       };
       const response = await NewOrders(payload);
-      isLoading = false;
+      Stores.Loading.instance.stop();
       if (response && response?.success) {
         Cart.reset();
         Stores.Navigation.instance.goTo(Routes.order, {
@@ -98,7 +90,7 @@
           order: response?.data,
         });
       } else {
-        toggleErrorAlert(response?.data);
+        Stores.MessageAlert.instance.show(response?.data);
       }
     } else {
       Stores.Navigation.instance.reset(Routes.login);
@@ -107,12 +99,12 @@
 
   async function addCoupon() {
     if (coupon && coupon.length >= 3) {
-      isLoading = true;
+      Stores.Loading.instance.start();
       const response = await AddCoupon(coupon);
       if (response?.success) {
         couponObject = response?.data;
       }
-      isLoading = false;
+      Stores.Loading.instance.stop();
     }
   }
 
@@ -135,9 +127,9 @@
     if (response?.success && response?.data) {
       Settings.set({ ...$Settings, ...response?.data });
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
     response = await GetAddresses();
     if (response?.success) {
       const addresses = response?.data?.filter((item) => item.selected);
@@ -297,15 +289,6 @@
   </h2>
 {/if}
 <Views.GTerms />
-
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
-
-<Views.MessageAlert {Layout} object={errorAlert} bind:show={showAlert} />
 
 <style>
   .paymentCard {
