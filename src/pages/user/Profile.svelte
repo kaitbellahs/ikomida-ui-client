@@ -131,12 +131,6 @@
   <Views.Button {Layout} type="transparent" on:click={out}>Logout</Views.Button>
   <Views.GTerms />
 {/if}
-{#if isLoading || !userInfo}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 
 <style>
   h2 {

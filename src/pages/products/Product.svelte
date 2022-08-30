@@ -11,6 +11,7 @@
   import { StatusBar } from "../../stores/Setup";
   import { Views, Utils, Logics, Types, Stores } from "@ikomida/components";
   import { Layout } from "../../stores/Setup";
+  import { onMount } from "svelte";
 
   const router = Stores.Navigation.instance.router;
   const item = $router.options;
@@ -65,6 +66,8 @@
   function erroLoadImage(event) {
     showImage = false;
   }
+
+  onMount(() => Stores.Loading.instance.stop());
 
   Stores.Title.instance.set(item.title);
 </script>
