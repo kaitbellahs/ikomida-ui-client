@@ -19,7 +19,7 @@ export async function all() {
 export async function search(query) {
     await all();
     if (items) {
-        return items.map(section => {
+        items = items.map(section => {
             return {
                 title: section.title,
                 products: section.products.filter(item => {
@@ -31,7 +31,19 @@ export async function search(query) {
                 })
             };
         }).filter(item => item.products.length > 0);
+        return sortItems(items)
     } else {
         return [];
     }
+}
+
+function sortItems(items) {
+    return items
+        .map((category) => {
+            category.products = category.products.sort(
+                (i1, i2) => (i1?.order ?? 0) - (i2?.order ?? 0)
+            );
+            return category;
+        })
+        .sort((i1, i2) => (i1?.order ?? 0) - (i2?.order ?? 0));
 }

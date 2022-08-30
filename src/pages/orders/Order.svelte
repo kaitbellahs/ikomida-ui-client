@@ -7,7 +7,6 @@
   import { Filesystem, Directory } from "@capacitor/filesystem";
   import Routes from "../../stores/Routes";
   import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
-  import { StatusBar } from "../../stores/Setup";
   import { Layout, Settings } from "../../stores/Setup";
 
   const router = Stores.Navigation.instance.router;
@@ -23,6 +22,10 @@
       Stores.Navigation.instance.reset(Routes.orders);
     });
   }
+  $: total =
+    Number(order?.subtotal ?? 0) +
+    Number(order?.delivery ?? 0) -
+    Number(order?.discount ?? 0);
 
   function hideCardBrand() {
     showCardBrand = false;
@@ -54,18 +57,14 @@
     }
     Stores.Loading.instance.stop();
   }
+
   async function delivered() {
     await changeOrderStatus(Types.OrderStatusType.DELIVERED);
   }
+
   async function cancel() {
     await changeOrderStatus(Types.OrderStatusType.CANCELED);
   }
-  let errorAlert;
-  let showAlert = false;
-  $: total =
-    Number(order?.subtotal ?? 0) +
-    Number(order?.delivery ?? 0) -
-    Number(order?.discount ?? 0);
 
   async function share() {
     async function sleep(ms) {
@@ -95,6 +94,11 @@
       dialogTitle: "Compartilhar o pedido",
     });
   }
+
+  function erroLoadImage(event) {
+    showImage = false;
+  }
+
   onMount(async () => {
     if (await Share.canShare()) {
       Stores.Menu.instance.addItem({
@@ -105,9 +109,7 @@
     }
     Stores.Loading.instance.stop();
   });
-  function erroLoadImage(event) {
-    showImage = false;
-  }
+
   Stores.Title.instance.set("Detalhes do predido");
 </script>
 

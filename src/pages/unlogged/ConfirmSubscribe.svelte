@@ -12,10 +12,9 @@
   import { onDestroy, onMount } from "svelte";
 
   const countdownWaitTime = 60;
+  const router = Stores.Navigation.instance.router;
 
   let showRequestValidatingCodeAlert = false;
-
-  const router = Stores.Navigation.instance.router;
   let subscribeObject = {
     ...Logics.Objects.deepCopy($router.options),
     ...{ phone: null, phoneValidationCode: null, signature: null },
@@ -25,8 +24,6 @@
   let canSubscribe = false;
   let canRequestCode = false;
   let isValidationValid = false;
-  let errorAlert;
-  let showAlert = false;
   let timer = null;
   let countdownCanRequestCode = true;
   let countdown = 0;
@@ -39,7 +36,6 @@
     countdownCanRequestCode = true;
     countdown = countdownWaitTime;
   }
-
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
 
   async function doSubscribe() {

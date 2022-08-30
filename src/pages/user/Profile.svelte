@@ -15,8 +15,6 @@
     newPass: false,
     reNewPass: false,
   };
-  let errorAlert;
-  let showAlert = false;
 
   $: if (userInfo?.avatar) {
     // update()

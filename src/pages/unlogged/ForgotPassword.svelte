@@ -21,8 +21,6 @@
   let canRequestPassword = false;
   let canRequestCode = false;
   let isValidationValid = false;
-  let errorAlert;
-  let showAlert = false;
   let timer = null;
   let countdownCanRequestCode = true;
   let countdown = 0;
@@ -36,7 +34,6 @@
     countdownCanRequestCode = true;
     countdown = countdownWaitTime;
   }
-
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
 
   function toggleshowRequestValidatingCodeAlert() {

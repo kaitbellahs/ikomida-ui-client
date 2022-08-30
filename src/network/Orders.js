@@ -4,11 +4,6 @@ import {
     Stores,
 } from "@ikomida/components";
 
-
-export async function getOrders(refresh = false) {
-    return await Network.instance.loadMore(Stores.Cache.Types.ORDERS, '/orders', true, refresh)
-}
-
 export async function NewOrders(payload) {
     const response = await Network.instance.post("/order", true, payload, "newOrder");
     if (response?.success) {

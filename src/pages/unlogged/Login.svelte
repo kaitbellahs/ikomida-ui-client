@@ -16,8 +16,6 @@
   let showImage = true;
 
   $: canLogin = isValidPhone;
-  let errorAlert;
-  let showAlert = false;
 
   async function doSubscribe() {
     Stores.Navigation.instance.goTo(Routes.subscribe);
@@ -50,6 +48,7 @@
   function erroLoadImage(event) {
     showImage = false;
   }
+
   onMount(() => {
     Stores.Loading.instance.stop();
   });

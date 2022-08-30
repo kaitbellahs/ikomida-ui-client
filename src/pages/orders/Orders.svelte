@@ -1,8 +1,7 @@
 <script>
   import Routes from "../../stores/Routes";
-  import { getOrders, OrderStatus } from "../../network/Orders";
+  import { OrderStatus } from "../../network/Orders";
   import { Views, Utils, Types, Stores } from "@ikomida/components";
-  import { faSync } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
 
   onMount(async () => {

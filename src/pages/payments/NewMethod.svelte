@@ -1,5 +1,5 @@
 <script>
-    import { Layout, StatusBar } from "../../stores/Setup";
+    import { Layout } from "../../stores/Setup";
     import { Views, Stores } from "@ikomida/components";
     import { NewCreditCard } from "../../network/Payment";
     import creditCardType from "credit-card-type";
@@ -22,8 +22,6 @@
     };
 
     let cardInfo;
-    let errorAlert;
-    let showAlert = false;
     let showNewMethodAlert = false;
 
     $: if ((newCreditCardObject?.number?.length ?? 0) > 0) {
@@ -93,9 +91,11 @@
         }
         Stores.Loading.instance.stop();
     }
+
     onMount(() => {
         Stores.Loading.instance.stop();
     });
+
     Stores.Title.instance.set("Novo cartão");
 </script>
 
