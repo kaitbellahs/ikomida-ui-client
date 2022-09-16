@@ -1,7 +1,9 @@
 <script>
   import { Views, Stores } from "@ikomida/components";
+  import { onMount } from "svelte";
   import { StatusBar, Layout } from "../../stores/Setup";
 
+  onMount(() => Stores.Loading.instance.stop());
   Stores.Title.instance.set("Sem serviço");
 </script>
 

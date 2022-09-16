@@ -1,5 +1,6 @@
 <script>
   import { Views, Stores } from "@ikomida/components";
+  import { onMount } from "svelte";
   import { Settings, Layout } from "../../stores/Setup";
 
   const days = [
@@ -20,6 +21,9 @@
   function numerToTime(object) {
     return `${object?.substring(0, 2)}h${object?.substring(2, 4)}`;
   }
+
+  onMount(() => Stores.Loading.instance.stop());
+
   Stores.Title.instance.set("Horario de funcionamento");
 </script>
 

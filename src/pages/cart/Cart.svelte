@@ -91,6 +91,7 @@
       const addresses = response?.data?.filter((item) => item.selected);
       address = (addresses?.length ?? 0) === 1 ? addresses[0] : null;
     }
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set("Sacola de compras");

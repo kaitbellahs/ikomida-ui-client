@@ -131,7 +131,6 @@
     } else {
       Stores.MessageAlert.instance.show(response?.data);
     }
-    Stores.Loading.instance.stop();
     response = await GetAddresses();
     if (response?.success) {
       const addresses = response?.data?.filter((item) => item.selected);
@@ -164,6 +163,7 @@
         await getLocation();
       }
     }
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set("Resumo e pagamento");

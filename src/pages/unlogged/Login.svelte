@@ -1,14 +1,13 @@
 <script>
   import * as AuthNetwork from "../../network/Auth";
-  import { Views } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import Routes from "../../stores/Routes";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
-  import { Utils, Stores } from "@ikomida/components";
   import { registerPushNotificationToken } from "../../network/PushNotification";
   import { Layout, Settings } from "../../stores/Setup";
   import { onMount } from "svelte";
 
-  let pushNotificationToken = Stores.PushNotificationToken.instance?.store();
+  let pushNotificationToken = Stores.PushNotificationToken.instance?.store;
 
   let phone;
   let password;
