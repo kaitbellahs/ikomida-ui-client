@@ -124,7 +124,7 @@
   }
 
   onMount(async () => {
-    auth = await Stores.Auth.instance.store();
+    auth = await Stores.Auth.Auth.instance.store();
     let response = await GetSettings();
     if (response?.success && response?.data) {
       Settings.set({ ...$Settings, ...response?.data });
@@ -260,12 +260,12 @@
       <span class="payWith">A cobrança será realizada com</span>
       <span class="paymentType"
         >{Utils.Strings.capitalizeFirstLeter(
-          new Types.PaymentMethodType(payment?.type).name
+          new Types.Types.TPaymentMethod(payment?.type).name
         )}</span
       >
-      {new Types.PaymentMethodType(payment?.type).description}
+      {new Types.Types.TPaymentMethod(payment?.type).description}
       <span class="brand">
-        {#if payment?.type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
+        {#if payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
           <img
             src="/assets/cardBrand/{payment?.brand}.svg"
             alt={payment?.brand}

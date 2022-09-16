@@ -49,7 +49,9 @@
   }
 
   onMount(async () => {
-    userInfo = await Utils.Jws.extractToken(await Stores.Auth.instance.data());
+    userInfo = await Utils.Jws.extractToken(
+      await Stores.Auth.Auth.instance.data()
+    );
     Stores.Loading.instance.stop();
   });
 
@@ -78,7 +80,7 @@
         userInfo?.identity
       )}
       fontSize="1.3em"
-      leftMargin="30"
+      leftMargin={30}
     />
     <Views.TextValue
       {Layout}
@@ -90,14 +92,14 @@
         userInfo?.phone
       )}
       fontSize="1.3em"
-      leftMargin="30"
+      leftMargin={30}
     />
     <Views.TextValue
       {Layout}
       text="mail:"
       value={userInfo.email}
       fontSize="1.3em"
-      leftMargin="30"
+      leftMargin={30}
     />
     <Views.Divider />
     <h2>Senha</h2>

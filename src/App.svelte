@@ -146,7 +146,7 @@
   );
 
   onMount(async () => {
-    auth = await Stores.Auth.instance.store();
+    auth = await Stores.Auth.Auth.instance.store();
     let response = await GetSettings();
     if (response?.success && response?.data) {
       Settings.set({ ...$Settings, ...response?.data });

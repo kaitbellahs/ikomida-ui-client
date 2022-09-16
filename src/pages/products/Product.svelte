@@ -85,7 +85,7 @@
   >
 
   <div class="price">
-    {#if [Types.DiscountTypes.PERCENT, Types.DiscountTypes.VALUE].includes(Types.DiscountTypes[item.discountType])}
+    {#if [Types.TDiscount.PERCENT, Types.TDiscount.VALUE].includes(Types.TDiscount[item.discountType])}
       <span class="oldPrice">{Utils.Strings.currency(item.price)}</span>
     {/if}
     <span class="current"

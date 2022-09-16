@@ -121,8 +121,8 @@
     bind:value={newCreditCardObject.holder}
     bind:isValid={newCreditCardObjectValidation.holder}
     initialValue={newCreditCardObject.holder}
-    min="3"
-    max="255"
+    min={3}
+    max={255}
 />
 <Views.TextEdit
     {Layout}
@@ -132,8 +132,8 @@
     placeHolder="Validade do cartão"
     bind:value={newCreditCardObject.validity}
     bind:isValid={newCreditCardObjectValidation.validity}
-    min="4"
-    max="4"
+    min={4}
+    max={4}
     error="Por favor preencha uma data válida usando este formato dd/YY."
 />
 <Views.TextEdit

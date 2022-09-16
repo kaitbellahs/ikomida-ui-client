@@ -44,7 +44,7 @@ const items = async () => {
             key: 'Cart'
         });
         _items = JSON.parse(ret.value);
-    } catch (error) {
+    } catch (error: any) {
         _items = [];
         //TODO: -- report errors
     }
@@ -57,7 +57,7 @@ const addItem = async (item) => {
     let oldItems = [];
     try {
         oldItems = await items();
-    } catch (error) {
+    } catch (error: any) {
         //TODO: -- report errors
     }
     const update = [...new Set([...oldItems, item])]
@@ -71,7 +71,7 @@ const subtotal = async () => {
     let oldItems = [];
     try {
         oldItems = await items();
-    } catch (error) {
+    } catch (error: any) {
         //TODO: -- report errors
     }
     const _subtotal = oldItems.map((item) => item.quantity * item.price).reduce((a, b) => a + b);

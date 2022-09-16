@@ -221,8 +221,8 @@ mesmo!"
       bind:value={newAddressObject.street}
       bind:this={newAddressObjectInputs.street}
       bind:isValid={newAddressObjectValidation.street}
-      min="2"
-      max="255"
+      min={2}
+      max={255}
     />
     <Views.TextEdit
       {Layout}
@@ -230,8 +230,8 @@ mesmo!"
       bind:value={newAddressObject.number}
       bind:this={newAddressObjectInputs.number}
       bind:isValid={newAddressObjectValidation.number}
-      min="1"
-      max="255"
+      min={1}
+      max={255}
       empty={!newAddressObjectValidation.postalCode}
     />
     <Views.TextEdit
@@ -247,8 +247,8 @@ mesmo!"
       bind:value={newAddressObject.neighborhood}
       bind:isValid={newAddressObjectValidation.neighborhood}
       bind:this={newAddressObjectInputs.neighborhood}
-      min="2"
-      max="255"
+      min={2}
+      max={255}
     />
     <Views.TextEdit
       {Layout}
@@ -257,8 +257,8 @@ mesmo!"
       bind:value={newAddressObject.city}
       bind:isValid={newAddressObjectValidation.city}
       bind:this={newAddressObjectInputs.city}
-      min="2"
-      max="255"
+      min={2}
+      max={255}
     />
     <Views.TextEdit
       {Layout}
@@ -267,8 +267,8 @@ mesmo!"
       bind:value={newAddressObject.stat}
       bind:this={newAddressObjectInputs.stat}
       bind:isValid={newAddressObjectValidation.stat}
-      min="2"
-      max="2"
+      min={2}
+      max={2}
     />
     <Views.Divider />
   </Views.Alert>

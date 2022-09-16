@@ -43,10 +43,10 @@
       order.status = orderStatus?.status;
       order.finishedAt = orderStatus?.finishedAt;
       Stores.MessageAlert.instance.show(
-        orderStatus?.status === Types.OrderStatusType.CANCELED
+        orderStatus?.status === Types.Types.TOrderStatus.CANCELED
           ? `Seu pedido foi cancelado com sucesso${
               order?.payment.type ===
-              Types?.PaymentMethodType.CREDIT_CARD_ONLINE
+              Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE
                 ? ", e o seu pagamento será estornado no próximo fechamento da fatura do seu cartão de crédito."
                 : "!"
             }`
@@ -59,11 +59,11 @@
   }
 
   async function delivered() {
-    await changeOrderStatus(Types.OrderStatusType.DELIVERED);
+    await changeOrderStatus(Types.Types.TOrderStatus.DELIVERED);
   }
 
   async function cancel() {
-    await changeOrderStatus(Types.OrderStatusType.CANCELED);
+    await changeOrderStatus(Types.Types.TOrderStatus.CANCELED);
   }
 
   async function share() {
@@ -130,23 +130,23 @@
         <h2>{$Settings?.profile?.contractName}</h2>
       {/if}
     </div>
-    <Views.Divider height="30" />
+    <Views.Divider height={30} />
   </div>
-  {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status) && new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
+  {#if [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status) && new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
     <Views.Status
       {Layout}
-      type={Views.Status.Types.ERROR}
+      type={Types.Status.ERROR}
       circle={false}
       showIcon={false}>Pedido atrasado</Views.Status
     >
   {/if}
-  {#if [Types.OrderStatusType.DELIVERED].includes(order.status)}
-    <Views.Status {Layout} type={Views.Status.Types.SUCCESS} circle={true}
+  {#if [Types.Types.TOrderStatus.DELIVERED].includes(order.status)}
+    <Views.Status {Layout} type={Types.Status.SUCCESS} circle={true}
       >Pedido entregue</Views.Status
     >
   {/if}
-  {#if [Types.OrderStatusType.CANCELED].includes(order.status)}
-    <Views.Status {Layout} type={Views.Status.Types.ERROR} circle={false}
+  {#if [Types.Types.TOrderStatus.CANCELED].includes(order.status)}
+    <Views.Status {Layout} type={Types.Status.ERROR} circle={false}
       >Pedido cancelado</Views.Status
     >
   {/if}
@@ -154,7 +154,7 @@
   <h3 class="title">Pedido N˚: {order?.customID}</h3>
   <Views.Divider />
 
-  {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order.status)}
+  {#if ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(order.status)}
     <Views.Status {Layout}>
       Pedido {OrderStatus(order?.status)}
     </Views.Status>
@@ -201,12 +201,12 @@
   <div class="paymentMethod">
     <span
       >Pago com <b
-        >{new Types.PaymentMethodType(order?.payment.type).name}
-        {new Types.PaymentMethodType(order?.payment.type).description}</b
+        >{new Types.Types.TPaymentMethod(order?.payment.type).name}
+        {new Types.Types.TPaymentMethod(order?.payment.type).description}</b
       ></span
     >
     <span class="brand">
-      {#if order?.payment.type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
+      {#if order?.payment.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
         {#if showCardBrand}
           <img
             on:error={hideCardBrand}
@@ -219,13 +219,13 @@
     </span>
   </div>
   <div data-html2canvas-ignore class="buttonGroup">
-    {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN].includes(order?.status)}
-      <Views.Button multiplier="0.8" type="secondary" on:click={cancel}
+    {#if [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN].includes(order?.status)}
+      <Views.Button sizeMultiplier={0.8} type="secondary" on:click={cancel}
         >Cancelar</Views.Button
       >
     {/if}
-    {#if [Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order?.status)}
-      <Views.Button multiplier="1" on:click={delivered}
+    {#if [Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order?.status)}
+      <Views.Button sizeMultiplier="1" on:click={delivered}
         >Confirmar<br />a entrega</Views.Button
       >
     {/if}
@@ -275,7 +275,7 @@
   </table>
 
   <div class="signature {screenShot ? 'screenShot' : ''}">
-    <Views.Divider height="30" />
+    <Views.Divider height={30} />
     <span>Feito com carinho por</span><img
       src="assets/icons/transparent-logo-1.svg"
       alt="iKomida"

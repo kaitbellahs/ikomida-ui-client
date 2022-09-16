@@ -79,18 +79,18 @@
   >
   {#each payments as { id, type, brand, lastDigits, selected } (id)}
     <div class="paymentCard">
-      {#if type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
+      {#if type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
         <Views.FloatRemove callback={() => onRemoveClick(id)} />
       {/if}
       <div class="content">
         <span class="paymentType"
           >{Utils.Strings.capitalizeFirstLeter(
-            new Types.PaymentMethodType(type).name
+            new Types.Types.TPaymentMethod(type).name
           )}</span
         >
-        Pagar {new Types.PaymentMethodType(type).description}
+        Pagar {new Types.Types.TPaymentMethod(type).description}
         <span class="brand">
-          {#if type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
+          {#if type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
             <img src="/assets/cardBrand/{brand}.svg" alt={brand} /> **** {lastDigits}
           {/if}
         </span>

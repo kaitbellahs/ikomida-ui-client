@@ -7,7 +7,7 @@ let appVersion = '${{version}}$'
 let agent = "client"
 try {
     isProd = (isProduction !== undefined && isProduction)
-} catch (error) {
+} catch (error: any) {
 }
 const url = isProd ? "https://api.ikomida.com" : "http://192.168.1.200"
 
@@ -18,7 +18,7 @@ Stores.MenuHamburger.createInstance()
 Stores.Menu.createInstance()
 Stores.Title.createInstance()
 Stores.PushNotificationToken.createInstance()
-Stores.Navigation.createInstance(Routes);
+Stores.Navigation.createInstance(Routes.home);
 Stores.LoadMore.createInstance();
 
 const app = new App({

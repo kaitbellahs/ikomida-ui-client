@@ -27,38 +27,34 @@
   <div class="leftShadow orderContainer">
     <div on:click={goToOrder(item)}>
       <h3 class="title">Pedido N˚: {item?.customID}</h3>
-      {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(item?.status) && new Date(new Date(item?.createdAt).getTime() + item?.preparation?.max * 1000) < new Date()}
-        <Views.Status
-          type={Views.Status.Types.ERROR}
-          circle={false}
-          showIcon={false}>Pedido atrasado</Views.Status
+      {#if [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(item?.status) && new Date(new Date(item?.createdAt).getTime() + item?.preparation?.max * 1000) < new Date()}
+        <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}
+          >Pedido atrasado</Views.Status
         >
       {/if}
-      {#if [Types.OrderStatusType.DELIVERED].includes(item?.status)}
+      {#if [Types.Types.TOrderStatus.DELIVERED].includes(item?.status)}
         <Views.Status
-          type={Views.Status.Types.SUCCESS}
+          type={Types.Status.SUCCESS}
           circle={false}
           showIcon={false}>Pedido entregue</Views.Status
         >
       {/if}
-      {#if [Types.OrderStatusType.CANCELED].includes(item?.status)}
-        <Views.Status
-          type={Views.Status.Types.ERROR}
-          circle={false}
-          showIcon={false}>Pedido cancelado</Views.Status
+      {#if [Types.Types.TOrderStatus.CANCELED].includes(item?.status)}
+        <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}
+          >Pedido cancelado</Views.Status
         >
       {/if}
-      <Views.Divider height="5" />
-      {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(item?.status)}
+      <Views.Divider height={5} />
+      {#if ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(item?.status)}
         <Views.Status>
           Pedido {OrderStatus(item?.status)}
         </Views.Status>
-        <Views.Divider height="5" />
+        <Views.Divider height={5} />
       {/if}
       <div class="time">
         Data: {Utils.Strings.dateToString(item?.createdAt)}
       </div>
-      <Views.Divider height="10" />
+      <Views.Divider height={10} />
       {#if item?.products?.length > 0}
         <div class="product">1. {item?.products?.[0]?.title}</div>
       {/if}
@@ -68,18 +64,18 @@
           {item?.products?.length - 1 == 1 ? "item" : "itens"}
         </div>
       {/if}
-      <Views.Divider height="5" />
+      <Views.Divider height={5} />
       <div class="address">
         Entregua na: <b>{item?.address.street ?? "-"}</b>
       </div>
       <div class="paymentMethod">
         Forma de pagamento: <b
-          >{new Types.PaymentMethodType(item?.payment.type).name}
-          {new Types.PaymentMethodType(item?.payment.type).description}</b
+          >{new Types.Types.TPaymentMethod(item?.payment.type).name}
+          {new Types.Types.TPaymentMethod(item?.payment.type).description}</b
         >
       </div>
     </div>
-    <Views.Divider height="10" />
+    <Views.Divider height={10} />
     <div class="value">
       Total:&nbsp;<span
         >{Utils.Strings.currency(

@@ -38,21 +38,21 @@
       settings?.cnpj
     )}
     fontSize="1.3em"
-    leftMargin="30"
+    leftMargin={30}
   />
   <Views.Divider />
   <Views.TextValue
     text="Celular:"
     value={Utils?.Strings?.formatAsPhone(settings?.phone)}
     fontSize="1.3em"
-    leftMargin="30"
+    leftMargin={30}
   />
   <Views.Divider />
   <Views.TextValue
     text="Email:"
     value={settings?.email}
     fontSize="1.3em"
-    leftMargin="30"
+    leftMargin={30}
   />
   <Views.Divider />
   <h3>Endereço:</h3>
