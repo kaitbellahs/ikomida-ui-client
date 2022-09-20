@@ -3,7 +3,7 @@ import { Network, Stores } from '@ikomida/shared-frontend';
 import Routes from './stores/Routes';
 import { Cart } from './stores/Cart';
 
-const appVersion = '0.0.1';
+const appVersion = '${{version}}$'
 let isProd = false;
 try {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -14,7 +14,7 @@ try {
 const agent = 'CLIENT';
 const url = isProd ? 'https://api.ikomida.com' : 'http://192.168.1.200';
 Stores.Cache.createInstance();
-Network.createInstance(url, 'com.ikomida.br.', agent, '6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS', appVersion);
+Network.createInstance(url, '"${{iKomidaId}}$', agent, '6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS', appVersion);
 Stores.Auth.Auth.createInstance(agent);
 Stores.MenuHamburger.createInstance();
 Stores.Menu.createInstance();
