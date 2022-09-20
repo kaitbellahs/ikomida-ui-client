@@ -12,3 +12,4 @@ ios/App/App/public
 android/app/src/main/assets/App
 ios/App/App/App
 Pods
+*.log

@@ -12,7 +12,8 @@
   } from '@fortawesome/free-solid-svg-icons';
   import Routes from '../stores/Routes';
   import { Views, Utils, Logics, Stores } from '@ikomida/shared-frontend';
-  import { Cart as CartStore, IStore } from '../stores/Cart';
+  import { Cart as CartStore } from '../stores/Cart';
+  import type { IStore } from '../stores/Cart';
   import { StatusBar, Settings } from '../stores/Setup';
   import Home from './products/Home.svelte';
   import Orders from './orders/Orders.svelte';

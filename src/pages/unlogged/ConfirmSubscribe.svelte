@@ -1,6 +1,6 @@
 <script lang="ts">
   import Routes from '../../stores/Routes';
-  import { Views, Utils, Logics, Stores, Types } from '@ikomida/shared-frontend';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
   import { faUnlock } from '@fortawesome/free-solid-svg-icons';
   import { requestPhoneValidation, validatePhoneValidationCode, subscribe } from '../../network/Auth';
   import { getTermOfUse } from '../../network/Terms';

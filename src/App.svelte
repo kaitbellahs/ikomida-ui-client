@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import { Network } from '@capacitor/network';
   import { StatusBar } from '@ikomida/capacitor-plugin-status-bar';
-  import { StatusBar as _StatusBar, StatusBarType, Settings } from './stores/Setup';
+  import { StatusBar as _StatusBar, Settings } from './stores/Setup';
+  import type { StatusBarType } from './stores/Setup';
   import Routes from './stores/Routes';
   import { registerPushNotificationToken } from './network/PushNotification';
   import { getLayout } from './network/Layout';
@@ -45,11 +46,13 @@
   }
 
   $: if (networkStatus == null || !networkStatus.connected) {
-    $_StatusBar.topMargin = 20;
-    _StatusBar.setStatusBar($_StatusBar);
+    const statusBar = $_StatusBar;
+    statusBar.topMargin = 20;
+    _StatusBar.setStatusBar(statusBar);
   } else {
-    $_StatusBar.topMargin = 0;
-    _StatusBar.setStatusBar($_StatusBar);
+    const statusBar = $_StatusBar;
+    statusBar.topMargin = 0;
+    _StatusBar.setStatusBar(statusBar);
   }
 
   function togglePushNotificationPopup() {

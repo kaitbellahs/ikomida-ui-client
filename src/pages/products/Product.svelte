@@ -2,7 +2,6 @@
   import { Cart } from '../../stores/Cart';
   import Routes from '../../stores/Routes';
   import Fa from 'svelte-fa';
-  import { v4 as uuidV4 } from 'uuid';
   import { faPlusSquare, faMinusSquare, faCartPlus } from '@fortawesome/free-solid-svg-icons';
   import { StatusBar } from '../../stores/Setup';
   import { Views, Utils, Logics, Types, Stores } from '@ikomida/shared-frontend';

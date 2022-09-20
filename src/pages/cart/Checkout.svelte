@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { Views, Utils, Types, Logics, Stores, Network } from '@ikomida/shared-frontend';
+  import { Views, Utils, Types, Logics, Stores } from '@ikomida/shared-frontend';
   import { Capacitor } from '@capacitor/core';
   import { Geolocation } from '@capacitor/geolocation';
   import { onMount } from 'svelte';
-  import { IStore, Cart } from '../../stores/Cart';
+  import { Cart } from '../../stores/Cart';
+  import type { IStore } from '../../stores/Cart';
   import { Settings } from '../../stores/Setup';
   import { GetPaymentMethods, AddCoupon } from '../../network/Payment';
   import { NewOrders } from '../../network/Orders';
@@ -17,7 +18,6 @@
 
   let address: Types.Classes.CAddress | undefined;
   let payment: Types.Classes.CPaymentMethod | undefined;
-  let auth: Stores.Auth.IStore;
 
   $: subtotalArray = $Products.map(
     (product) =>
@@ -108,7 +108,6 @@
   }
 
   onMount(async () => {
-    auth = await Stores.Auth.Auth.instance.store();
     Products = await Cart.instance.store();
     let response = await GetSettings();
     if (response?.success && response?.data) {

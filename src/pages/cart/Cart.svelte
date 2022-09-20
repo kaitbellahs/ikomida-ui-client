@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Cart, IStore } from '../../stores/Cart';
+  import { Cart } from '../../stores/Cart';
+  import type { IStore } from '../../stores/Cart';
   import Routes from '../../stores/Routes';
   import { faTrash } from '@fortawesome/free-solid-svg-icons';
   import { Views, Utils, Logics, Stores, Types } from '@ikomida/shared-frontend';

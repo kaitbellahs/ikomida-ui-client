@@ -3,7 +3,6 @@
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
   import { onMount } from 'svelte';
   import { getTermsOfUse } from '../../network/Terms';
-  const Layout = Stores.Layout.instance.store;
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   let term: Types.Classes.CTerm;
