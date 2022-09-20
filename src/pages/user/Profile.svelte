@@ -1,16 +1,12 @@
-<script>
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { onMount } from "svelte";
-  import { StatusBar, Layout } from "../../stores/Setup";
-  import { updatePassword, logout } from "../../network/Auth";
+<script lang="ts">
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
+  import { onMount } from 'svelte';
+  import { updatePassword, logout } from '../../network/Auth';
+  const Layout = Stores.Layout.instance.store;
 
-  let userInfo;
+  let userInfo: Types.Classes.CUser;
 
-  let passwordObject = {
-    oldPass: null,
-    newPass: null,
-    reNewPass: null,
-  };
+  let passwordObject: Types.Classes.CUser = Types.Classes.CUser.fillWith(null);
   let passwordValidationObject = {
     newPass: false,
     reNewPass: false,
@@ -28,18 +24,16 @@
 
   async function editPassword() {
     if (!passwordValidationObject.newPass) {
-      Stores.MessageAlert.instance.show("A nova senha não está correta!");
+      Stores.MessageAlert.instance.show('A nova senha não está correta!');
       return;
     } else if (!passwordValidationObject.reNewPass) {
-      Stores.MessageAlert.instance.show(
-        "A confirmação da senha não está correta"
-      );
+      Stores.MessageAlert.instance.show('A confirmação da senha não está correta');
       return;
     }
     Stores.Loading.instance.start();
     let response = await updatePassword(passwordObject);
     if (response.success) {
-      Stores.MessageAlert.instance.show("Senha atualizada com sucesso!");
+      Stores.MessageAlert.instance.show('Senha atualizada com sucesso!');
     } else {
       Stores.MessageAlert.instance.show(response?.data);
       Stores.Loading.instance.stop();
@@ -49,18 +43,19 @@
   }
 
   onMount(async () => {
-    userInfo = await Utils.Jws.extractToken(
-      await Stores.Auth.Auth.instance.data()
-    );
+    userInfo = await Utils.Jws.extractToken((await Stores.Auth.Auth.instance.data()) ?? '');
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Perfil");
+  function validatePassword(password: string) {
+    return passwordObject.newPass === password;
+  }
+
+  Stores.Title.instance.set('Perfil');
 </script>
 
 {#if userInfo}
   <Views.UploadablePhoto
-    {Layout}
     type="profile"
     image={userInfo?.avatar}
     name={userInfo.name[0]}
@@ -71,47 +66,23 @@
     <h2 class="name">{userInfo.name} {userInfo.lastName}</h2>
     <Views.Divider />
     <Views.TextValue
-      {Layout}
       text="CPF:"
-      value={Utils?.Strings?.formatString(
-        /\d/gi,
-        "___.___.___-__",
-        "_",
-        userInfo?.identity
-      )}
+      value={Utils?.Strings?.formatString(/\d/gi, '___.___.___-__', '_', userInfo?.identity)}
       fontSize="1.3em"
       leftMargin={30}
     />
     <Views.TextValue
-      {Layout}
       text="Telefone:"
-      value={Utils?.Strings?.formatString(
-        /\d/gi,
-        "(__) _____-____",
-        "_",
-        userInfo?.phone
-      )}
+      value={Utils?.Strings?.formatString(/\d/gi, '(__) _____-____', '_', userInfo?.phone)}
       fontSize="1.3em"
       leftMargin={30}
     />
-    <Views.TextValue
-      {Layout}
-      text="mail:"
-      value={userInfo.email}
-      fontSize="1.3em"
-      leftMargin={30}
-    />
+    <Views.TextValue text="mail:" value={userInfo.email} fontSize="1.3em" leftMargin={30} />
     <Views.Divider />
     <h2>Senha</h2>
+    <Views.TextEdit type={Types.TTextEdit.PASSWORD} placeHolder="Senha atual" bind:value={passwordObject.oldPass} />
     <Views.TextEdit
-      {Layout}
-      type="password"
-      placeHolder="Senha atual"
-      bind:value={passwordObject.oldPass}
-    />
-    <Views.TextEdit
-      {Layout}
-      type="password"
+      type={Types.TTextEdit.PASSWORD}
       placeHolder="Nova senha"
       bind:value={passwordObject.newPass}
       bind:isValid={passwordValidationObject.newPass}
@@ -119,18 +90,17 @@
         uma letra maiúscula, uma letra minúscula, um número e um símbolo"
     />
     <Views.TextEdit
-      {Layout}
-      type="password"
+      type={Types.TTextEdit.PASSWORD}
       placeHolder="Confirmação"
       bind:value={passwordObject.reNewPass}
       bind:isValid={passwordValidationObject.reNewPass}
-      validation={(password) => passwordObject.newPass === password}
+      validation={validatePassword}
       error="A confirmação da senha não é válida"
     />
     <Views.Divider />
   </div>
   <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
-  <Views.Button {Layout} type="transparent" on:click={out}>Logout</Views.Button>
+  <Views.Button type="transparent" on:click={out}>Logout</Views.Button>
   <Views.GTerms />
 {/if}
 

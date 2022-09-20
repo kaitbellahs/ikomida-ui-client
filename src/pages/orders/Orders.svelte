@@ -1,77 +1,81 @@
-<script>
-  import Routes from "../../stores/Routes";
-  import { OrderStatus } from "../../network/Orders";
-  import { Views, Utils, Types, Stores } from "@ikomida/components";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import Routes from '../../stores/Routes';
+  import { OrderStatus } from '../../network/Orders';
+  import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend';
+  import { onMount } from 'svelte';
+
+  let items: Types.Classes.COrder[];
+
+  $: if (items) {
+    for (let index = 0; index < items.length; index++) {
+      items[index] = Types.Classes.COrder.fromObject(items[index]);
+    }
+    items = items;
+  }
 
   onMount(async () => {
     Stores.Loading.instance.stop();
   });
 
-  function goToOrder(order) {
+  function goToOrder(order: Types.Classes.COrder) {
     Stores.Navigation.instance.goTo(Routes.order, {
       newOrder: false,
       order,
     });
   }
 
-  Stores.Title.instance.set("Pedidos");
+  Stores.Title.instance.set('Pedidos');
 </script>
 
 <Views.LoadMoreReusableList
   noItems="Não há pedido para exibir por enquanto, aproveite e faça seu primeiro pedido agora!"
   cache={Stores.Cache.Types.ORDERS}
   url="/orders"
+  bind:items
+  hasRecaptcha={true}
   let:item
+  let:index
 >
   <div class="leftShadow orderContainer">
-    <div on:click={goToOrder(item)}>
-      <h3 class="title">Pedido N˚: {item?.customID}</h3>
-      {#if [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(item?.status) && new Date(new Date(item?.createdAt).getTime() + item?.preparation?.max * 1000) < new Date()}
-        <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}
-          >Pedido atrasado</Views.Status
-        >
+    <div on:click={() => goToOrder(items[index])}>
+      <h3 class="title">Pedido N˚: {item.customID}</h3>
+      {#if item.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(item.status) && new Date((item.createdAt?.getTime() ?? 0) + item.preparation?.max * 1000) < new Date()}
+        <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}>Pedido atrasado</Views.Status>
       {/if}
-      {#if [Types.Types.TOrderStatus.DELIVERED].includes(item?.status)}
-        <Views.Status
-          type={Types.Status.SUCCESS}
-          circle={false}
-          showIcon={false}>Pedido entregue</Views.Status
-        >
+      {#if item.status && [Types.Types.TOrderStatus.DELIVERED].includes(item.status)}
+        <Views.Status type={Types.Status.SUCCESS} circle={false} showIcon={false}>Pedido entregue</Views.Status>
       {/if}
-      {#if [Types.Types.TOrderStatus.CANCELED].includes(item?.status)}
-        <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}
-          >Pedido cancelado</Views.Status
-        >
+      {#if item.status && [Types.Types.TOrderStatus.CANCELED].includes(item.status)}
+        <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}>Pedido cancelado</Views.Status>
       {/if}
       <Views.Divider height={5} />
-      {#if ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(item?.status)}
+      {#if !item.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(item.status)}
         <Views.Status>
-          Pedido {OrderStatus(item?.status)}
+          Pedido {OrderStatus(item.status)}
         </Views.Status>
         <Views.Divider height={5} />
       {/if}
       <div class="time">
-        Data: {Utils.Strings.dateToString(item?.createdAt)}
+        Data: {Utils.Strings.dateToString(item.createdAt)}
       </div>
       <Views.Divider height={10} />
-      {#if item?.products?.length > 0}
-        <div class="product">1. {item?.products?.[0]?.title}</div>
+      {#if item.products?.length > 0}
+        <div class="product">1. {item.products?.[0]?.title}</div>
       {/if}
-      {#if item?.products?.length > 1}
+      {#if item.products?.length > 1}
         <div class="product">
-          e mais {item?.products?.length - 1}
-          {item?.products?.length - 1 == 1 ? "item" : "itens"}
+          e mais {item.products?.length - 1}
+          {item.products?.length - 1 == 1 ? 'item' : 'itens'}
         </div>
       {/if}
       <Views.Divider height={5} />
       <div class="address">
-        Entregua na: <b>{item?.address.street ?? "-"}</b>
+        Entregua na: <b>{item.address.street ?? '-'}</b>
       </div>
       <div class="paymentMethod">
         Forma de pagamento: <b
-          >{new Types.Types.TPaymentMethod(item?.payment.type).name}
-          {new Types.Types.TPaymentMethod(item?.payment.type).description}</b
+          >{item.payment?.type.name}
+          {item.payment?.type.description}</b
         >
       </div>
     </div>
@@ -79,9 +83,7 @@
     <div class="value">
       Total:&nbsp;<span
         >{Utils.Strings.currency(
-          Number(item?.subtotal ?? 0) +
-            Number(item?.delivery ?? 0) -
-            Number(item?.discount ?? 0)
+          Number(item.subtotal ?? 0) + Number(item.delivery ?? 0) - Number(item.discount ?? 0),
         )}</span
       >
     </div>

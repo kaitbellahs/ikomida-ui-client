@@ -1,10 +1,10 @@
 import {
     Network,
     Types
-} from "@ikomida/components";
+} from "@ikomida/shared-frontend";
 
 export async function getTermsOfUse() {
-    const response = await Network.instance?.get(`/term/${Types.TTerm.TERM_OF_USE_CLIENT}`);
+    const response = await Network.instance?.get(`/term/${Types.Types.TTerm.TERM_OF_USE_VENDOR}`);
     if (response && response?.success) {
         return response?.data
     }
@@ -12,7 +12,7 @@ export async function getTermsOfUse() {
 }
 
 export async function getTermOfUse() {
-    const response = await Network.instance?.get(`/termID/${Types.TTerm.TERM_OF_USE_CLIENT}`);
+    const response = await Network.instance?.get(`/termID/${Types.Types.TTerm.TERM_OF_USE_VENDOR}`);
     if (response && response?.success) {
         return response?.data
     }
@@ -20,7 +20,7 @@ export async function getTermOfUse() {
 }
 
 export async function getPrivacyPolicy() {
-    const response = await Network.instance?.get(`/term/${Types.TTerm.PRIVACY_POLICY}`);
+    const response = await Network.instance?.get(`/term/${Types.Types.TTerm.PRIVACY_POLICY}`);
     if (response && response?.success) {
         return response?.data
     }

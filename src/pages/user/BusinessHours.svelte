@@ -1,42 +1,43 @@
-<script>
-  import { Views, Stores } from "@ikomida/components";
-  import { onMount } from "svelte";
-  import { Settings, Layout } from "../../stores/Setup";
+<script lang="ts">
+  import { Views, Stores, Types } from '@ikomida/shared-frontend';
+  import { onMount } from 'svelte';
+  import { Settings } from '../../stores/Setup';
+  const Layout = Stores.Layout.instance.store;
 
   const days = [
-    { name: "Domingo", checked: false },
-    { name: "Segunda-feira", checked: false },
-    { name: "Terça-feira", checked: false },
-    { name: "Quarta-feira", checked: false },
-    { name: "Quinta-feira", checked: false },
-    { name: "Sexta-feira", checked: false },
-    { name: "Sabado", checked: false },
+    { name: 'Domingo', checked: false },
+    { name: 'Segunda-feira', checked: false },
+    { name: 'Terça-feira', checked: false },
+    { name: 'Quarta-feira', checked: false },
+    { name: 'Quinta-feira', checked: false },
+    { name: 'Sexta-feira', checked: false },
+    { name: 'Sabado', checked: false },
   ];
 
   $: twintyFourHours =
-    $Settings?.business?.hours?.filter((item) => {
-      return item.start === "0000" && item.end === "2359";
+    $Settings?.business?.hours?.filter((item: Types.Classes.CBusinessTimeHours) => {
+      return item.start === '0000' && item.end === '2359';
     }).length > 0;
 
-  function numerToTime(object) {
+  function numerToTime(object: string) {
     return `${object?.substring(0, 2)}h${object?.substring(2, 4)}`;
   }
 
   onMount(() => Stores.Loading.instance.stop());
 
-  Stores.Title.instance.set("Horario de funcionamento");
+  Stores.Title.instance.set('Horario de funcionamento');
 </script>
 
 {#if !$Settings?.business}
-  <Views.LocalLoading size="2" />
+  <Views.LocalLoading size={2} />
 {:else if $Settings?.business?.days && $Settings?.business?.hours}
   <!-- {#if $Settings?.business?.days?.length === 7 && twintyFourHours}
     Estamos atendendo 24h/7
   {:else} -->
   <div
     class="date"
-    style="--buttonBackground: {$Layout?.button?.background ??
-      '#4c0708'};--buttonColor: {$Layout?.button?.color ?? '#ffffff'};"
+    style="--buttonBackground: {$Layout?.button?.background ?? '#4c0708'};--buttonColor: {$Layout?.button?.color ??
+      '#ffffff'};"
   >
     <h2 class="title">Dias de funcionamento</h2>
     <div class="data">
@@ -44,7 +45,7 @@
         <span>Todos os dias da semana</span>
       {:else}
         {#each $Settings?.business?.days as day}
-          <span>{days?.[day]?.name || "-"}</span>
+          <span>{days?.[day]?.name || '-'}</span>
         {/each}
       {/if}
     </div>
@@ -52,8 +53,8 @@
   <Views.Divider />
   <div
     class="date"
-    style="--buttonBackground: {$Layout?.button?.background ??
-      '#4c0708'};--buttonColor: {$Layout?.button?.color ?? '#ffffff'};"
+    style="--buttonBackground: {$Layout?.button?.background ?? '#4c0708'};--buttonColor: {$Layout?.button?.color ??
+      '#ffffff'};"
   >
     <h2 class="title">Horários de funcionamento</h2>
     <div class="data">
@@ -61,11 +62,7 @@
         <span>24h por dia</span>
       {:else}
         {#each $Settings?.business?.hours as businessHour}
-          <span
-            >das {numerToTime(businessHour?.start)} até {numerToTime(
-              businessHour?.end
-            )}
-          </span>
+          <span>das {numerToTime(businessHour?.start)} até {numerToTime(businessHour?.end)} </span>
         {/each}
       {/if}
     </div>

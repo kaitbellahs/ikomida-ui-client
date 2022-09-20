@@ -1,6 +1,6 @@
 import {
     Network
-} from "@ikomida/components";
+} from "@ikomida/shared-frontend";
 
 export async function registerPushNotificationToken(object) {
     return Network.instance?.post("/notification/register", true, object);

@@ -12,6 +12,8 @@ import {
 	asMarkupPreprocessor
 } from 'svelte-as-markup-preprocessor';
 import replace from "@rollup/plugin-replace";
+import typescript from '@rollup/plugin-typescript';
+// import obfuscatorPlugin from 'rollup-plugin-javascript-obfuscator';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -37,13 +39,22 @@ function serve() {
 }
 
 export default {
-	input: 'src/main.js',
+	onwarn(warning, warn) {
+		if (warning.code === 'CIRCULAR_DEPENDENCY') {
+			if (warning.message.includes('\\luxon\\')) {
+				return;
+			}
+		}
+		// if (warning.code === 'THIS_IS_UNDEFINED') { return; }
+		warn(warning);
+	},
+	input: 'src/main.ts',
 	output: {
 		inlineDynamicImports: true,
 		sourcemap: !production,
 		format: 'iife',
 		name: 'app',
-		file: 'App/build/bundle.js',
+		file: 'App/build/bundle.js'
 	},
 	plugins: [
 		replace({
@@ -52,10 +63,20 @@ export default {
 		}),
 		svelte({
 			preprocess: [
+				// obfuscatorPlugin({
+				// 	compact: true,
+				// 	controlFlowFlattening: true,
+				// 	deadCodeInjection: true,
+				// 	debugProtection: true,
+				// 	identifierNamesGenerator: 'mangled-shuffled',
+				// 	log: false,
+				// 	numbersToExpressions: true,
+				// 	optionsPreset: 'medium-obfuscation',
+				// }),
 				asMarkupPreprocessor([
-					sveltePreprocess()
+					sveltePreprocess({ sourceMap: !production })
 				]),
-				cssModules()
+				cssModules(),
 			],
 			compilerOptions: {
 				// enable run-time checks when not in production
@@ -79,14 +100,18 @@ export default {
 			dedupe: ['svelte']
 		}),
 		commonjs(),
+		typescript({
+			sourceMap: !production,
+			inlineSources: !production
+		}),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
 		!production && serve(),
 
-		// Watch the `App` directory and refresh the
+		// Watch the `public` directory and refresh the
 		// browser on changes when not in production
-		!production && livereload('App'),
+		!production && livereload('public'),
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify

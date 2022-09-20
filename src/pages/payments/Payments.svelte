@@ -1,22 +1,16 @@
-<script>
-  import Routes from "../../stores/Routes";
-  import { StatusBar } from "../../stores/Setup";
-  import { Views, Types, Utils, Stores } from "@ikomida/components";
-  import {
-    GetPaymentMethods,
-    UpdateCreditCard,
-    DeleteCreditCard,
-  } from "../../network/Payment";
-  import { onMount } from "svelte";
-  import { Layout } from "../../stores/Setup";
+<script lang="ts">
+  import Routes from '../../stores/Routes';
+  import { Views, Types, Utils, Stores } from '@ikomida/shared-frontend';
+  import { GetPaymentMethods, UpdateCreditCard, DeleteCreditCard } from '../../network/Payment';
+  import { onMount } from 'svelte';
 
-  let payments;
+  let payments: Types.Classes.CPaymentMethod[];
 
   function toggleNewCreditCard() {
     Stores.Navigation.instance.goTo(Routes.newMethod);
   }
 
-  async function updateCreditCard(id) {
+  async function updateCreditCard(id?: string) {
     Stores.Loading.instance.start();
     const response = await UpdateCreditCard(id);
     if (response?.success) {
@@ -33,7 +27,7 @@
     Stores.Loading.instance.stop();
   }
 
-  async function onRemoveClick(id) {
+  async function onRemoveClick(id?: string) {
     Stores.Loading.instance.start();
     const response = await DeleteCreditCard(id);
     if (response?.success) {
@@ -52,21 +46,19 @@
   onMount(async () => {
     const response = await GetPaymentMethods();
     if (response?.success) {
-      payments =
-        response?.data?.sort(
-          (i1, i2) => new Date(i2?.createdAt) - new Date(i1?.createdAt)
-        ) || [];
+      const data: Types.Classes.CPaymentMethod[] = Types.Classes.CPaymentMethod.fromObject(response.data);
+      payments = data.sort((i1, i2) => (i2.createdAt?.getTime() ?? 0) - (i1.createdAt?.getTime() ?? 0)) || [];
     }
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Meios de pagamento");
+  Stores.Title.instance.set('Meios de pagamento');
 </script>
 
 <Views.Divider />
-<Views.Button {Layout} on:click={toggleNewCreditCard}>novo cartão</Views.Button>
+<Views.Button on:click={toggleNewCreditCard}>novo cartão</Views.Button>
 {#if !payments}
-  <Views.LocalLoading size="2" />
+  <Views.LocalLoading size={2} />
 {:else if (payments?.length ?? 0) === 0}
   <Views.CentredMessage
     text="Não há cartões de crédito cadastrados para exibir, cadastre agora uma para fazer seu pedido com segurança!"
@@ -74,28 +66,22 @@
 {:else}
   <Views.Divider />
   <h3>Selecione seu meio de pagamento principal</h3>
-  <small
-    >Esse meio de pagamento será usado para realizar cobranças do seus pedidos</small
-  >
+  <small>Esse meio de pagamento será usado para realizar cobranças do seus pedidos</small>
   {#each payments as { id, type, brand, lastDigits, selected } (id)}
     <div class="paymentCard">
       {#if type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
         <Views.FloatRemove callback={() => onRemoveClick(id)} />
       {/if}
       <div class="content">
-        <span class="paymentType"
-          >{Utils.Strings.capitalizeFirstLeter(
-            new Types.Types.TPaymentMethod(type).name
-          )}</span
-        >
-        Pagar {new Types.Types.TPaymentMethod(type).description}
+        <span class="paymentType">{Utils.Strings.capitalizeFirstLeter(type.name)}</span>
+        Pagar {type.description}
         <span class="brand">
           {#if type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
             <img src="/assets/cardBrand/{brand}.svg" alt={brand} /> **** {lastDigits}
           {/if}
         </span>
       </div>
-      <div class="checkbox" on:click={updateCreditCard(id)}>
+      <div class="checkbox" on:click={() => updateCreditCard(id)}>
         <Views.Checkbox bind:checked={selected} />
       </div>
     </div>
@@ -123,7 +109,7 @@
     flex-grow: 10;
   }
   .paymentCard > .content > .paymentType {
-    font-family: "RobotoMedium";
+    font-family: 'RobotoMedium';
     margin-bottom: 10px;
   }
   .paymentCard > .content > .brand > img {

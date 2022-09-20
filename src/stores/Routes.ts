@@ -1,4 +1,5 @@
 export default {
+    login: Symbol("/login"),
     home: Symbol("/home"),
     orders: Symbol("/orders"),
     order: Symbol("/order"),

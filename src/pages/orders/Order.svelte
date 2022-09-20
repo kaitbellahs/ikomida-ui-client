@@ -1,56 +1,49 @@
-<script>
-  import { Share } from "@capacitor/share";
-  import { onMount } from "svelte";
-  import html2canvas from "html2canvas";
-  import { Views, Utils, Types, Logics, Stores } from "@ikomida/components";
-  import { faShare } from "@fortawesome/free-solid-svg-icons";
-  import { Filesystem, Directory } from "@capacitor/filesystem";
-  import Routes from "../../stores/Routes";
-  import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
-  import { Layout, Settings } from "../../stores/Setup";
+<script lang="ts">
+  import { Share } from '@capacitor/share';
+  import { onMount, tick } from 'svelte';
+  import html2canvas from 'html2canvas';
+  import { Views, Utils, Types, Logics, Stores } from '@ikomida/shared-frontend';
+  import { faShare } from '@fortawesome/free-solid-svg-icons';
+  import { Filesystem, Directory } from '@capacitor/filesystem';
+  import Routes from '../../stores/Routes';
+  import { OrderStatus, ChangeOrderStatus } from '../../network/Orders';
+  import { Settings } from '../../stores/Setup';
 
   const router = Stores.Navigation.instance.router;
-  const { newOrder, order } = $router.options;
+  const newOrder: boolean = $router.options.newOrder;
+  const order: Types.Classes.COrder = Types.Classes.COrder.fromObject($router.options.order);
 
   let screenShot = false;
   let showImage = true;
   let showCardBrand = true;
-  let orderScreen;
+  let orderScreen: HTMLElement;
 
   $: if (newOrder) {
     Stores.Navigation.instance.setBack(() => {
       Stores.Navigation.instance.reset(Routes.orders);
     });
   }
-  $: total =
-    Number(order?.subtotal ?? 0) +
-    Number(order?.delivery ?? 0) -
-    Number(order?.discount ?? 0);
+  $: total = Number(order.subtotal ?? 0) + Number(order.delivery ?? 0) - Number(order.discount ?? 0);
 
   function hideCardBrand() {
     showCardBrand = false;
   }
 
-  async function changeOrderStatus(status) {
+  async function changeOrderStatus(status: Types.Types.TOrderStatus) {
     Stores.Loading.instance.start();
-    const response = await ChangeOrderStatus(order?.id, status);
+    const response = await ChangeOrderStatus(order.id, status);
     const orderStatus = response?.data;
-    if (
-      response?.success &&
-      orderStatus?.id === order?.id &&
-      orderStatus?.status === status
-    ) {
+    if (response?.success && orderStatus?.id === order.id && orderStatus?.status === status) {
       order.status = orderStatus?.status;
       order.finishedAt = orderStatus?.finishedAt;
       Stores.MessageAlert.instance.show(
         orderStatus?.status === Types.Types.TOrderStatus.CANCELED
           ? `Seu pedido foi cancelado com sucesso${
-              order?.payment.type ===
-              Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE
-                ? ", e o seu pagamento será estornado no próximo fechamento da fatura do seu cartão de crédito."
-                : "!"
+              order.payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE
+                ? ', e o seu pagamento será estornado no próximo fechamento da fatura do seu cartão de crédito.'
+                : '!'
             }`
-          : "Obrigado por nos avisar a entrega do seu pedido"
+          : 'Obrigado por nos avisar a entrega do seu pedido',
       );
     } else {
       Stores.MessageAlert.instance.show(response?.data);
@@ -67,42 +60,40 @@
   }
 
   async function share() {
-    async function sleep(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    }
     Stores.Loading.instance.start();
     screenShot = true;
-    await sleep(1);
+    await tick();
     const canvas = await html2canvas(orderScreen, {
       logging: false,
-      backgroundColor: "#dfdfdf",
+      backgroundColor: '#dfdfdf',
     });
     screenShot = false;
+    await tick();
     Stores.Loading.instance.stop();
-    const data = canvas.toDataURL().split(",");
+    const data = canvas.toDataURL().split(',');
     const screenShotFile = await Filesystem.writeFile({
-      path: `screenshots/order-${order?.customID}.jpg`,
+      path: `screenshots/order-${order.customID}.jpg`,
       data: data?.[1],
       directory: Directory.Cache,
       recursive: true,
     });
     //TODO: -- report identifier of the app that received the share action. Can be an empty string in some cases. On web it will be undefined.
     const activityType = await Share.share({
-      title: `Pedido #${order?.customID}`,
-      text: "Eu estou compartilhando com você meu pedido",
+      title: `Pedido #${order.customID}`,
+      text: 'Eu estou compartilhando com você meu pedido',
       url: `file://${screenShotFile?.uri}`,
-      dialogTitle: "Compartilhar o pedido",
+      dialogTitle: 'Compartilhar o pedido',
     });
   }
 
-  function erroLoadImage(event) {
+  function erroLoadImage() {
     showImage = false;
   }
 
   onMount(async () => {
     if (await Share.canShare()) {
       Stores.Menu.instance.addItem({
-        name: "Compartilhar",
+        name: 'Compartilhar',
         icon: faShare,
         callback: share,
       });
@@ -110,7 +101,7 @@
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Detalhes do predido");
+  Stores.Title.instance.set('Detalhes do predido');
 </script>
 
 <div class="order {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>
@@ -119,9 +110,8 @@
       {#if $Settings?.profile?.mainPicture && showImage}
         <img
           on:error={erroLoadImage}
-          src={$Settings?.profile?.mainPicture ??
-            "assets/icons/transparent-logo-1.svg"}
-          alt={$Settings?.profile?.contractName ?? "iKomida"}
+          src={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+          alt={$Settings?.profile?.contractName ?? 'iKomida'}
         />
       {:else if $Settings?.profile?.contractName}
         <h1>{$Settings?.profile?.contractName}</h1>
@@ -132,47 +122,33 @@
     </div>
     <Views.Divider height={30} />
   </div>
-  {#if [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status) && new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
-    <Views.Status
-      {Layout}
-      type={Types.Status.ERROR}
-      circle={false}
-      showIcon={false}>Pedido atrasado</Views.Status
-    >
+  {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status) && new Date((order.createdAt?.getTime() ?? 0) + order.preparation?.max * 1000) < new Date()}
+    <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}>Pedido atrasado</Views.Status>
   {/if}
-  {#if [Types.Types.TOrderStatus.DELIVERED].includes(order.status)}
-    <Views.Status {Layout} type={Types.Status.SUCCESS} circle={true}
-      >Pedido entregue</Views.Status
-    >
+  {#if order.status && [Types.Types.TOrderStatus.DELIVERED].includes(order.status)}
+    <Views.Status type={Types.Status.SUCCESS} circle={true}>Pedido entregue</Views.Status>
   {/if}
-  {#if [Types.Types.TOrderStatus.CANCELED].includes(order.status)}
-    <Views.Status {Layout} type={Types.Status.ERROR} circle={false}
-      >Pedido cancelado</Views.Status
-    >
+  {#if order.status && [Types.Types.TOrderStatus.CANCELED].includes(order.status)}
+    <Views.Status type={Types.Status.ERROR} circle={false}>Pedido cancelado</Views.Status>
   {/if}
   <Views.Divider />
-  <h3 class="title">Pedido N˚: {order?.customID}</h3>
+  <h3 class="title">Pedido N˚: {order.customID}</h3>
   <Views.Divider />
 
-  {#if ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(order.status)}
-    <Views.Status {Layout}>
-      Pedido {OrderStatus(order?.status)}
+  {#if !order.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(order.status)}
+    <Views.Status>
+      Pedido {OrderStatus(order.status)}
     </Views.Status>
     <Views.Divider />
   {/if}
-  <span class="time"
-    >Data: {Utils.Strings.timestampToString(order?.createdAt)}</span
-  >
+  <span class="time">Data: {Utils.Strings.timestampToString(order.createdAt)}</span>
   <Views.Divider />
   <h3>Itens a entregar</h3>
-  {#each order?.products as { id, title, price, quantity, discount, discountType }, index (id ?? index)}
+  {#each order.products as { id, title, price, quantity, discount, discountType }, index (id ?? index)}
     <div class="product">
-      <span class="quantity">{quantity}</span><span class="title">{title}</span
-      ><span class="price"
+      <span class="quantity">{quantity}</span><span class="title">{title}</span><span class="price"
         >{Utils.Strings.currency(
-          quantity *
-            (price -
-              Logics.Finances.calcDiscount(price, discount, discountType))
+          quantity * (price - Logics.Finances.calcDiscount(price, discount, discountType)),
         )}</span
       >
     </div>
@@ -182,16 +158,14 @@
   <div class="address">
     Endereço:
     <span class="street"
-      >{order?.address?.street ?? "-"}, {order?.address?.number ?? "-"}{order
-        ?.address?.complement
-        ? ` - ${order?.address?.complement}`
-        : ""}</span
+      >{order.address?.street ?? '-'}, {order.address?.number ?? '-'}{order.address?.complement
+        ? ` - ${order.address?.complement}`
+        : ''}</span
     ><br />
     <span class="neighborhood"
-      >{order?.address?.neighborhood ?? "-"}<br />
+      >{order.address?.neighborhood ?? '-'}<br />
       <span class="city"
-        >{order?.address?.city ?? "-"}/{order?.address?.stat ?? "-"} CEP: {order
-          ?.address?.postalCode ?? "-"}</span
+        >{order.address?.city ?? '-'}/{order.address?.stat ?? '-'} CEP: {order.address?.postalCode ?? '-'}</span
       >
     </span>
   </div>
@@ -201,33 +175,25 @@
   <div class="paymentMethod">
     <span
       >Pago com <b
-        >{new Types.Types.TPaymentMethod(order?.payment.type).name}
-        {new Types.Types.TPaymentMethod(order?.payment.type).description}</b
+        >{order.payment?.type.name}
+        {order.payment?.type.description}</b
       ></span
     >
     <span class="brand">
-      {#if order?.payment.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
+      {#if order.payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
         {#if showCardBrand}
-          <img
-            on:error={hideCardBrand}
-            src="/assets/cardBrand/{order?.payment.brand}.svg"
-            alt={order?.payment.brand}
-          />
+          <img on:error={hideCardBrand} src="/assets/cardBrand/{order.payment.brand}.svg" alt={order.payment.brand} />
         {/if}
-        **** {order?.payment.lastDigits}
+        **** {order.payment.lastDigits}
       {/if}
     </span>
   </div>
   <div data-html2canvas-ignore class="buttonGroup">
-    {#if [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN].includes(order?.status)}
-      <Views.Button sizeMultiplier={0.8} type="secondary" on:click={cancel}
-        >Cancelar</Views.Button
-      >
+    {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN].includes(order.status)}
+      <Views.Button sizeMultiplier={0.8} type="secondary" on:click={cancel}>Cancelar</Views.Button>
     {/if}
-    {#if [Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order?.status)}
-      <Views.Button sizeMultiplier="1" on:click={delivered}
-        >Confirmar<br />a entrega</Views.Button
-      >
+    {#if order.status && [Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status)}
+      <Views.Button on:click={delivered}>Confirmar<br />a entrega</Views.Button>
     {/if}
   </div>
   <Views.Divider />
@@ -240,31 +206,24 @@
     <tbody>
       <tr>
         <td class="resumeText">Subtotal</td>
-        <td class="resumeValue">{Utils.Strings.currency(order?.subtotal)}</td>
+        <td class="resumeValue">{Utils.Strings.currency(order.subtotal)}</td>
       </tr>
-      {#if Number(order?.discount) > 0}
+      {#if Number(order.discount) > 0}
         <tr>
           <td class="resumeText">Desconto</td>
-          <td class="resumeValue"
-            ><span class="deliveryFree"
-              >- {Utils.Strings.currency(order?.discount)}</span
-            ></td
-          >
+          <td class="resumeValue"><span class="deliveryFree">- {Utils.Strings.currency(order.discount)}</span></td>
         </tr><tr>
           <td class="coupon" colspan="2"
-            >{order?.coupon?.name?.toUpperCase()} (- {order?.coupon?.type?.toUpperCase() ===
-            Types?.DiscountTypes?.PERCENT?.toUpperCase()
-              ? Utils.Strings.percent(order?.coupon?.value)
-              : Utils.Strings.currency(order?.coupon?.value)})</td
+            >{order.coupon?.name?.toUpperCase()} (- {order.coupon?.valueType === Types.Types.TDiscount.PERCENT
+              ? Utils.Strings.percent(order.coupon?.value)
+              : Utils.Strings.currency(order.coupon?.value)})</td
           >
         </tr>
       {/if}
       <tr>
         <td class="resumeText">Taxa de entrega</td>
         <td class="resumeValue"
-          ><span class:deliveryFree={order?.delivery == 0}
-            >{Utils.Strings.currency(order?.delivery)}</span
-          ></td
+          ><span class:deliveryFree={order.delivery == 0}>{Utils.Strings.currency(order.delivery)}</span></td
         >
       </tr>
       <tr>
@@ -276,10 +235,7 @@
 
   <div class="signature {screenShot ? 'screenShot' : ''}">
     <Views.Divider height={30} />
-    <span>Feito com carinho por</span><img
-      src="assets/icons/transparent-logo-1.svg"
-      alt="iKomida"
-    />
+    <span>Feito com carinho por</span><img src="assets/icons/transparent-logo-1.svg" alt="iKomida" />
   </div>
 </div>
 <Views.GTerms />
@@ -321,11 +277,11 @@
     margin-bottom: 10px;
   }
   .address > .street {
-    font-family: "RobotoMedium";
+    font-family: 'RobotoMedium';
     margin-bottom: 10px;
   }
   .address > .neighborhood {
-    font-family: "RobotoMedium";
+    font-family: 'RobotoMedium';
     font-size: 1em;
     width: 100%;
   }

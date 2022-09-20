@@ -1,27 +1,27 @@
-<script>
-  import Routes from "../../stores/Routes";
-  import { search } from "../../network/Products";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { faSearch } from "@fortawesome/free-solid-svg-icons";
-  import { Layout, StatusBar, Settings } from "../../stores/Setup";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import Routes from '../../stores/Routes';
+  import { search } from '../../network/Products';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
+  import { faSearch } from '@fortawesome/free-solid-svg-icons';
+  import { Settings } from '../../stores/Setup';
+  import { onMount } from 'svelte';
 
-  let items = [];
-  let value = "";
-  let oldValue;
+  let categoriesAndProducts: Types.Classes.CCategoryProducts[] = [];
+  let value = '';
+  let oldValue = '';
   let error = false;
 
   $: if (value != oldValue) {
     Stores.Loading.instance.start();
     error = false;
     if ((value?.length ?? 0) > 0) {
-      search(value).then((_items) => {
-        items = _items;
+      search(value).then((_categoriesAndProducts) => {
+        categoriesAndProducts = _categoriesAndProducts;
         oldValue = value;
       });
     } else {
-      items = [];
-      oldValue = "";
+      categoriesAndProducts = [];
+      oldValue = '';
     }
     Stores.Loading.instance.stop();
   }
@@ -29,25 +29,19 @@
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Pesquisar produtos");
+  Stores.Title.instance.set('Pesquisar produtos');
 </script>
 
-<Views.TextEdit
-  {Layout}
-  marginTop="-"
-  icon={faSearch}
-  bind:value
-  placeHolder="Buscar no cardápio"
-/>
+<Views.TextEdit icon={faSearch} bind:value placeHolder="Buscar no cardápio" />
 <Views.Divider />
-{#if (items?.length ?? 0) > 0 && !error}
+{#if (categoriesAndProducts?.length ?? 0) > 0 && !error}
   <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
   <div class="preparationTime">
     entre {Utils.Strings.timeToString($Settings?.preparation?.min * 60)}, e {Utils.Strings.timeToString(
-      $Settings?.preparation?.max * 60
+      $Settings?.preparation?.max * 60,
     )}
   </div>
-  <Views.ItemsList {items} productPage={Routes.product} />
+  <Views.ItemsList {categoriesAndProducts} productPage={Routes.product} />
 {:else}
   <Views.CentredMessage text="Nenhum produto foi encontrad">
     <h3>Tente usar outro termo para pequisar</h3>

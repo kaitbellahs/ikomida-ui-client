@@ -2,9 +2,9 @@ import {
     Network,
     Types,
     Stores,
-} from "@ikomida/components";
+} from "@ikomida/shared-frontend";
 
-export async function NewOrders(payload) {
+export async function NewOrders(payload: Types.Classes.COrder) {
     const response = await Network.instance?.post("/order", true, payload, "newOrder");
     if (response?.success) {
         await Network.instance?.clearCache(Stores.Cache.Types.ORDERS)
@@ -12,10 +12,10 @@ export async function NewOrders(payload) {
     return response
 }
 
-export async function ChangeOrderStatus(id, status) {
-    const response = Network.instance?.put("/order", true, {
+export async function ChangeOrderStatus(id?: string, status?: Types.Types.TOrderStatus) {
+    const response = await Network.instance?.put("/order", true, {
         id,
-        status
+        status: status?.id
     }, "editOrder");
     if (response?.success) {
         await Network.instance?.clearCache(Stores.Cache.Types.ORDERS)
@@ -23,7 +23,7 @@ export async function ChangeOrderStatus(id, status) {
     return response
 }
 
-export function OrderStatus(status) {
+export function OrderStatus(status?: Types.Types.TOrderStatus) {
     switch (status) {
         case Types.Types.TOrderStatus.WAITING_PAYMENT:
             return "aguardando pagamento";

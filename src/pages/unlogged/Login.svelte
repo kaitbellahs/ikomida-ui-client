@@ -1,16 +1,17 @@
-<script>
-  import * as AuthNetwork from "../../network/Auth";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import Routes from "../../stores/Routes";
-  import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
-  import { registerPushNotificationToken } from "../../network/PushNotification";
-  import { Layout, Settings } from "../../stores/Setup";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import * as AuthNetwork from '../../network/Auth';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
+  import Routes from '../../stores/Routes';
+  import { faPhone, faUnlock } from '@fortawesome/free-solid-svg-icons';
+  import { registerPushNotificationToken } from '../../network/PushNotification';
+  import { Settings } from '../../stores/Setup';
+  import { onMount } from 'svelte';
 
   let pushNotificationToken = Stores.PushNotificationToken.instance?.store;
+  let Layout = Stores.Layout.instance?.store;
 
-  let phone;
-  let password;
+  let phone: string;
+  let password: string;
   let isValidPhone = false;
   let showImage = true;
 
@@ -26,17 +27,17 @@
 
   async function doLogin() {
     Stores.Loading.instance.start();
-    const response = await AuthNetwork.doLogin(55, phone, password);
+    const response = await AuthNetwork.doLogin('55', phone, password);
     if (response?.success) {
       const token = await Utils.Jws.extractToken(response?.data);
       if (token !== null) {
         await Stores.Auth.Auth.instance.setToken(response?.data);
-        if ($pushNotificationToken && $pushNotificationToken !== {}) {
+        if ($pushNotificationToken) {
           await registerPushNotificationToken($pushNotificationToken);
         }
         Stores.Navigation.instance.reset(Routes.home);
       } else {
-        Stores.MessageAlert.instance.show("O token de acesso não é válido");
+        Stores.MessageAlert.instance.show('O token de acesso não é válido');
       }
     } else {
       Stores.MessageAlert.instance.show(response?.data);
@@ -44,7 +45,7 @@
     Stores.Loading.instance.stop();
   }
 
-  function erroLoadImage(event) {
+  function erroLoadImage() {
     showImage = false;
   }
 
@@ -58,14 +59,12 @@
     {#if $Settings?.profile?.mainPicture && showImage}
       <img
         on:error={erroLoadImage}
-        src={$Settings?.profile?.mainPicture ??
-          "assets/icons/transparent-logo-1.svg"}
-        alt={$Settings?.profile?.contractName ?? "iKomida"}
+        src={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+        alt={$Settings?.profile?.contractName ?? 'iKomida'}
       />
     {:else if $Settings?.profile?.contractName}
       <div class="avatarCircle">
-        {$Settings?.profile?.contractName?.[0]}{$Settings?.profile
-          ?.contractName?.[1]}
+        {$Settings?.profile?.contractName?.[0]}{$Settings?.profile?.contractName?.[1]}
       </div>
       <h2>{$Settings?.profile?.contractName}</h2>
     {:else}
@@ -74,36 +73,20 @@
     {/if}
   </div>
   <h3>
-    Se você ainda não tem uma conta, <span
-      on:click={doSubscribe}
-      style="color: #4c0708;">clique aqui</span
-    > é rápido e fácil.
+    Se você ainda não tem uma conta, <span on:click={doSubscribe} style="color: #4c0708;">clique aqui</span> é rápido e fácil.
   </h3>
   <Views.TextEdit
-    {Layout}
     bind:value={phone}
     icon={faPhone}
-    type="phone"
+    type={Types.TTextEdit.PHONE}
     placeHolder="Número de celular"
     bind:isValid={isValidPhone}
   />
-  <Views.TextEdit
-    {Layout}
-    bind:value={password}
-    icon={faUnlock}
-    placeHolder="Senha"
-    type="password"
-  />
+  <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Senha" type={Types.TTextEdit.PASSWORD} />
   <div />
-  <Views.Button {Layout} on:click={doLogin} disabled={!canLogin}
-    >Entrar</Views.Button
-  >
-  <Views.Button {Layout} type="transparent" on:click={doSubscribe}
-    >Criar conta</Views.Button
-  >
-  <Views.Button {Layout} type="transparent" on:click={forgotPassword}
-    >Recuperar a senha</Views.Button
-  >
+  <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
+  <Views.Button type="transparent" on:click={doSubscribe}>Criar conta</Views.Button>
+  <Views.Button type="transparent" on:click={forgotPassword}>Recuperar a senha</Views.Button>
   <Views.GTerms />
 </main>
 

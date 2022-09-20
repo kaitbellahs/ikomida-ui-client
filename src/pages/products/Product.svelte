@@ -1,31 +1,22 @@
-<script>
-  import { Cart, Store } from "../../stores/Cart";
-  import Routes from "../../stores/Routes";
-  import Fa from "svelte-fa";
-  import { v4 as uuidV4 } from "uuid";
-  import {
-    faPlusSquare,
-    faMinusSquare,
-    faCartPlus,
-  } from "@fortawesome/free-solid-svg-icons";
-  import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils, Logics, Types, Stores } from "@ikomida/components";
-  import { Layout } from "../../stores/Setup";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import { Cart } from '../../stores/Cart';
+  import Routes from '../../stores/Routes';
+  import Fa from 'svelte-fa';
+  import { v4 as uuidV4 } from 'uuid';
+  import { faPlusSquare, faMinusSquare, faCartPlus } from '@fortawesome/free-solid-svg-icons';
+  import { StatusBar } from '../../stores/Setup';
+  import { Views, Utils, Logics, Types, Stores } from '@ikomida/shared-frontend';
+  import { onMount } from 'svelte';
 
   const router = Stores.Navigation.instance.router;
-  const item = $router.options;
+  const cartProduct: Types.CCart = Types.CCart.fromObject($router.options);
   let quantity = 1;
   let showImage = true;
 
   $: total = Utils.Strings.currency(
     quantity *
-      (item.price -
-        Logics.Finances.calcDiscount(
-          item.price,
-          item.discount,
-          item.discountType
-        ))
+      (cartProduct.price -
+        Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType)),
   );
 
   function minos() {
@@ -35,88 +26,66 @@
   }
 
   function plus() {
-    if (quantity < item.quantity) {
+    if (quantity < cartProduct.quantity) {
       quantity++;
     }
   }
 
   const addProduct = async () => {
     let update = false;
-    const cardItems = $Store;
+    const cardItems = await Cart.instance.products();
     for (const cardItem of cardItems) {
-      if (
-        item?.id === cardItem.id &&
-        cardItem?.quantity + quantity <= item?.quantity
-      ) {
+      if (cartProduct.id === cardItem.id && cardItem?.quantity + quantity <= cartProduct.quantity) {
         cardItem.quantity += quantity;
         update = true;
       }
     }
     if (update) {
-      await Cart.update(cardItems);
+      await Cart.instance.update(cardItems);
     } else {
-      item.leftQuantity = item.quantity;
-      item.quantity = quantity;
-      item.uuid = uuidV4();
-      await Cart.addItem(item);
+      cartProduct.leftQuantity = cartProduct.quantity;
+      cartProduct.quantity = quantity;
+      await Cart.instance.addProduct(cartProduct);
     }
     Stores.Navigation.instance.goTo(Routes.cart);
   };
 
-  function erroLoadImage(event) {
+  function erroLoadImage() {
     showImage = false;
   }
 
   onMount(() => Stores.Loading.instance.stop());
 
-  Stores.Title.instance.set(item.title);
+  Stores.Title.instance.set(cartProduct.title);
 </script>
 
 <div class="product">
-  {#if item.image && showImage}
-    <img
-      class="image"
-      on:error={erroLoadImage}
-      src={item.image}
-      alt={item.title}
-    />
+  {#if cartProduct.image && showImage}
+    <img class="image" on:error={erroLoadImage} src={cartProduct.image} alt={cartProduct.title} />
   {/if}
-  <h2>{item.title}</h2>
-  <p>{item.description}</p>
-  <span class="serves"
-    >Aproximadamente {Logics.Finances.formatWeight(item.weight)}</span
-  >
+  <h2>{cartProduct.title}</h2>
+  <p>{cartProduct.description}</p>
+  <span class="serves">Aproximadamente {Logics.Finances.formatWeight(cartProduct.weight ?? 0)}</span>
 
   <div class="price">
-    {#if [Types.TDiscount.PERCENT, Types.TDiscount.VALUE].includes(Types.TDiscount[item.discountType])}
-      <span class="oldPrice">{Utils.Strings.currency(item.price)}</span>
+    {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
+      <span class="oldPrice">{Utils.Strings.currency(cartProduct.price)}</span>
     {/if}
     <span class="current"
       >{Utils.Strings.currency(
-        item.price -
-          Logics.Finances.calcDiscount(
-            item.price,
-            item.discount,
-            item.discountType
-          )
+        cartProduct.price -
+          Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType),
       )}</span
     >
   </div>
   <div class="quantity">
-    <Views.Button {Layout} type="transparent" size="none" on:click={minos}>
+    <Views.Button type="transparent" size="none" on:click={minos}>
       <Fa icon={faMinusSquare} /></Views.Button
-    ><span>{quantity}</span><Views.Button
-      {Layout}
-      type="transparent"
-      size="none"
-      on:click={plus}><Fa icon={faPlusSquare} /></Views.Button
+    ><span>{quantity}</span><Views.Button type="transparent" size="none" on:click={plus}
+      ><Fa icon={faPlusSquare} /></Views.Button
     >
   </div>
-  <Views.Button
-    {Layout}
-    isFloat="true"
-    on:click={addProduct}
-    bottomPadding={$StatusBar.bottomPadding}
+  <Views.Button isFloat={true} on:click={addProduct} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faCartPlus} /> <span>Adicionar</span>
     <span>({total})</span></Views.Button
   >

@@ -1,21 +1,21 @@
-<script>
-  import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { onMount } from "svelte";
-  import { getPrivacyPolicy } from "../../network/Terms";
-  import { Layout } from "../../stores/Setup";
+<script lang="ts">
+  import { StatusBar } from '../../stores/Setup';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
+  import { onMount } from 'svelte';
+  import { getPrivacyPolicy } from '../../network/Terms';
+  const Layout = Stores.Layout.instance.store;
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
-  let term;
+  let term: Types.Classes.CTerm;
 
   onMount(async () => {
-    term = await getPrivacyPolicy();
+    term = Types.Classes.CTerm.fromObject(await getPrivacyPolicy());
     Stores.Loading.instance.stop();
   });
-  $: Stores.Title.instance.set(term?.name ?? "Política de privacidade");
+  $: Stores.Title.instance.set(term?.name ?? 'Política de privacidade');
 </script>
 
-<Views.NavigationBar {Layout} paddingTop={$StatusBar.height} />
+<Views.NavigationBar paddingTop={$StatusBar.height} />
 <main
   style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;"
 >
@@ -27,21 +27,15 @@
         <Views.Divider />
         <h2>id: #{term?.id}</h2>
         <h3>
-          Grava esse código de identificação em algum lugar, ele é a
-          identificação do termo que você está assinando.
+          Grava esse código de identificação em algum lugar, ele é a identificação do termo que você está assinando.
         </h3>
       </div>
       <div class="content">
-        {@html term?.body}
+        {@html term?.text}
       </div>
-      <small
-        >Data do termo: {Utils.Strings.dateToDateString(term?.createdAt)}</small
-      >
+      <small>Data do termo: {Utils.Strings.dateToDateString(term?.createdAt)}</small>
     {:else}
-      <h2 class="error">
-        Ocorreu um erro, não conclua o seu pedido sem ler o termo e entre em
-        contato com a gente
-      </h2>
+      <h2 class="error">Ocorreu um erro, não conclua o seu pedido sem ler o termo e entre em contato com a gente</h2>
     {/if}
   </div>
 </main>

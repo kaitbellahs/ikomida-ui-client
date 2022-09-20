@@ -1,30 +1,23 @@
-<script>
-  import { Cart, Store } from "../../stores/Cart";
-  import Routes from "../../stores/Routes";
-  import { faTrash } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils, Logics, Stores } from "@ikomida/components";
-  import { Layout, Settings } from "../../stores/Setup";
-  import { GetAddresses } from "../../network/User";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import { Cart, IStore } from '../../stores/Cart';
+  import Routes from '../../stores/Routes';
+  import { faTrash } from '@fortawesome/free-solid-svg-icons';
+  import { Views, Utils, Logics, Stores, Types } from '@ikomida/shared-frontend';
+  import { Settings } from '../../stores/Setup';
+  import { GetAddresses } from '../../network/User';
+  import { onMount } from 'svelte';
 
+  let Products: IStore;
   let showAlert = false;
-  let address;
+  let address: Types.Classes.CAddress | null;
 
-  $: subtotalArray = $Store.map(
-    (item) =>
-      item.quantity *
-      (item?.price -
-        Logics.Finances.calcDiscount(
-          item.price,
-          item.discount,
-          item.discountType
-        ))
+  $: subtotalArray = $Products.map(
+    (product) =>
+      product.quantity *
+      (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType)),
   );
-  $: subtotal =
-    subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
-  $: calcDelivery = address
-    ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0)
-    : 0;
+  $: subtotal = subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
+  $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0) : 0;
   $: delivery = $Settings?.delivery?.free
     ? 0
     : calcDelivery < $Settings?.delivery?.min
@@ -32,12 +25,12 @@
     : calcDelivery;
   $: total = subtotal + delivery;
 
-  function addMoreItems() {
+  function addMoreProducts() {
     Stores.Navigation.instance.pop(2);
   }
 
-  function resetCart() {
-    Cart.reset();
+  async function resetCart() {
+    await Cart.instance.reset();
     Stores.Navigation.instance.reset(Routes.home);
   }
 
@@ -49,54 +42,56 @@
     Stores.Navigation.instance.goTo(Routes.checkout);
   }
 
-  async function onRemoveClick(uuid) {
-    await Cart.update($Store.filter((item) => item?.uuid !== uuid));
+  async function onRemoveClick(id?: string) {
+    await Cart.instance.update($Products.filter((product) => product?.id !== id));
   }
 
-  async function onPlusClick(uuid) {
+  async function onPlusClick(id?: string) {
     let update = false;
-    const items = $Store;
-    for (const item of items) {
-      if (item?.uuid === uuid && item?.quantity < item?.leftQuantity) {
-        item.quantity++;
+    const products = $Products;
+    for (const product of products) {
+      if (product?.id === id && product?.quantity < product?.leftQuantity) {
+        product.quantity++;
         update = true;
       }
     }
     if (update) {
-      await Cart.update(items);
+      await Cart.instance.update(products);
     }
   }
 
-  async function onMinosClick(uuid) {
+  async function onMinosClick(id?: string) {
     let update = false;
-    const items = $Store;
-    for (const item of items) {
-      if (item?.uuid === uuid) {
-        if (item?.quantity > 1) {
-          item.quantity--;
+    const products = $Products;
+    for (const product of products) {
+      if (product?.id === id) {
+        if (product?.quantity > 1) {
+          product.quantity--;
           update = true;
         } else {
-          await onRemoveClick(uuid);
+          await onRemoveClick(id);
         }
       }
     }
     if (update) {
-      await Cart.update(items);
+      await Cart.instance.update(products);
     }
   }
 
   onMount(async () => {
     let response = await GetAddresses();
     if (response?.success) {
-      const addresses = response?.data?.filter((item) => item.selected);
+      const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response?.data);
+      const addresses = data.filter((address) => address.selected);
       address = (addresses?.length ?? 0) === 1 ? addresses[0] : null;
     }
+    Products = await Cart.instance.store();
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Sacola de compras");
+  Stores.Title.instance.set('Sacola de compras');
   Stores.Menu.instance.addItem({
-    name: "Limpar",
+    name: 'Limpar',
     icon: faTrash,
     callback: toggleAlert,
   });
@@ -104,29 +99,20 @@
 
 {#if showAlert}
   <Views.Alert
-    {Layout}
     title="Alerta"
     message="Você tem certeza que quer remover todos produtos do carrinho de compras?"
     closeCallBack={toggleAlert}
     buttons={[
-      { name: "Não", callback: toggleAlert, principal: true },
-      { name: "Sim", callback: resetCart },
+      { name: 'Não', callback: toggleAlert, principal: true },
+      { name: 'Sim', callback: resetCart },
     ]}
   />
 {/if}
 
-{#each $Store as item (item?.id)}
-  <Views.CartItem
-    {Layout}
-    {onRemoveClick}
-    {onPlusClick}
-    {onMinosClick}
-    {...item}
-  />
+{#each $Products as product, index (product?.id ?? index)}
+  <Views.CartItem {onRemoveClick} {onPlusClick} {onMinosClick} {product} />
 {/each}
-<Views.Button {Layout} type="transparent" on:click={addMoreItems}
-  >Adicionar mais itens</Views.Button
->
+<Views.Button type="transparent" on:click={addMoreProducts}>Adicionar mais itens</Views.Button>
 <table>
   <thead>
     <tr>
@@ -138,8 +124,7 @@
       <tr>
         <td class="resumeText">Taxa de entrega</td>
         <td class="resumeValue"
-          ><span class:deliveryFree={delivery == 0}
-            >{delivery == 0 ? "Gratis" : Utils.Strings.currency(delivery)}</span
+          ><span class:deliveryFree={delivery == 0}>{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
           ></td
         >
       </tr>
@@ -150,9 +135,7 @@
     </tr>
   </tbody>
 </table>
-<Views.Button {Layout} isFloat={true} on:click={forward}
-  ><span>Continuar</span></Views.Button
->
+<Views.Button isFloat={true} on:click={forward}><span>Continuar</span></Views.Button>
 
 <style>
   table {

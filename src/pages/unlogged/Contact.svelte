@@ -1,7 +1,7 @@
-<script>
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { Settings } from "../../stores/Setup";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { Settings } from '../../stores/Setup';
+  import { onMount } from 'svelte';
 
   let showImage = true;
 
@@ -15,28 +15,19 @@
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Contato");
+  Stores.Title.instance.set('Contato');
 </script>
 
 <div class="settings">
   {#if showImage}
-    <img
-      on:error={hideImage}
-      src={settings.mainPicture}
-      alt={settings?.contractName}
-    />
+    <img on:error={hideImage} src={settings.mainPicture} alt={settings?.contractName} />
     <Views.Divider />
   {/if}
   <h2>{settings?.contractName}</h2>
   <Views.Divider />
   <Views.TextValue
     text="CNPJ:"
-    value={Utils?.Strings?.formatString(
-      /\d/gi,
-      "__.___.___/____-__",
-      "_",
-      settings?.cnpj
-    )}
+    value={Utils?.Strings?.formatString(/\d/gi, '__.___.___/____-__', '_', settings?.contractIdentity)}
     fontSize="1.3em"
     leftMargin={30}
   />
@@ -48,21 +39,14 @@
     leftMargin={30}
   />
   <Views.Divider />
-  <Views.TextValue
-    text="Email:"
-    value={settings?.email}
-    fontSize="1.3em"
-    leftMargin={30}
-  />
+  <Views.TextValue text="Email:" value={settings?.email} fontSize="1.3em" leftMargin={30} />
   <Views.Divider />
   <h3>Endereço:</h3>
   <br />
-  {settings?.address?.street}, {settings?.address?.number}{settings?.address
-    ?.complement
+  {settings?.address?.street}, {settings?.address?.number}{settings?.address?.complement
     ? ` - ${settings?.address?.complement}`
-    : ""}<br />{settings?.address?.neighborhood}<br />
-  {settings?.address?.city}/{settings?.address?.stat} CEP: {settings?.address
-    ?.postalCode}
+    : ''}<br />{settings?.address?.neighborhood}<br />
+  {settings?.address?.city}/{settings?.address?.stat} CEP: {settings?.address?.postalCode}
 </div>
 
 <style>

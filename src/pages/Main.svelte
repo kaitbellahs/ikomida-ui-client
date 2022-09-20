@@ -1,5 +1,5 @@
-<script>
-  import { onMount } from "svelte";
+<script lang="ts">
+  import { onMount } from 'svelte';
   import {
     faHome,
     faList,
@@ -9,71 +9,73 @@
     faAddressCard,
     faHourglass,
     faPhone,
-  } from "@fortawesome/free-solid-svg-icons";
-  import Routes from "../stores/Routes";
-  import { Views, Utils, Logics, Stores } from "@ikomida/components";
-  import { Cart as CartStore, Store } from "../stores/Cart";
-  import { StatusBar, Layout, Settings } from "../stores/Setup";
-  import Home from "./products/Home.svelte";
-  import Orders from "./orders/Orders.svelte";
-  import Order from "./orders/Order.svelte";
-  import Search from "./products/Search.svelte";
-  import Profile from "./user/Profile.svelte";
-  import BusinessHours from "./user/BusinessHours.svelte";
-  import Product from "./products/Product.svelte";
-  import Checkout from "./cart/Checkout.svelte";
-  import Cart from "./cart/Cart.svelte";
-  import Addresses from "./user/Addresses.svelte";
-  import Payments from "./payments/Payments.svelte";
-  import NewMethod from "./payments/NewMethod.svelte";
-  import Contact from "./unlogged/Contact.svelte";
+  } from '@fortawesome/free-solid-svg-icons';
+  import Routes from '../stores/Routes';
+  import { Views, Utils, Logics, Stores } from '@ikomida/shared-frontend';
+  import { Cart as CartStore, IStore } from '../stores/Cart';
+  import { StatusBar, Settings } from '../stores/Setup';
+  import Home from './products/Home.svelte';
+  import Orders from './orders/Orders.svelte';
+  import Order from './orders/Order.svelte';
+  import Search from './products/Search.svelte';
+  import Profile from './user/Profile.svelte';
+  import BusinessHours from './user/BusinessHours.svelte';
+  import Product from './products/Product.svelte';
+  import Checkout from './cart/Checkout.svelte';
+  import Cart from './cart/Cart.svelte';
+  import Addresses from './user/Addresses.svelte';
+  import Payments from './payments/Payments.svelte';
+  import NewMethod from './payments/NewMethod.svelte';
+  import Contact from './unlogged/Contact.svelte';
 
+  let Store: IStore;
+  let Layout = Stores.Layout.instance?.store;
   let router = Stores.Navigation.instance.router;
   const tabs = [
     {
-      name: "Home",
+      name: 'Home',
       route: Routes.home,
       icon: faHome,
     },
     {
-      name: "Busca",
+      name: 'Busca',
       route: Routes.search,
       icon: faSearch,
     },
     {
-      name: "Pedidos",
+      name: 'Pedidos',
       route: Routes.orders,
       icon: faList,
     },
   ];
   const menuHamburgerItems = [
     {
-      name: "Home",
+      name: 'Home',
       callback: () => Stores.Navigation.instance.reset(Routes.home),
       icon: faHome,
     },
     {
-      name: "Perfil",
+      name: 'Perfil',
       callback: () => Stores.Navigation.instance.goTo(Routes.profile),
       icon: faUser,
     },
     {
-      name: "Endereços",
+      name: 'Endereços',
       callback: () => Stores.Navigation.instance.goTo(Routes.addresses),
       icon: faAddressCard,
     },
     {
-      name: "Meios de pagamento",
+      name: 'Meios de pagamento',
       callback: () => Stores.Navigation.instance.goTo(Routes.payments),
       icon: faMoneyBill1Wave,
     },
     {
-      name: "Horario de funcionamento",
+      name: 'Horario de funcionamento',
       callback: () => Stores.Navigation.instance.goTo(Routes.businessHours),
       icon: faHourglass,
     },
     {
-      name: "Contato",
+      name: 'Contato',
       callback: () => Stores.Navigation.instance.goTo(Routes.contact),
       icon: faPhone,
     },
@@ -82,17 +84,9 @@
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   $: route = $router.route;
   $: subtotalArray = $Store.map(
-    (item) =>
-      item.quantity *
-      (item.price -
-        Logics.Finances.calcDiscount(
-          item.price,
-          item.discount,
-          item.discountType
-        ))
+    (item) => item.quantity * (item.price - Logics.Finances.calcDiscount(item.price, item.discount, item.discountType)),
   );
-  $: subtotal =
-    subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
+  $: subtotal = subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: delivery = 0;
   $: total = subtotal + delivery;
   $: showCart =
@@ -105,13 +99,7 @@
     route !== Routes.profile;
 
   Stores.MenuHamburger.instance.reset();
-  menuHamburgerItems.forEach((page) =>
-    Stores.MenuHamburger.instance.addItem(page)
-  );
-
-  function handler(event) {
-    direction = event.detail.direction;
-  }
+  menuHamburgerItems.forEach((page) => Stores.MenuHamburger.instance.addItem(page));
 
   function goToCart() {
     Stores.Navigation.instance.goTo(Routes.cart);
@@ -135,11 +123,12 @@
       }
     `;
     }
-  let style;
+  let style: HTMLElement;
   onMount(async () => {
-    style = document.createElement("style");
+    style = document.createElement('style');
     document.head.appendChild(style);
-    await CartStore.items();
+    Store = await CartStore.instance.store();
+    // await CartStore.items();
   });
 </script>
 
@@ -178,19 +167,14 @@
     <Home />
   {/if}
   {#if showCart}
-    <Views.Button
-      bottomPadding={$StatusBar.bottomPadding}
-      {Layout}
-      on:click={goToCart}
-      isFloat={true}>Ver sacola {Utils.Strings.currency(total)}</Views.Button
+    <Views.Button bottomPadding={$StatusBar.bottomPadding} on:click={goToCart} isFloat={true}
+      >Ver sacola {Utils.Strings.currency(total)}</Views.Button
     >
   {/if}
 </main>
 <Views.NavigationBar
-  logo={$Settings?.profile?.mainPicture ||
-    "assets/icons/transparent-logo-1.svg"}
-  {Layout}
+  logo={$Settings?.profile?.mainPicture || 'assets/icons/transparent-logo-1.svg'}
   paddingTop={$StatusBar.height}
   topMargin={$StatusBar.topMargin}
 />
-<Views.Tabs {Layout} {tabs} bottomPadding={$StatusBar.bottomPadding} />
+<Views.Tabs {tabs} bottomPadding={$StatusBar.bottomPadding} />

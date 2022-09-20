@@ -1,50 +1,38 @@
-<script>
-  import { Views, Utils, Types, Logics, Stores } from "@ikomida/components";
-  import { Capacitor } from "@capacitor/core";
-  import { Geolocation } from "@capacitor/geolocation";
-  import { onMount } from "svelte";
-  import { Store, Cart } from "../../stores/Cart";
-  import { Layout, Settings, StatusBar } from "../../stores/Setup";
-  import { GetPaymentMethods, AddCoupon } from "../../network/Payment";
-  import { NewOrders } from "../../network/Orders";
-  import { GetAddresses, GetSettings } from "../../network/User";
-  import Routes from "../../stores/Routes";
-  let location;
-  let coupon;
-  let couponObject = null;
+<script lang="ts">
+  import { Views, Utils, Types, Logics, Stores, Network } from '@ikomida/shared-frontend';
+  import { Capacitor } from '@capacitor/core';
+  import { Geolocation } from '@capacitor/geolocation';
+  import { onMount } from 'svelte';
+  import { IStore, Cart } from '../../stores/Cart';
+  import { Settings } from '../../stores/Setup';
+  import { GetPaymentMethods, AddCoupon } from '../../network/Payment';
+  import { NewOrders } from '../../network/Orders';
+  import { GetAddresses, GetSettings } from '../../network/User';
+  import Routes from '../../stores/Routes';
 
-  let address;
-  let payment;
-  let auth;
+  let Products: IStore;
+  let location: Types.Classes.CLocation;
+  let coupon: string | undefined;
+  let couponObject: Types.Classes.CCoupon | undefined = undefined;
 
-  $: subtotalArray = $Store.map(
-    (item) =>
-      item.quantity *
-      (item?.price -
-        Logics.Finances.calcDiscount(
-          item.price,
-          item.discount,
-          item.discountType
-        ))
+  let address: Types.Classes.CAddress | undefined;
+  let payment: Types.Classes.CPaymentMethod | undefined;
+  let auth: Stores.Auth.IStore;
+
+  $: subtotalArray = $Products.map(
+    (product) =>
+      product.quantity *
+      (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType)),
   );
-  $: subtotal =
-    subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
-  $: calcDelivery = address
-    ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0)
-    : 0;
+  $: subtotal = subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
+  $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0) : 0;
   $: delivery = $Settings?.delivery?.free
     ? 0
     : calcDelivery < $Settings?.delivery?.min
     ? $Settings?.delivery?.min
     : calcDelivery;
   $: netTotal = subtotal + delivery;
-  $: discount = couponObject
-    ? Logics.Finances.calcDiscount(
-        subtotal,
-        couponObject.value,
-        couponObject.type
-      )
-    : 0;
+  $: discount = couponObject ? Logics.Finances.calcDiscount(subtotal, couponObject.value, couponObject.valueType) : 0;
   $: total = netTotal - discount;
   $: validate = address && payment;
   $: businessTime = Logics.DateTime.isBusinessTime($Settings.business);
@@ -56,44 +44,40 @@
   async function getLocation() {
     if (Capacitor.isNativePlatform()) {
       const res = await Geolocation.getCurrentPosition();
-      location = {
+      location = Types.Classes.CLocation.fromObject({
         latitude: res.coords.latitude,
         longitude: res.coords.longitude,
-      };
+      });
     } else {
-      navigator.geolocation.getCurrentPosition((pos) => {
-        location = {
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-        };
+      navigator.geolocation.getCurrentPosition((res) => {
+        location = Types.Classes.CLocation.fromObject({
+          latitude: res.coords.latitude,
+          longitude: res.coords.longitude,
+        });
       });
     }
   }
 
   async function forward() {
-    if ($auth !== null && $auth !== undefined && $auth !== "null") {
-      Stores.Loading.instance.start();
-      const payload = {
-        items: $Store,
-        address,
-        payment,
-        delivery,
-        coupon: couponObject,
-        location,
-      };
-      const response = await NewOrders(payload);
-      Stores.Loading.instance.stop();
-      if (response && response?.success) {
-        Cart.reset();
-        Stores.Navigation.instance.goTo(Routes.order, {
-          newOrder: true,
-          order: response?.data,
-        });
-      } else {
-        Stores.MessageAlert.instance.show(response?.data);
-      }
+    Stores.Loading.instance.start();
+    const payload = Types.Classes.COrder.fromObject({
+      products: $Products,
+      address,
+      payment,
+      delivery,
+      coupon: couponObject,
+      location,
+    });
+    const response = await NewOrders(payload);
+    Stores.Loading.instance.stop();
+    if (response && response?.success) {
+      await Cart.instance.reset();
+      Stores.Navigation.instance.goTo(Routes.order, {
+        newOrder: true,
+        order: response?.data,
+      });
     } else {
-      Stores.Navigation.instance.reset(Routes.login);
+      Stores.MessageAlert.instance.show(response?.data);
     }
   }
 
@@ -102,17 +86,17 @@
       Stores.Loading.instance.start();
       const response = await AddCoupon(coupon);
       if (response?.success) {
-        couponObject = response?.data;
+        couponObject = Types.Classes.CCoupon.fromObject(response.data);
       } else {
-        toggleErrorAlert(response?.data);
+        Stores.MessageAlert.instance?.show(response?.data);
       }
       Stores.Loading.instance.stop();
     }
   }
 
   function removeCoupon() {
-    couponObject = null;
-    coupon = null;
+    couponObject = undefined;
+    coupon = undefined;
   }
 
   function manageCard() {
@@ -125,27 +109,30 @@
 
   onMount(async () => {
     auth = await Stores.Auth.Auth.instance.store();
+    Products = await Cart.instance.store();
     let response = await GetSettings();
     if (response?.success && response?.data) {
-      Settings.set({ ...$Settings, ...response?.data });
+      Settings.set(Types.Classes.CVendorSettings.fromObject({ ...$Settings, ...response?.data }));
     } else {
       Stores.MessageAlert.instance.show(response?.data);
     }
     response = await GetAddresses();
     if (response?.success) {
-      const addresses = response?.data?.filter((item) => item.selected);
-      address = (addresses?.length ?? 0) === 1 ? addresses[0] : null;
+      const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response.data);
+      const addresses = data.filter((address) => address.selected);
+      address = (addresses?.length ?? 0) === 1 ? addresses[0] : undefined;
     }
     response = await GetPaymentMethods();
     if (response?.success) {
-      const payments = response?.data?.filter((item) => item.selected);
-      payment = (payments?.length ?? 0) === 1 ? payments[0] : null;
+      const data: Types.Classes.CPaymentMethod[] = Types.Classes.CAddress.fromObject(response.data);
+      const payments = data.filter((paymentMethod) => paymentMethod.selected);
+      payment = (payments?.length ?? 0) === 1 ? payments[0] : undefined;
     }
     if (Capacitor.isNativePlatform()) {
       const checkpermissions = await Geolocation.checkPermissions();
-      if (checkpermissions.location != "prompt") {
+      if (checkpermissions.location != 'prompt') {
         const permissions = await Geolocation.requestPermissions();
-        if (permissions.location != "granted") {
+        if (permissions.location != 'granted') {
           await getLocation();
         }
       } else {
@@ -154,9 +141,9 @@
     } else {
       if (navigator.permissions && navigator.permissions.query) {
         const permission = await navigator.permissions.query({
-          name: "geolocation",
+          name: 'geolocation',
         });
-        if (permission.state != "denied") {
+        if (permission.state != 'denied') {
           await getLocation();
         }
       } else if (navigator.geolocation) {
@@ -166,7 +153,7 @@
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Resumo e pagamento");
+  Stores.Title.instance.set('Resumo e pagamento');
 </script>
 
 <table>
@@ -183,22 +170,17 @@
     {#if discount !== 0}
       <tr>
         <td class="resumeText"
-          >cupom (- {couponObject?.type?.toUpperCase() ===
-          Types?.DiscountTypes?.PERCENT?.toUpperCase()
+          >cupom (- {couponObject?.valueType === Types.Types.TDiscount.PERCENT
             ? Utils.Strings.percent(couponObject?.value)
             : Utils.Strings.currency(couponObject?.value)})
         </td>
-        <td class="resumeValue"
-          ><span class="deliveryFree">- {Utils.Strings.currency(discount)}</span
-          ></td
-        >
+        <td class="resumeValue"><span class="deliveryFree">- {Utils.Strings.currency(discount)}</span></td>
       </tr>
     {/if}
     <tr>
       <td class="resumeText">Taxa de entrega</td>
       <td class="resumeValue"
-        ><span class:deliveryFree={delivery == 0}
-          >{delivery == 0 ? "Gratis" : Utils.Strings.currency(delivery)}</span
+        ><span class:deliveryFree={delivery == 0}>{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
         ></td
       >
     </tr><tr class="spacer" />
@@ -209,86 +191,71 @@
   </tbody>
 </table>
 {#if couponObject}
-  <Views.Button {Layout} type="transparent" on:click={removeCoupon}
-    >Remover o cupom</Views.Button
-  >
+  <Views.Button type="transparent" on:click={removeCoupon}>Remover o cupom</Views.Button>
 {:else}
   <Views.TextEdit
-    {Layout}
     bind:value={coupon}
     placeHolder="Adicionar cupom"
     buttonName="Adicionar"
     callback={addCoupon}
-    type="alphanumeric"
+    type={Types.TTextEdit.ALPHA_NUMERIC}
     upper={true}
   />
 {/if}
-<Views.Button {Layout} type="transparent" on:click={addMoreItems}
-  >Adicionar mais itens</Views.Button
->
+<Views.Button type="transparent" on:click={addMoreItems}>Adicionar mais itens</Views.Button>
 <Views.Divider />
-<Views.Button {Layout} on:click={manageAddress}>trocar endereço</Views.Button>
+<Views.Button on:click={manageAddress}>trocar endereço</Views.Button>
 {#if address === undefined}
-  <Views.LocalLoading size="2" />
+  <Views.LocalLoading size={2} />
 {:else if address}
   <div class="address">
     <div class="content">
       <span class="delivery">A entrega será realizada na</span>
-      <span
-        >{address?.street}, {address?.number}{address?.complement
-          ? ` - ${address?.complement}`
-          : ""}</span
-      >
+      <span>{address?.street}, {address?.number}{address?.complement ? ` - ${address?.complement}` : ''}</span>
       <span class="neighborhood">{address?.neighborhood} </span>
-      <span class="city"
-        >{address?.city}/{address?.stat} CEP: {address?.postalCode}</span
-      >
+      <span class="city">{address?.city}/{address?.stat} CEP: {address?.postalCode}</span>
     </div>
   </div>
 {:else}
   <h3>Para continuar precisa selecionar ou adicionar um endereço</h3>
 {/if}
 <Views.Divider />
-<Views.Button {Layout} on:click={manageCard}
-  >Trocar meio de pagamento</Views.Button
->
+<Views.Button on:click={manageCard}>Trocar meio de pagamento</Views.Button>
 {#if payment === undefined}
-  <Views.LocalLoading size="2" />
+  <Views.LocalLoading size={2} />
 {:else if payment}
   <div class="paymentCard">
     <div class="content">
       <span class="payWith">A cobrança será realizada com</span>
-      <span class="paymentType"
-        >{Utils.Strings.capitalizeFirstLeter(
-          new Types.Types.TPaymentMethod(payment?.type).name
-        )}</span
-      >
-      {new Types.Types.TPaymentMethod(payment?.type).description}
+      <span class="paymentType">{Utils.Strings.capitalizeFirstLeter(payment?.type.name)}</span>
+      {payment?.type.description}
       <span class="brand">
         {#if payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
-          <img
-            src="/assets/cardBrand/{payment?.brand}.svg"
-            alt={payment?.brand}
-          />
+          <img src="/assets/cardBrand/{payment?.brand}.svg" alt={payment?.brand} />
           **** {payment?.lastDigits}
         {/if}
       </span>
     </div>
   </div>
 {:else}
-  <h3>
-    Para continuar precisa selecionar ou adicionar um novo cartão de crédito
-  </h3>
+  <h3>Para continuar precisa selecionar ou adicionar um novo cartão de crédito</h3>
 {/if}
 {#if businessTime}
-  <Views.Button {Layout} disabled={!validate} isFloat={true} on:click={forward}>
-    <span>Confirmar o {payment?.type === "Cash" ? "pedido" : "pagamento"}</span
+  <Views.Button disabled={!validate} isFloat={true} on:click={forward}>
+    <span
+      >Confirmar o {!payment?.type ||
+      [
+        Types.Types.TPaymentMethod.CASH_ON_DELIVERY,
+        Types.Types.TPaymentMethod.CREDIT_CARD_ON_DELIVERY,
+        Types.Types.TPaymentMethod.DEBT_CARD_ON_DELIVERY,
+        Types.Types.TPaymentMethod.PIX_ON_DELIVERY,
+      ].includes(payment.type)
+        ? 'pedido'
+        : 'pagamento'}</span
     ></Views.Button
   >
 {:else}
-  <h2 class="businessHoursError">
-    Estámos fora do horario do funcionamento, confire os nossos horários
-  </h2>
+  <h2 class="businessHoursError">Estámos fora do horario do funcionamento, confire os nossos horários</h2>
 {/if}
 <Views.GTerms />
 

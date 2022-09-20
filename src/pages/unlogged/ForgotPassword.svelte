@@ -1,27 +1,28 @@
-<script>
-  import Routes from "../../stores/Routes";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { Layout, StatusBar } from "../../stores/Setup";
+<script lang="ts">
+  import Routes from '../../stores/Routes';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
+  import { StatusBar } from '../../stores/Setup';
   import {
     requestPasswordPhoneValidation,
     validatePasswordPhoneValidationCode,
     requestPassword,
-  } from "../../network/Auth";
-  import { onDestroy, onMount } from "svelte";
+  } from '../../network/Auth';
+  import { onDestroy, onMount } from 'svelte';
 
   const countdownWaitTime = 60;
+  const Layout = Stores.Layout.instance.store;
 
-  let requestPasswordObject = {
+  let requestPasswordObject: Types.Classes.CUser = Types.Classes.CUser.fromObject({
     phone: null,
     phoneValidationCode: null,
     signature: null,
     areaCode: 55,
-  };
+  });
   let canDigitValidationCode = false;
   let canRequestPassword = false;
   let canRequestCode = false;
   let isValidationValid = false;
-  let timer = null;
+  let timer: NodeJS.Timer | null = null;
   let countdownCanRequestCode = true;
   let countdown = 0;
   let showRequestValidatingCodeAlert = false;
@@ -43,7 +44,7 @@
     showPasswordRequistedAlert = !showPasswordRequistedAlert;
   }
 
-  function validateValidationCode(validationValid) {
+  function validateValidationCode(validationValid: string) {
     return (validationValid?.length ?? 0) == 4;
   }
 
@@ -62,14 +63,9 @@
     showRequestValidatingCodeAlert = false;
     Stores.Loading.instance.start();
     requestPasswordObject.phone = requestPasswordObject.phone;
-    const response = await requestPasswordPhoneValidation(
-      requestPasswordObject
-    );
+    const response = await requestPasswordPhoneValidation(requestPasswordObject);
     if (response?.success) {
-      requestPasswordObject = {
-        ...requestPasswordObject,
-        signature: response?.data,
-      };
+      requestPasswordObject.signature = response?.data;
       canDigitValidationCode = true;
       countdownCanRequestCode = false;
       countdown = countdownWaitTime;
@@ -77,7 +73,7 @@
         countdown--;
       }, 1000);
       Stores.MessageAlert.instance.show(
-        `Digite o código que você receberá em instantes no seu celular no campo seguinte `
+        `Digite o código que você receberá em instantes no seu celular no campo seguinte `,
       );
     } else {
       Stores.MessageAlert.instance.show(response?.data);
@@ -87,13 +83,11 @@
 
   async function ValidatePhoneCode() {
     Stores.Loading.instance.start();
-    const response = await validatePasswordPhoneValidationCode(
-      requestPasswordObject
-    );
+    const response = await validatePasswordPhoneValidationCode(requestPasswordObject);
     if (response?.success) {
       canRequestPassword = true;
       Stores.MessageAlert.instance.show(
-        `O código inserido é correto!, agora é só clicar no botão “CONTINUAR” para gerar um nova senha aleatória!`
+        `O código inserido é correto!, agora é só clicar no botão “CONTINUAR” para gerar um nova senha aleatória!`,
       );
     } else {
       Stores.MessageAlert.instance.show(response?.data);
@@ -111,7 +105,7 @@
     }
   });
 
-  Stores.Title.instance.set("Recuperar senha");
+  Stores.Title.instance.set('Recuperar senha');
 </script>
 
 <main
@@ -119,12 +113,9 @@
 >
   <Views.Divider />
   <h2>Por favor informe seu número de telefone cadastrado</h2>
-  <small
-    >clique em "<b>Solicitar</b>" para solicitar o código de validação</small
-  >
+  <small>clique em "<b>Solicitar</b>" para solicitar o código de validação</small>
   <Views.TextEdit
-    {Layout}
-    type="phone"
+    type={Types.TTextEdit.PHONE}
     bind:value={requestPasswordObject.phone}
     buttonName="Solicitar"
     callback={requestPhoneValidation}
@@ -133,14 +124,11 @@
     placeHolder="Número de telefone"
   />
   {#if !countdownCanRequestCode}
-    <small
-      >Caso não receber o código, espera {countdown} segundos para solicitar um novo!</small
-    >
+    <small>Caso não receber o código, espera {countdown} segundos para solicitar um novo!</small>
   {/if}
   <Views.Divider />
   <Views.TextEdit
-    {Layout}
-    type="number"
+    type={Types.TTextEdit.NUMBER}
     bind:value={requestPasswordObject.phoneValidationCode}
     mask="_ _ _ _"
     buttonName="Confirmar"
@@ -153,27 +141,23 @@
   />
   <Views.Divider />
   <Views.Divider />
-  <Views.Button
-    {Layout}
-    on:click={requestNewPassword}
-    disabled={!canRequestPassword}>Solicitar nova senha</Views.Button
-  >
+  <Views.Button on:click={requestNewPassword} disabled={!canRequestPassword}>Solicitar nova senha</Views.Button>
   <Views.GTerms />
 
   {#if showRequestValidatingCodeAlert}
     <Views.Alert
       title="Alerta"
       message={`Verifica se seu número de telefone inserido ${Utils.Strings.formatAsPhone(
-        requestPasswordObject?.phone
+        requestPasswordObject?.phone,
       )} está correto para prosseguir`}
       closeCallBack={toggleshowRequestValidatingCodeAlert}
       buttons={[
         {
-          name: "Quero corrigir",
+          name: 'Quero corrigir',
           callback: toggleshowRequestValidatingCodeAlert,
         },
         {
-          name: "Está correto",
+          name: 'Está correto',
           callback: requestPhoneValidation,
           principal: true,
         },
@@ -187,7 +171,7 @@
       closeCallBack={toggleshowPasswordRequistedAlert}
       buttons={[
         {
-          name: "Fazer login",
+          name: 'Fazer login',
           callback: () => Stores.Navigation.instance.reset(Routes.login),
           principal: true,
         },
@@ -196,7 +180,7 @@
   {/if}
 </main>
 
-<Views.NavigationBar {Layout} paddingTop={$StatusBar.height} />
+<Views.NavigationBar paddingTop={$StatusBar.height} />
 
 <style>
   main {

@@ -1,30 +1,25 @@
-<script>
-  import { faSearch } from "@fortawesome/free-solid-svg-icons";
-  import { Layout, StatusBar } from "../../stores/Setup";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import {
-    GetAddresses,
-    GetAddressByCep,
-    NewAddress,
-    UpdateAddress,
-    DeleteAddress,
-  } from "../../network/User";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import { faSearch } from '@fortawesome/free-solid-svg-icons';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
+  import { GetAddresses, GetAddressByCep, NewAddress, UpdateAddress, DeleteAddress } from '../../network/User';
+  import { onMount } from 'svelte';
 
-  let addresses;
-  let currentPostalCode;
+  interface INewAddress {
+    postalCode: Views.TextEdit | null;
+    street: Views.TextEdit | null;
+    number: Views.TextEdit | null;
+    complement: Views.TextEdit | null;
+    neighborhood: Views.TextEdit | null;
+    city: Views.TextEdit | null;
+    stat: Views.TextEdit | null;
+  }
+
+  let addresses: Types.Classes.CAddress[];
+  let currentPostalCode: string;
   let showNewAddress = false;
 
-  let newAddressObject = {
-    postalCode: null,
-    street: null,
-    number: null,
-    complement: null,
-    neighborhood: null,
-    city: null,
-    stat: null,
-  };
-  let newAddressObjectInputs = {
+  let newAddressObject: Types.Classes.CAddress = Types.Classes.CAddress.fillWith(null);
+  let newAddressObjectInputs: INewAddress = {
     postalCode: null,
     street: null,
     number: null,
@@ -44,10 +39,7 @@
 
   $: canProceed = Utils?.Objects?.validateFields(newAddressObjectValidation);
 
-  $: if (
-    (newAddressObject?.postalCode?.length ?? 0) === 8 &&
-    newAddressObject?.postalCode != currentPostalCode
-  ) {
+  $: if ((newAddressObject?.postalCode?.length ?? 0) === 8 && newAddressObject?.postalCode != currentPostalCode) {
     findAddress();
   }
 
@@ -60,10 +52,7 @@
           const address = response?.data;
           currentPostalCode = address?.postalCode;
           newAddressObject = { ...newAddressObject, ...address };
-          Utils?.Objects?.updateInputs(
-            newAddressObjectInputs,
-            newAddressObject
-          );
+          Utils?.Objects?.updateInputs(newAddressObjectInputs, newAddressObject);
         } else {
           Stores.MessageAlert.instance.show(response?.data);
         }
@@ -80,33 +69,21 @@
 
   async function newAddress() {
     if ((newAddressObject?.postalCode?.length ?? 0) !== 8) {
-      Stores.MessageAlert.instance.show(
-        `é obrigatorio o preencheemento do CEP`
-      );
+      Stores.MessageAlert.instance.show(`é obrigatorio o preencheemento do CEP`);
     } else if ((newAddressObject?.street?.length ?? 0) < 3) {
-      Stores.MessageAlert.instance.show(
-        `é obrigatorio o preencheemento do nome da rua`
-      );
+      Stores.MessageAlert.instance.show(`é obrigatorio o preencheemento do nome da rua`);
     } else if ((newAddressObject?.neighborhood?.length ?? 0) < 2) {
-      Stores.MessageAlert.instance.show(
-        `é obrigatorio o preencheemento do nome do bairro`
-      );
+      Stores.MessageAlert.instance.show(`é obrigatorio o preencheemento do nome do bairro`);
     } else if ((newAddressObject?.city?.length ?? 0) < 3) {
-      Stores.MessageAlert.instance.show(
-        `é obrigatorio o preencheemento do nome da cidade`
-      );
+      Stores.MessageAlert.instance.show(`é obrigatorio o preencheemento do nome da cidade`);
     } else if ((newAddressObject?.stat?.length ?? 0) !== 2) {
-      Stores.MessageAlert.instance.show(
-        `é obrigatorio o preencheemento do simbolo do estado`
-      );
+      Stores.MessageAlert.instance.show(`é obrigatorio o preencheemento do simbolo do estado`);
     } else {
       Stores.Loading.instance.start();
       const response = await NewAddress(newAddressObject);
       if (response?.success) {
         addresses = response?.data;
-        newAddressObject = {
-          postalCode: null,
-        };
+        newAddressObject = Types.Classes.CAddress.fillWith(null);
       } else {
         Stores.MessageAlert.instance.show(response?.data);
       }
@@ -115,7 +92,7 @@
     }
   }
 
-  async function updateAddress(id) {
+  async function updateAddress(id?: string) {
     Stores.Loading.instance.start();
     const response = await UpdateAddress(id);
     if (response?.success) {
@@ -132,7 +109,7 @@
     Stores.Loading.instance.stop();
   }
 
-  async function onRemoveClick(id) {
+  async function onRemoveClick(id?: string) {
     Stores.Loading.instance.start();
     const response = await DeleteAddress(id);
     if (response?.success) {
@@ -151,13 +128,13 @@
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Endereços");
+  Stores.Title.instance.set('Endereços');
 </script>
 
 <Views.Divider />
-<Views.Button {Layout} on:click={toggleNewAddress}>Novo endereço</Views.Button>
+<Views.Button on:click={toggleNewAddress}>Novo endereço</Views.Button>
 {#if !addresses}
-  <Views.LocalLoading size="2" />
+  <Views.LocalLoading size={2} />
 {:else if (addresses?.length ?? 0) > 0}
   <Views.Divider />
   <h3>Selecione seu endereço principal</h3>
@@ -167,16 +144,12 @@
       <Views.FloatRemove callback={() => onRemoveClick(address?.id)} />
       <div class="content">
         <span class="street"
-          >{address?.street}, {address?.number}{address?.complement
-            ? ` - ${address?.complement}`
-            : ""}</span
+          >{address?.street}, {address?.number}{address?.complement ? ` - ${address?.complement}` : ''}</span
         >
         <span class="neighborhood">{address?.neighborhood}</span>
-        <span class="city"
-          >{address?.city}/{address?.stat} CEP: {address?.postalCode}</span
-        >
+        <span class="city">{address?.city}/{address?.stat} CEP: {address?.postalCode}</span>
       </div>
-      <div class="checkbox" on:click={updateAddress(address?.id)}>
+      <div class="checkbox" on:click={() => updateAddress(address.id)}>
         <Views.Checkbox bind:checked={address.selected} />
       </div>
     </div>
@@ -190,14 +163,13 @@ mesmo!"
 
 {#if showNewAddress}
   <Views.Alert
-    {Layout}
     type="big"
     title="Novo endereço!"
     closeCallBack={toggleNewAddress}
     buttons={[
-      { name: "Cancelar", callback: toggleNewAddress },
+      { name: 'Cancelar', callback: toggleNewAddress },
       {
-        name: "Adicionar",
+        name: 'Adicionar',
         callback: newAddress,
         principal: true,
         disabled: !canProceed,
@@ -205,8 +177,7 @@ mesmo!"
     ]}
   >
     <Views.TextEdit
-      {Layout}
-      type="cep"
+      type={Types.TTextEdit.CEP}
       callback={findAddress}
       buttonIcon={faSearch}
       bind:value={newAddressObject.postalCode}
@@ -215,7 +186,6 @@ mesmo!"
       placeHolder="CEP"
     />
     <Views.TextEdit
-      {Layout}
       disabled={true}
       placeHolder="Endereço"
       bind:value={newAddressObject.street}
@@ -225,7 +195,6 @@ mesmo!"
       max={255}
     />
     <Views.TextEdit
-      {Layout}
       placeHolder="Número"
       bind:value={newAddressObject.number}
       bind:this={newAddressObjectInputs.number}
@@ -235,13 +204,11 @@ mesmo!"
       empty={!newAddressObjectValidation.postalCode}
     />
     <Views.TextEdit
-      {Layout}
       placeHolder="Complemento"
       bind:value={newAddressObject.complement}
       bind:this={newAddressObjectInputs.complement}
     />
     <Views.TextEdit
-      {Layout}
       disabled={true}
       placeHolder="Bairro"
       bind:value={newAddressObject.neighborhood}
@@ -251,7 +218,6 @@ mesmo!"
       max={255}
     />
     <Views.TextEdit
-      {Layout}
       disabled={true}
       placeHolder="Cidade"
       bind:value={newAddressObject.city}
@@ -261,7 +227,6 @@ mesmo!"
       max={255}
     />
     <Views.TextEdit
-      {Layout}
       disabled={true}
       placeHolder="UF"
       bind:value={newAddressObject.stat}
@@ -295,7 +260,7 @@ mesmo!"
     flex-grow: 2;
   }
   .address > .content > .street {
-    font-family: "RobotoMedium";
+    font-family: 'RobotoMedium';
     margin-bottom: 10px;
   }
   .address > .content > .neighborhood {
