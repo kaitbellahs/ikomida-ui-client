@@ -14,7 +14,7 @@ try {
 const agent = 'CLIENT';
 const url = isProd ? 'https://api.ikomida.com' : 'http://192.168.1.200';
 Stores.Cache.createInstance();
-Network.createInstance(url, '"${{iKomidaId}}$', agent, '6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS', appVersion);
+Network.createInstance(url, '${{iKomidaId}}$', agent, '6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS', appVersion);
 Stores.Auth.Auth.createInstance(agent);
 Stores.MenuHamburger.createInstance();
 Stores.Menu.createInstance();
