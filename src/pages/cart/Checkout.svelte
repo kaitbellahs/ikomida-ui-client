@@ -19,12 +19,13 @@
   let address: Types.Classes.CAddress | undefined;
   let payment: Types.Classes.CPaymentMethod | undefined;
 
-  $: subtotalArray = $Products.map(
-    (product) =>
-      product.quantity *
-      (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType)),
-  );
-  $: subtotal = subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
+  $: subtotalArray =
+    $Products?.map(
+      (product) =>
+        product.quantity *
+        (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType)),
+    ) ?? [];
+  $: subtotal = (subtotalArray?.length ?? 0) > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0) : 0;
   $: delivery = $Settings?.delivery?.free
     ? 0
@@ -108,46 +109,52 @@
   }
 
   onMount(async () => {
-    Products = await Cart.instance.store();
-    let response = await GetSettings();
-    if (response?.success && response?.data) {
-      Settings.set(Types.Classes.CVendorSettings.fromObject({ ...$Settings, ...response?.data }));
-    } else {
-      Stores.MessageAlert.instance.show(response?.data);
-    }
-    response = await GetAddresses();
-    if (response?.success) {
-      const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response.data);
-      const addresses = data.filter((address) => address.selected);
-      address = (addresses?.length ?? 0) === 1 ? addresses[0] : undefined;
-    }
-    response = await GetPaymentMethods();
-    if (response?.success) {
-      const data: Types.Classes.CPaymentMethod[] = Types.Classes.CAddress.fromObject(response.data);
-      const payments = data.filter((paymentMethod) => paymentMethod.selected);
-      payment = (payments?.length ?? 0) === 1 ? payments[0] : undefined;
-    }
-    if (Capacitor.isNativePlatform()) {
-      const checkpermissions = await Geolocation.checkPermissions();
-      if (checkpermissions.location != 'prompt') {
-        const permissions = await Geolocation.requestPermissions();
-        if (permissions.location != 'granted') {
+    try {
+      console.log('onMount');
+      Products = await Cart.instance.store();
+      let response = await GetSettings();
+      if (response?.success && response?.data) {
+        const settings = Types.Classes.CVendorSettings.fromObject({ ...Settings.get().toJSON(), ...response?.data });
+        Settings.set(settings);
+      } else {
+        Stores.MessageAlert.instance.show(response?.data);
+      }
+      response = await GetAddresses();
+      if (response?.success) {
+        const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response.data);
+        const addresses = data.filter((address) => address.selected);
+        address = (addresses?.length ?? 0) === 1 ? addresses[0] : undefined;
+      }
+      response = await GetPaymentMethods();
+      if (response?.success) {
+        const data: Types.Classes.CPaymentMethod[] = Types.Classes.CAddress.fromObject(response.data);
+        const payments = data.filter((paymentMethod) => paymentMethod.selected);
+        payment = (payments?.length ?? 0) === 1 ? payments[0] : undefined;
+      }
+      if (Capacitor.isNativePlatform()) {
+        const checkpermissions = await Geolocation.checkPermissions();
+        if (checkpermissions.location != 'prompt') {
+          const permissions = await Geolocation.requestPermissions();
+          if (permissions.location != 'granted') {
+            await getLocation();
+          }
+        } else {
           await getLocation();
         }
       } else {
-        await getLocation();
-      }
-    } else {
-      if (navigator.permissions && navigator.permissions.query) {
-        const permission = await navigator.permissions.query({
-          name: 'geolocation',
-        });
-        if (permission.state != 'denied') {
+        if (navigator.permissions && navigator.permissions.query) {
+          const permission = await navigator.permissions.query({
+            name: 'geolocation',
+          });
+          if (permission.state != 'denied') {
+            await getLocation();
+          }
+        } else if (navigator.geolocation) {
           await getLocation();
         }
-      } else if (navigator.geolocation) {
-        await getLocation();
       }
+    } catch (exception: any) {
+      console.error(exception);
     }
     Stores.Loading.instance.stop();
   });

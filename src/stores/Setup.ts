@@ -1,4 +1,5 @@
 import {
+	get,
 	writable
 } from 'svelte/store';
 import { StatusBarInfo, Style } from '@ikomida/capacitor-plugin-status-bar';
@@ -23,7 +24,7 @@ function createStatusBar() {
 export const StatusBar = createStatusBar();
 
 function createSettings() {
-	const { subscribe, set } = writable(Types.Classes.CVendorSettings.fromObject({
+	const store = writable(Types.Classes.CVendorSettings.fromObject({
 		profile: {
 			areaCode: 55,
 			mainPicture: '',
@@ -40,9 +41,10 @@ function createSettings() {
 	}));
 
 	return {
-		subscribe,
-		set: (info: Types.Classes.CVendorSettings) => set(info)
-	};
+		subscribe: store.subscribe,
+		set: (info: Types.Classes.CVendorSettings) => store.set(info),
+		get: () => Types.Classes.CVendorSettings.fromObject(get(store))
+	}
 }
 
 export const Settings = createSettings();

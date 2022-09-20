@@ -33,8 +33,7 @@
   };
   let showNotificationPopup = false;
   let logedIn = false;
-
-  $: isActive = $Settings?.isActive ?? true;
+  let isActive = false;
   $: route = $router.route;
   $: if ($auth && isActive) {
     logedIn = false;
@@ -143,6 +142,7 @@
     let response = await GetSettings();
     if (response?.success && response?.data) {
       Settings.set({ ...$Settings, ...response?.data });
+      isActive = $Settings?.isActive ?? true;
     }
     response = await getLayout();
     if (response?.success && response?.data) {
@@ -170,7 +170,7 @@
 </script>
 
 <Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
-{#if !$Settings || $Settings?.isActive === null}
+{#if !isActive}
   <LaunchScreen />
 {:else if !isActive}
   <NoService />

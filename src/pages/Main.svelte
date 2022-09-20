@@ -84,14 +84,17 @@
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   $: route = $router.route;
-  $: subtotalArray = $Store.map(
-    (item) => item.quantity * (item.price - Logics.Finances.calcDiscount(item.price, item.discount, item.discountType)),
-  );
+
+  $: subtotalArray =
+    $Store?.map(
+      (item) =>
+        item.quantity * (item.price - Logics.Finances.calcDiscount(item.price, item.discount, item.discountType)),
+    ) ?? [];
   $: subtotal = subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: delivery = 0;
   $: total = subtotal + delivery;
   $: showCart =
-    $Store.length > 0 &&
+    ($Store?.length ?? 0) > 0 &&
     route !== Routes.cart &&
     route !== Routes.product &&
     route !== Routes.checkout &&

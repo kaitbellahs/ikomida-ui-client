@@ -12,12 +12,13 @@
   let showAlert = false;
   let address: Types.Classes.CAddress | null;
 
-  $: subtotalArray = $Products.map(
-    (product) =>
-      product.quantity *
-      (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType)),
-  );
-  $: subtotal = subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
+  $: subtotalArray =
+    $Products?.map(
+      (product) =>
+        product.quantity *
+        (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType)),
+    ) ?? [];
+  $: subtotal = (subtotalArray?.length ?? 0) > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
   $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0) : 0;
   $: delivery = $Settings?.delivery?.free
     ? 0
@@ -40,6 +41,7 @@
   }
 
   function forward() {
+    console.log('forward');
     Stores.Navigation.instance.goTo(Routes.checkout);
   }
 
@@ -110,7 +112,7 @@
   />
 {/if}
 
-{#each $Products as product, index (product?.id ?? index)}
+{#each $Products ?? [] as product}
   <Views.CartItem {onRemoveClick} {onPlusClick} {onMinosClick} {product} />
 {/each}
 <Views.Button type="transparent" on:click={addMoreProducts}>Adicionar mais itens</Views.Button>
