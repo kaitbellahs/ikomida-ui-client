@@ -12,7 +12,7 @@ try {
     // eslint-disable-next-line no-empty
 } catch (error: any) { }
 const agent = 'CLIENT';
-const url = isProd ? 'https://api.ikomida.com' : 'http://192.168.1.200';
+const url = isProd ? 'https://api.ikomida.com' : 'hmlg.api.ikomida.com';
 Stores.Cache.createInstance();
 Network.createInstance(url, '${{iKomidaId}}$', agent, '6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS', appVersion);
 Stores.Auth.Auth.createInstance(agent);

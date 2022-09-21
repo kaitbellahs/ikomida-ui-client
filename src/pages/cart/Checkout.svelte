@@ -127,7 +127,7 @@
       }
       response = await GetPaymentMethods();
       if (response?.success) {
-        const data: Types.Classes.CPaymentMethod[] = Types.Classes.CAddress.fromObject(response.data);
+        const data: Types.Classes.CPaymentMethod[] = Types.Classes.CPaymentMethod.fromObject(response.data);
         const payments = data.filter((paymentMethod) => paymentMethod.selected);
         payment = (payments?.length ?? 0) === 1 ? payments[0] : undefined;
       }
@@ -233,7 +233,7 @@
   <div class="paymentCard">
     <div class="content">
       <span class="payWith">A cobrança será realizada com</span>
-      <span class="paymentType">{Utils.Strings.capitalizeFirstLeter(payment?.type.name)}</span>
+      <span class="paymentType">{Utils.Strings.capitalizeFirstLeter(payment.type?.name)}</span>
       {payment?.type.description}
       <span class="brand">
         {#if payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
