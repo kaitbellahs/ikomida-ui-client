@@ -14,6 +14,7 @@ export default {
     forgotPassword: Symbol("/forgotPassword"),
     tac: Symbol("/tac"),
     addresses: Symbol("/addresses"),
+    newAddress: Symbol("/newAddress"),
     payments: Symbol("/payments"),
     businessHours: Symbol("businessHours"),
     pp: Symbol("privacyPolicy"),

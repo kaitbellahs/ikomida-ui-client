@@ -1,0 +1,120 @@
+<script lang="ts">
+  import { Views, Stores, Types } from '@ikomida/shared-frontend';
+  import { GetAddresses, UpdateAddress, DeleteAddress } from '../../network/User';
+  import { onMount } from 'svelte';
+  import Routes from '../../stores/Routes';
+
+  let addresses: Types.Classes.CAddress[];
+
+  function toggleNewAddress() {
+    Stores.Navigation.instance.goTo(Routes.newAddress);
+  }
+
+  async function updateAddress(id?: string) {
+    Stores.Loading.instance.start();
+    const response = await UpdateAddress(id);
+    if (response?.success) {
+      for (const item of addresses) {
+        item.selected = false;
+        if (item.id === id) {
+          item.selected = true;
+        }
+      }
+      addresses = [...addresses];
+    } else {
+      Stores.MessageAlert.instance.show(response?.data);
+    }
+    Stores.Loading.instance.stop();
+  }
+
+  async function onRemoveClick(id?: string) {
+    Stores.Loading.instance.start();
+    const response = await DeleteAddress(id);
+    if (response?.success) {
+      addresses = addresses?.filter((item) => item.id !== id);
+    } else {
+      Stores.MessageAlert.instance.show(response?.data);
+    }
+    Stores.Loading.instance.stop();
+  }
+
+  onMount(async () => {
+    let response = await GetAddresses();
+    if (response?.success) {
+      addresses = response?.data;
+    }
+    Stores.Loading.instance.stop();
+  });
+
+  Stores.Title.instance.set('Endereços');
+</script>
+
+<Views.Divider />
+<Views.Button on:click={toggleNewAddress}>Novo endereço</Views.Button>
+{#if !addresses}
+  <Views.LocalLoading size={2} />
+{:else if (addresses?.length ?? 0) > 0}
+  <Views.Divider />
+  <h3>Selecione seu endereço principal</h3>
+  <small>Esse endereço será usado para entregar seus pedidos</small>
+  {#each addresses as address (address?.id)}
+    <div class="address">
+      <Views.FloatRemove callback={() => onRemoveClick(address?.id)} />
+      <div class="content">
+        <span class="street"
+          >{address?.street}, {address?.number}{address?.complement ? ` - ${address?.complement}` : ''}</span
+        >
+        <span class="neighborhood">{address?.neighborhood}</span>
+        <span class="city">{address?.city}/{address?.stat} CEP: {address?.postalCode}</span>
+      </div>
+      <div class="checkbox" on:click={() => updateAddress(address.id)}>
+        <Views.Checkbox bind:checked={address.selected} />
+      </div>
+    </div>
+  {/each}
+{:else}
+  <Views.CentredMessage
+    text="Não há endereços para exibir, aproveite e cadastre deu endereço pricipal agora
+mesmo!"
+  />
+{/if}
+
+<style>
+  .address {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #ccc;
+    box-shadow: 1px 2px #cccccc66;
+    margin-top: 30px;
+    padding: 10px;
+  }
+  .address > .checkbox {
+    display: flex;
+    align-items: flex-end;
+  }
+  .address > .content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 2;
+  }
+  .address > .content > .street {
+    font-family: 'RobotoMedium';
+    margin-bottom: 10px;
+  }
+  .address > .content > .neighborhood {
+    font-weight: lighter;
+    font-size: 1em;
+    width: 100%;
+  }
+  .address > .content > .city {
+    font-weight: lighter;
+    font-size: 0.9em;
+    width: 100%;
+  }
+  h3,
+  small {
+    text-align: center;
+  }
+</style>

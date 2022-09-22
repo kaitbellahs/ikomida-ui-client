@@ -24,7 +24,8 @@
   import Product from './products/Product.svelte';
   import Checkout from './cart/Checkout.svelte';
   import Cart from './cart/Cart.svelte';
-  import Addresses from './user/Addresses.svelte';
+  import Addresses from './Addresses/Addresses.svelte';
+  import NewAddress from './Addresses/NewAddress.svelte';
   import Payments from './payments/Payments.svelte';
   import NewMethod from './payments/NewMethod.svelte';
   import Contact from './unlogged/Contact.svelte';
@@ -159,6 +160,8 @@
     <Checkout />
   {:else if route == Routes.addresses}
     <Addresses />
+  {:else if route == Routes.newAddress}
+    <NewAddress />
   {:else if route == Routes.payments}
     <Payments />
   {:else if route == Routes.businessHours}

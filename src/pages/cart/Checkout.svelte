@@ -61,14 +61,25 @@
 
   async function forward() {
     Stores.Loading.instance.start();
-    const payload = Types.Classes.COrder.fromObject({
-      products: $Products,
-      address,
-      payment,
+    if (!address || !payment?.type) {
+      Stores.Loading.instance.stop();
+      return;
+    }
+    const payload: Types.Classes.COrder = Types.Classes.COrder.init(
+      netTotal,
+      discount,
       delivery,
-      coupon: couponObject,
-      location,
-    });
+      $Products,
+      address,
+      payment?.type,
+      $Settings.preparation,
+      couponObject,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      payment,
+    );
     const response = await NewOrders(payload);
     Stores.Loading.instance.stop();
     if (response && response?.success) {
@@ -114,7 +125,10 @@
       Products = await Cart.instance.store();
       let response = await GetSettings();
       if (response?.success && response?.data) {
-        const settings = Types.Classes.CVendorSettings.fromObject({ ...Settings.get().toJSON(), ...response?.data });
+        const settings: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject({
+          ...Settings.get().toJSON(),
+          ...response?.data,
+        });
         Settings.set(settings);
       } else {
         Stores.MessageAlert.instance.show(response?.data);

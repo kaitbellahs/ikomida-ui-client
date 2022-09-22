@@ -32,8 +32,8 @@
   async function changeOrderStatus(status: Types.Types.TOrderStatus) {
     Stores.Loading.instance.start();
     const response = await ChangeOrderStatus(order.id, status);
-    const orderStatus = response?.data;
-    if (response?.success && orderStatus?.id === order.id && orderStatus?.status === status) {
+    const orderStatus = Types.Classes.COrder.fromObject(response?.data);
+    if (response?.success && orderStatus.id === order.id && orderStatus?.status === status) {
       order.status = orderStatus?.status;
       order.finishedAt = orderStatus?.finishedAt;
       Stores.MessageAlert.instance.show(

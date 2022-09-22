@@ -61,6 +61,7 @@
   async function newCreditCard() {
     showNewMethodAlert = false;
     Stores.Loading.instance.start();
+    newCreditCardObject.code = Number(newCreditCardObject.code);
     const response = await NewCreditCard(newCreditCardObject);
     if (response?.success) {
       Stores.Navigation.instance.pop();
