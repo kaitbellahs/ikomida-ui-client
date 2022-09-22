@@ -4,7 +4,7 @@ import {
 } from "@ikomida/shared-frontend";
 
 export async function getTermsOfUse() {
-    const response = await Network.instance?.get(`/term/${Types.Types.TTerm.TERM_OF_USE_VENDOR}`);
+    const response = await Network.instance?.get(`/term/${Types.Types.TTerm.TERM_OF_USE_VENDOR.id}`);
     if (response && response?.success) {
         return response?.data
     }
@@ -12,7 +12,7 @@ export async function getTermsOfUse() {
 }
 
 export async function getTermOfUse() {
-    const response = await Network.instance?.get(`/termID/${Types.Types.TTerm.TERM_OF_USE_VENDOR}`);
+    const response = await Network.instance?.get(`/termID/${Types.Types.TTerm.TERM_OF_USE_VENDOR.id}`);
     if (response && response?.success) {
         return response?.data
     }
@@ -20,7 +20,7 @@ export async function getTermOfUse() {
 }
 
 export async function getPrivacyPolicy() {
-    const response = await Network.instance?.get(`/term/${Types.Types.TTerm.PRIVACY_POLICY}`);
+    const response = await Network.instance?.get(`/term/${Types.Types.TTerm.PRIVACY_POLICY.id}`);
     if (response && response?.success) {
         return response?.data
     }

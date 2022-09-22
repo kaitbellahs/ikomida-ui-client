@@ -4,6 +4,7 @@
   import { StatusBar } from '../../stores/Setup';
   import { faUser } from '@fortawesome/free-solid-svg-icons';
   import { onMount } from 'svelte';
+  import { getTermOfUse } from '../../network/Terms';
 
   const Layout = Stores.Layout.instance.store;
 
@@ -28,7 +29,12 @@
     Stores.Navigation.instance.goTo(Routes.confirmSubscribe, subscribeObject);
   }
 
-  onMount(() => {
+  onMount(async () => {
+    const term = await getTermOfUse();
+    if (term) {
+      subscribeObject.termId = term?.id;
+    }
+    subscribeObject.areaCode = '55';
     Stores.Loading.instance.stop();
   });
 

@@ -3,7 +3,6 @@
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
   import { faUnlock } from '@fortawesome/free-solid-svg-icons';
   import { requestPhoneValidation, validatePhoneValidationCode, subscribe } from '../../network/Auth';
-  import { getTermOfUse } from '../../network/Terms';
   import { StatusBar } from '../../stores/Setup';
   import { onDestroy, onMount } from 'svelte';
 
@@ -12,11 +11,7 @@
   const Layout = Stores.Layout.instance.store;
 
   let showRequestValidatingCodeAlert = false;
-  let subscribeObject: Types.Classes.CUser = Types.Classes.CUser.fromObject({
-    ...$router.options.toJSON(),
-    ...{ phone: null, phoneValidationCode: null, signature: null },
-    areaCode: 55,
-  });
+  let subscribeObject: Types.Classes.CUser = $router.options;
   let canDigitValidationCode = false;
   let canSubscribe = false;
   let canRequestCode = false;
@@ -109,11 +104,7 @@
     Stores.Navigation.instance.goTo(Routes.pp);
   }
 
-  onMount(async () => {
-    const term = await getTermOfUse();
-    if (term) {
-      subscribeObject.termId = term?.id;
-    }
+  onMount(() => {
     Stores.Loading.instance.stop();
   });
 
