@@ -39,7 +39,6 @@ export class Cart {
                 const user: Types.Classes.CUser = Types.Classes.CUser.fromObject(await Utils.Jws.extractToken(token))
                 if (user) {
                     this.name = `Cart-${user.id}`
-                    console.log('this.name:', this.name)
                 }
             })
         });
