@@ -1,61 +1,71 @@
 <script lang="ts">
-  import { Cart } from '../../stores/Cart';
-  import Routes from '../../stores/Routes';
-  import Fa from 'svelte-fa';
-  import { faPlusSquare, faMinusSquare, faCartPlus } from '@fortawesome/free-solid-svg-icons';
-  import { StatusBar } from '../../stores/Setup';
-  import { Views, Utils, Logics, Types, Stores } from '@ikomida/shared-frontend';
-  import { onMount } from 'svelte';
+  import { Cart } from '../../stores/Cart'
+  import Routes from '../../stores/Routes'
+  import Fa from 'svelte-fa'
+  import { faPlusSquare, faMinusSquare, faCartPlus } from '@fortawesome/free-solid-svg-icons'
+  import { StatusBar } from '../../stores/Setup'
+  import { Views, Utils, Logics, Types, Stores } from '@ikomida/shared-frontend'
+  import { onMount } from 'svelte'
 
-  const router = Stores.Navigation.instance.router;
-  const cartProduct: Types.CCart = Types.CCart.fromObject($router.options);
-  let quantity = 1;
-  let showImage = true;
+  const router = Stores.Navigation.instance.router
+  const cartProduct: Types.CCart = Types.CCart.fromObject($router.options)
+  let quantity = 1
+  let showImage = true
+
+  $: optionsTotal = () => {
+    let calcTotal = 0
+    for (const option of cartProduct.options ?? []) {
+      calcTotal +=
+        option.units *
+        (option.price - Logics.Finances.calcDiscount(option.price, cartProduct.discount, cartProduct.discountType))
+    }
+    return calcTotal
+  }
 
   $: total = Utils.Strings.currency(
     quantity *
       (cartProduct.price -
-        Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType)),
-  );
+        Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType))
+  )
 
   function minos() {
     if (quantity > 1) {
-      quantity--;
+      quantity--
     }
   }
 
   function plus() {
     if (quantity < cartProduct.quantity) {
-      quantity++;
+      quantity++
     }
   }
 
   const addProduct = async () => {
-    let update = false;
-    const cardItems = await Cart.instance.products();
+    let update = false
+    const cardItems = await Cart.instance.products()
     for (const cardItem of cardItems) {
       if (cartProduct.id === cardItem.id && cardItem?.quantity + quantity <= cartProduct.quantity) {
-        cardItem.quantity += quantity;
-        update = true;
+        cardItem.quantity += quantity
+        update = true
       }
     }
     if (update) {
-      await Cart.instance.update(cardItems);
+      await Cart.instance.update(cardItems)
     } else {
-      cartProduct.leftQuantity = cartProduct.quantity;
-      cartProduct.quantity = quantity;
-      await Cart.instance.addProduct(cartProduct);
+      cartProduct.leftQuantity = cartProduct.quantity
+      cartProduct.quantity = quantity
+      await Cart.instance.addProduct(cartProduct)
     }
-    Stores.Navigation.instance.goTo(Routes.cart);
-  };
-
-  function erroLoadImage() {
-    showImage = false;
+    Stores.Navigation.instance.goTo(Routes.cart)
   }
 
-  onMount(() => Stores.Loading.instance.stop());
+  function erroLoadImage() {
+    showImage = false
+  }
 
-  Stores.Title.instance.set(cartProduct.title);
+  onMount(() => Stores.Loading.instance.stop())
+
+  Stores.Title.instance.set(cartProduct.title)
 </script>
 
 <div class="product">
@@ -73,7 +83,7 @@
     <span class="current"
       >{Utils.Strings.currency(
         cartProduct.price -
-          Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType),
+          Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType)
       )}</span
     >
   </div>
@@ -84,6 +94,54 @@
       ><Fa icon={faPlusSquare} /></Views.Button
     >
   </div>
+  <Views.Divider />
+  <h2>Opções do produto:</h2>
+  {#if (product.optionsCategories?.length ?? 0) > 0}
+    {#each product.optionsCategories ?? [] as optionsCategory, index}
+      <Views.Divider />
+      <div class="optionsCategory">
+        <header>
+          {#if showImage.optionsCategories[index].image && optionsCategory.image}
+            <img on:error={() => erroLoadImage(index)} src={optionsCategory.image} alt={optionsCategory.name} />
+          {/if}
+          <div>
+            <h3>{optionsCategory.name}</h3>
+            Escolher entre {optionsCategory.min} e {optionsCategory.max} opções
+          </div>
+        </header>
+        {#if (optionsCategory.options?.length ?? 0) > 0}
+          {#each optionsCategory.options ?? [] as option, optionIndex}
+            <Views.Divider />
+            <div class="option">
+              {#if showImage.optionsCategories[index].options[optionIndex].image && option.image}
+                <img on:error={() => erroLoadImage(index, optionIndex)} src={option.image} alt={option.name} />
+              {/if}
+              <div>
+                <h3>{option.name}</h3>
+                {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(product.discountType) && option.price > 0}
+                  <span class="oldPrice">Preço original: {Utils.Strings.currency(option.price)}</span>
+                {/if}
+                <Views.TextValue
+                  text="Preço:"
+                  value={Utils.Strings.currency(
+                    option.price - Logics.Finances.calcDiscount(option.price, product.discount, product.discountType)
+                  )}
+                  leftMargin={50}
+                />
+                <Views.TextValue text="Por ptoduto:" value={`${option.units} unidades`} leftMargin={50} />
+              </div>
+            </div>
+          {/each}
+        {:else}
+          <Views.Divider />
+          <Views.Status>Não há opções cadastradas nesta categoria de opções.</Views.Status>
+        {/if}
+      </div>
+    {/each}
+  {:else}
+    <Views.Divider />
+    <Views.Status>Não há opções para customizar este produto.</Views.Status>
+  {/if}
   <Views.Button isFloat={true} on:click={addProduct} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faCartPlus} /> <span>Adicionar</span>
     <span>({total})</span></Views.Button

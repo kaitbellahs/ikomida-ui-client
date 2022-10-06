@@ -5,7 +5,9 @@
   "author": "Khalid Ait Bellahs",
   "license": "UNLICENSED",
   "scripts": {
-    "watch": "rollup -c -w",
+    "watch:prod": "rollup -c -w --environment ENV:production",
+    "watch:hmlg": "rollup -c -w --environment ENV:homologation",
+    "watch:dev": "rollup -c -w --environment ENV:development",
     "prod": "rollup -c --environment ENV:production",
     "hmlg": "rollup -c --environment ENV:homologation",
     "dev": "rollup -c --environment ENV:development",
@@ -37,6 +39,8 @@
     "version": "yarn format && git add -A src",
     "postversion": "git push && git push --tags",
     "test": "mocha",
+    "local:dev": "yarn glogin && ncu -u && yarn && yarn format && yarn lint && yarn svelte-check && yarn dev",
+    "local:watch:dev": "yarn glogin && ncu -u && yarn && yarn format && yarn lint && yarn svelte-check && yarn watch:dev",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
@@ -47,8 +51,8 @@
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.5.0",
     "@tsconfig/svelte": "^3.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.38.0",
-    "@typescript-eslint/parser": "^5.38.0",
+    "@typescript-eslint/eslint-plugin": "^5.39.0",
+    "@typescript-eslint/parser": "^5.39.0",
     "chai": "^4.3.6",
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
@@ -59,7 +63,7 @@
     "mocha": "^10.0.0",
     "node-sass": "^7.0.3",
     "npm-run-all": "^4.1.5",
-    "postcss": "^8.4.16",
+    "postcss": "^8.4.17",
     "postcss-load-config": "^4.0.1",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
@@ -72,13 +76,13 @@
     "sirv-cli": "^2.0.2",
     "svelte": "^3.50.1",
     "svelte-as-markup-preprocessor": "^0.3.0",
-    "svelte-check": "^2.9.0",
+    "svelte-check": "^2.9.1",
     "svelte-fa": "^3.0.3",
     "svelte-preprocess": "^4.10.7",
     "svelte-preprocess-cssmodules": "^2.2.3",
     "tslib": "^2.4.0",
     "typedoc": "^0.23.15",
-    "typescript": "^4.8.3"
+    "typescript": "^4.8.4"
   },
   "dependencies": {
     "@capacitor-community/http": "^1.4.1",
@@ -88,7 +92,7 @@
     "@capacitor/clipboard": "^4.0.1",
     "@capacitor/core": "^4.3.0",
     "@capacitor/device": "^4.0.1",
-    "@capacitor/filesystem": "^4.1.1",
+    "@capacitor/filesystem": "^4.1.2",
     "@capacitor/geolocation": "^4.0.1",
     "@capacitor/ios": "^4.3.0",
     "@capacitor/network": "^4.0.1",
@@ -97,7 +101,7 @@
     "@capacitor/share": "^4.0.1",
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@ikomida/capacitor-plugin-status-bar": "github:TIAltoNivel/capacitor-plugin-statusbar",
-    "@ikomida/shared-frontend": "^0.0.102",
+    "@ikomida/shared-frontend": "^1.0.3",
     "credit-card-type": "^9.1.0",
     "html2canvas": "^1.4.1",
     "uuid": "^9.0.0"

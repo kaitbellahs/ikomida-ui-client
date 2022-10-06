@@ -56,7 +56,7 @@
 
 {#if userInfo}
   <Views.UploadablePhoto
-    type="profile"
+    type={Types.TUploadablePhoto.PROFILE}
     image={userInfo?.avatar}
     name={userInfo.name[0]}
     lastName={userInfo.lastName[0]}
