@@ -75,6 +75,7 @@ export class Cart {
     if (!this.storeValue) {
       this.storeValue = await this.createStore()
     }
+    this.storeValue.subscribe(async value => await this.save(value))
     return this.storeValue
   }
 

@@ -1,103 +1,201 @@
 <script lang="ts">
-  import { Cart } from '../../stores/Cart';
-  import type { IStore } from '../../stores/Cart';
-  import Routes from '../../stores/Routes';
-  import { faTrash } from '@fortawesome/free-solid-svg-icons';
-  import { Views, Utils, Logics, Stores, Types } from '@ikomida/shared-frontend';
-  import { Settings } from '../../stores/Setup';
-  import { GetAddresses } from '../../network/User';
-  import { onMount } from 'svelte';
+  import { Cart } from '../../stores/Cart'
+  import type { IStore } from '../../stores/Cart'
+  import Routes from '../../stores/Routes'
+  import { faTrash } from '@fortawesome/free-solid-svg-icons'
+  import { Views, Utils, Logics, Stores, Types } from '@ikomida/shared-frontend'
+  import { Settings } from '../../stores/Setup'
+  import { GetAddresses } from '../../network/User'
+  import { onMount } from 'svelte'
 
-  let Products: IStore;
-  let showAlert = false;
-  let address: Types.Classes.CAddress | null;
+  let Products: IStore
+  let showAlert = false
+  let address: Types.Classes.CAddress | null
 
-  $: subtotalArray =
-    $Products?.map(
-      (product) =>
+  $: optionsTotal = () => {
+    const totalOptionsArray =
+      $Products?.map(product => {
+        let calcTotal = 0
+        for (const option of product?.options ?? []) {
+          calcTotal +=
+            option.units *
+            (option.price - Logics.Finances.calcDiscount(option.price, product.discount, product.discountType))
+        }
+        return calcTotal
+      }) ?? []
+    return (totalOptionsArray?.length ?? 0) > 0 ? totalOptionsArray.reduce((a, b) => a + b) : 0
+  }
+
+  $: subtotalArray = [
+    ...($Products?.map(
+      product =>
         product.quantity *
-        (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType)),
-    ) ?? [];
-  $: subtotal = (subtotalArray?.length ?? 0) > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
-  $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0) : 0;
+        (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType))
+    ) ?? []),
+    optionsTotal()
+  ]
+  $: subtotal = (subtotalArray?.length ?? 0) > 0 ? subtotalArray.reduce((a, b) => a + b) : 0
+  $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0) : 0
   $: delivery = $Settings?.delivery?.free
     ? 0
     : calcDelivery < $Settings?.delivery?.min
     ? $Settings?.delivery?.min
-    : calcDelivery;
-  $: total = subtotal + delivery;
+    : calcDelivery
+  $: total = subtotal + delivery
 
   function addMoreProducts() {
-    Stores.Navigation.instance.pop(2);
+    Stores.Navigation.instance.pop(2)
   }
 
   async function resetCart() {
-    await Cart.instance.reset();
-    Stores.Navigation.instance.reset(Routes.home);
+    await Cart.instance.reset()
+    Stores.Navigation.instance.reset(Routes.home)
   }
 
   function toggleAlert() {
-    showAlert = !showAlert;
+    showAlert = !showAlert
   }
 
   function forward() {
-    console.log('forward');
-    Stores.Navigation.instance.goTo(Routes.checkout);
+    Stores.Navigation.instance.goTo(Routes.checkout)
   }
 
-  async function onRemoveClick(id?: string) {
-    await Cart.instance.update($Products.filter((product) => product?.id !== id));
+  function getCartOptionsCount(cartProduct: Types.CCart, optionsCategory: Types.Classes.CProductOptionsCategory) {
+    const optionsCategoryIds = optionsCategory?.options.flatMap(option => option.id) ?? []
+    const categoryOptions = cartProduct.options
+      ?.filter(option => optionsCategoryIds.includes(option.id))
+      ?.flatMap(option => option.units)
+    return categoryOptions.length > 0
+      ? categoryOptions.reduce((previousValue, currentValue) => previousValue + currentValue)
+      : 0
   }
 
-  async function onPlusClick(id?: string) {
-    let update = false;
-    const products = $Products;
-    for (const product of products) {
-      if (product?.id === id && product?.quantity < product?.leftQuantity) {
-        product.quantity++;
-        update = true;
+  async function onRemoveClick(inputCartProduct?: Types.CCart, inputOption?: Types.CCartProductOption) {
+    if (inputCartProduct) {
+      const cartProduct = $Products.filter(product => product.equal(inputCartProduct))?.[0]
+      if (inputOption) {
+        const option = cartProduct.options.filter(option => option.equal(inputOption))?.[0]
+        const optionsCategories = cartProduct.optionsCategories?.filter(optionsCategory => {
+          const filtredOptionsCategory = optionsCategory.options.filter(productOption => productOption.id === option.id)
+          return filtredOptionsCategory.length === 1
+        })
+        const optionsCategory = optionsCategories?.[0]
+        if (optionsCategory && option) {
+          if (
+            getCartOptionsCount(cartProduct, optionsCategory) - inputOption.units <=
+            optionsCategory.min * cartProduct.quantity
+          ) {
+            Stores.MessageAlert.instance.show(
+              `Não será possível deletar esta opção nesta categoria, porque é obrigatório escolher no mínimo ${
+                optionsCategory.min * cartProduct.quantity
+              } ${optionsCategory.min * cartProduct.quantity > 1 ? 'opções' : 'opção'} na categoria "${
+                optionsCategory.name
+              }", tente adicionar outras opções nesta categoria e também pode excluir o produto.`
+            )
+            return
+          }
+          const optionIndex = cartProduct.options.indexOf(option)
+          cartProduct.options.splice(optionIndex, 1)
+          await Cart.instance.update($Products)
+        }
+      } else {
+        if (cartProduct) {
+          await Cart.instance.update($Products.filter(product => !product.equal(cartProduct)))
+        }
       }
     }
-    if (update) {
-      await Cart.instance.update(products);
-    }
   }
 
-  async function onMinosClick(id?: string) {
-    let update = false;
-    const products = $Products;
-    for (const product of products) {
-      if (product?.id === id) {
-        if (product?.quantity > 1) {
-          product.quantity--;
-          update = true;
-        } else {
-          await onRemoveClick(id);
+  async function onPlusClick(inputCartProduct?: Types.CCart, inputOption?: Types.CCartProductOption) {
+    let update = false
+    if (inputCartProduct) {
+      const cartProduct = $Products.filter(product => product.equal(inputCartProduct))?.[0]
+      if (inputOption) {
+        const option = cartProduct.options.filter(option => option.equal(inputOption))?.[0]
+        if (option && option.units < option.maxUnits * cartProduct.quantity) {
+          option.units++
+          update = true
+        }
+      } else {
+        if (cartProduct && cartProduct.quantity < cartProduct.leftQuantity) {
+          cartProduct.quantity++
+          update = true
         }
       }
     }
     if (update) {
-      await Cart.instance.update(products);
+      await Cart.instance.update($Products)
+    }
+  }
+
+  async function onMinosClick(inputCartProduct?: Types.CCart, inputOption?: Types.CCartProductOption) {
+    if (inputCartProduct) {
+      let update = false
+      const cartProduct = $Products.filter(product => product.equal(inputCartProduct))?.[0]
+      if (inputOption) {
+        const option = cartProduct.options.filter(option => option.equal(inputOption))?.[0]
+        const optionsCategories = cartProduct.optionsCategories?.filter(optionsCategory => {
+          const filtredOptionsCategory = optionsCategory.options.filter(productOption => productOption.id === option.id)
+          return filtredOptionsCategory.length === 1
+        })
+        const optionsCategory = optionsCategories?.[0]
+        if (optionsCategory && option) {
+          if (getCartOptionsCount(cartProduct, optionsCategory) <= optionsCategory.min * cartProduct.quantity) {
+            Stores.MessageAlert.instance.show(
+              `Não será possível diminuir a quantidade das opções, porque é obrigatório escolher no mínimo ${
+                optionsCategory.min * cartProduct.quantity
+              } ${optionsCategory.min * cartProduct.quantity > 1 ? 'opções' : 'opção'} na categoria "${
+                optionsCategory.name
+              }", tente adicionar outras opções nesta categoria e também pode excluir o produto.`
+            )
+            return
+          }
+          if (option.units > 1) {
+            option.units--
+            update = true
+          } else if (option) {
+            const optionIndex = cartProduct.options.indexOf(option)
+            cartProduct.options.splice(optionIndex, 1)
+            update = true
+          }
+        }
+      } else {
+        if (cartProduct?.quantity > 1) {
+          cartProduct.quantity--
+          update = true
+        } else {
+          await onRemoveClick(cartProduct)
+        }
+      }
+      if (update) {
+        await Cart.instance.update($Products)
+      }
+    }
+  }
+
+  async function addOptions(cartProduct?: Types.CCart) {
+    if (cartProduct) {
+      Stores.Navigation.instance?.goTo(Routes.product, cartProduct)
     }
   }
 
   onMount(async () => {
-    let response = await GetAddresses();
+    let response = await GetAddresses()
     if (response?.success) {
-      const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response?.data);
-      const addresses = data.filter((address) => address.selected);
-      address = (addresses?.length ?? 0) === 1 ? addresses[0] : null;
+      const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response?.data)
+      const addresses = data.filter(address => address.selected)
+      address = (addresses?.length ?? 0) === 1 ? addresses[0] : null
     }
-    Products = await Cart.instance.store();
-    Stores.Loading.instance.stop();
-  });
+    Products = await Cart.instance.store()
+    Stores.Loading.instance.stop()
+  })
 
-  Stores.Title.instance.set('Sacola de compras');
+  Stores.Title.instance.set('Sacola de compras')
   Stores.Menu.instance.addItem({
     name: 'Limpar',
     icon: faTrash,
-    callback: toggleAlert,
-  });
+    callback: toggleAlert
+  })
 </script>
 
 {#if showAlert}
@@ -107,15 +205,15 @@
     closeCallBack={toggleAlert}
     buttons={[
       { name: 'Não', callback: toggleAlert, principal: true },
-      { name: 'Sim', callback: resetCart },
+      { name: 'Sim', callback: resetCart }
     ]}
   />
 {/if}
 
 {#each $Products ?? [] as product}
-  <Views.CartItem {onRemoveClick} {onPlusClick} {onMinosClick} {product} />
+  <Views.CartItem {addOptions} {onRemoveClick} {onPlusClick} {onMinosClick} {product} />
 {/each}
-<Views.Button type="transparent" on:click={addMoreProducts}>Adicionar mais itens</Views.Button>
+<Views.Button type={Types.TButton.TRANSPARENT} on:click={addMoreProducts}>Adicionar mais itens</Views.Button>
 <table>
   <thead>
     <tr>

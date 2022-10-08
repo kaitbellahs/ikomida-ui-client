@@ -1,66 +1,60 @@
 <script lang="ts">
-  import * as AuthNetwork from '../../network/Auth';
-  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
-  import Routes from '../../stores/Routes';
-  import { faPhone, faUnlock } from '@fortawesome/free-solid-svg-icons';
-  import { registerPushNotificationToken } from '../../network/PushNotification';
-  import { Settings } from '../../stores/Setup';
-  import { onMount } from 'svelte';
+  import * as AuthNetwork from '../../network/Auth'
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
+  import Routes from '../../stores/Routes'
+  import { faPhone, faUnlock } from '@fortawesome/free-solid-svg-icons'
+  import { registerPushNotificationToken } from '../../network/PushNotification'
+  import { Settings } from '../../stores/Setup'
+  import { onMount } from 'svelte'
 
-  let pushNotificationToken = Stores.PushNotificationToken.instance?.store;
-  let Layout = Stores.Layout.instance?.store;
+  let pushNotificationToken = Stores.PushNotificationToken.instance?.store
+  let Layout = Stores.Layout.instance?.store
 
-  let phone: string;
-  let password: string;
-  let isValidPhone = false;
-  let showImage = true;
+  let phone: string
+  let password: string
+  let isValidPhone = false
 
-  $: canLogin = isValidPhone;
+  $: canLogin = isValidPhone
 
   async function doSubscribe() {
-    Stores.Navigation.instance.goTo(Routes.subscribe);
+    Stores.Navigation.instance.goTo(Routes.subscribe)
   }
 
   async function forgotPassword() {
-    Stores.Navigation.instance.goTo(Routes.forgotPassword);
+    Stores.Navigation.instance.goTo(Routes.forgotPassword)
   }
 
   async function doLogin() {
-    Stores.Loading.instance.start();
-    const response = await AuthNetwork.doLogin('55', phone, password);
+    Stores.Loading.instance.start()
+    const response = await AuthNetwork.doLogin('55', phone, password)
     if (response?.success) {
-      const token = await Utils.Jws.extractToken(response?.data);
+      const token = await Utils.Jws.extractToken(response?.data)
       if (token !== null) {
-        await Stores.Auth.Auth.instance.setToken(response?.data);
+        await Stores.Auth.Auth.instance.setToken(response?.data)
         if ($pushNotificationToken) {
-          await registerPushNotificationToken($pushNotificationToken);
+          await registerPushNotificationToken($pushNotificationToken)
         }
-        Stores.Navigation.instance.reset(Routes.home);
+        Stores.Navigation.instance.reset(Routes.home)
       } else {
-        Stores.MessageAlert.instance.show('O token de acesso não é válido');
+        Stores.MessageAlert.instance.show('O token de acesso não é válido')
       }
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
-  }
-
-  function erroLoadImage() {
-    showImage = false;
+    Stores.Loading.instance.stop()
   }
 
   onMount(() => {
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
 </script>
 
 <main style="background: {$Layout.background};height: 100%;">
   <div class="avatar">
-    {#if $Settings?.profile?.mainPicture && showImage}
-      <img
-        on:error={erroLoadImage}
-        src={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
-        alt={$Settings?.profile?.contractName ?? 'iKomida'}
+    {#if $Settings?.profile?.mainPicture}
+      <Views.Image
+        source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+        name={$Settings?.profile?.contractName ?? 'iKomida'}
       />
     {:else if $Settings?.profile?.contractName}
       <div class="avatarCircle">
@@ -68,7 +62,7 @@
       </div>
       <h2>{$Settings?.profile?.contractName}</h2>
     {:else}
-      <img src="assets/icons/transparent-logo-1.svg" alt="iKomida" />
+      <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
       <h2>{$Settings?.profile?.contractName}</h2>
     {/if}
   </div>
@@ -85,8 +79,8 @@
   <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Senha" type={Types.TTextEdit.PASSWORD} />
   <div />
   <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
-  <Views.Button type="transparent" on:click={doSubscribe}>Criar conta</Views.Button>
-  <Views.Button type="transparent" on:click={forgotPassword}>Recuperar a senha</Views.Button>
+  <Views.Button type={Types.TButton.TRANSPARENT} on:click={doSubscribe}>Criar conta</Views.Button>
+  <Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
   <Views.GTerms />
 </main>
 
@@ -111,7 +105,7 @@
     flex-direction: column;
     width: 100%;
   }
-  .avatar > img {
+  .avatar > :global(img) {
     font-size: 3em;
     width: 100%;
     max-width: 500px;

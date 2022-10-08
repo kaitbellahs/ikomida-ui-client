@@ -1,57 +1,57 @@
 <script lang="ts">
-  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
-  import { onMount } from 'svelte';
-  import { updatePassword, logout } from '../../network/Auth';
-  const Layout = Stores.Layout.instance.store;
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
+  import { onMount } from 'svelte'
+  import { updatePassword, logout } from '../../network/Auth'
+  const Layout = Stores.Layout.instance.store
 
-  let userInfo: Types.Classes.CUser;
+  let userInfo: Types.Classes.CUser
 
-  let passwordObject: Types.Classes.CUser = Types.Classes.CUser.fillWith(null);
+  let passwordObject: Types.Classes.CUser = Types.Classes.CUser.fillWith(null)
   let passwordValidationObject = {
     newPass: false,
-    reNewPass: false,
-  };
+    reNewPass: false
+  }
 
   $: if (userInfo?.avatar) {
     // update()
   }
 
   async function out() {
-    Stores.Loading.instance.start();
-    await logout();
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.start()
+    await logout()
+    Stores.Loading.instance.stop()
   }
 
   async function editPassword() {
     if (!passwordValidationObject.newPass) {
-      Stores.MessageAlert.instance.show('A nova senha não está correta!');
-      return;
+      Stores.MessageAlert.instance.show('A nova senha não está correta!')
+      return
     } else if (!passwordValidationObject.reNewPass) {
-      Stores.MessageAlert.instance.show('A confirmação da senha não está correta');
-      return;
+      Stores.MessageAlert.instance.show('A confirmação da senha não está correta')
+      return
     }
-    Stores.Loading.instance.start();
-    let response = await updatePassword(passwordObject);
+    Stores.Loading.instance.start()
+    let response = await updatePassword(passwordObject)
     if (response.success) {
-      Stores.MessageAlert.instance.show('Senha atualizada com sucesso!');
+      Stores.MessageAlert.instance.show('Senha atualizada com sucesso!')
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
-      Stores.Loading.instance.stop();
-      return;
+      Stores.MessageAlert.instance.show(response?.data)
+      Stores.Loading.instance.stop()
+      return
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   onMount(async () => {
-    userInfo = await Utils.Jws.extractToken((await Stores.Auth.Auth.instance.data()) ?? '');
-    Stores.Loading.instance.stop();
-  });
+    userInfo = await Utils.Jws.extractToken((await Stores.Auth.Auth.instance.data()) ?? '')
+    Stores.Loading.instance.stop()
+  })
 
   function validatePassword(password: string) {
-    return passwordObject.newPass === password;
+    return passwordObject.newPass === password
   }
 
-  Stores.Title.instance.set('Perfil');
+  Stores.Title.instance.set('Perfil')
 </script>
 
 {#if userInfo}
@@ -100,7 +100,7 @@
     <Views.Divider />
   </div>
   <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
-  <Views.Button type="transparent" on:click={out}>Logout</Views.Button>
+  <Views.Button type={Types.TButton.TRANSPARENT} on:click={out}>Logout</Views.Button>
   <Views.GTerms />
 {/if}
 

@@ -1,28 +1,20 @@
 <script lang="ts">
-  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
-  import { Settings } from '../../stores/Setup';
-  import { onMount } from 'svelte';
+  import { Views, Utils, Stores } from '@ikomida/shared-frontend'
+  import { Settings } from '../../stores/Setup'
+  import { onMount } from 'svelte'
 
-  let showImage = true;
-
-  $: settings = $Settings?.profile;
-
-  function hideImage() {
-    showImage = false;
-  }
+  $: settings = $Settings?.profile
 
   onMount(async () => {
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
 
-  Stores.Title.instance.set('Contato');
+  Stores.Title.instance.set('Contato')
 </script>
 
 <div class="settings">
-  {#if showImage}
-    <img on:error={hideImage} src={settings.mainPicture} alt={settings?.contractName} />
-    <Views.Divider />
-  {/if}
+  <Views.Image source={settings.mainPicture} name={settings?.contractName} />
+  <Views.Divider />
   <h2>{settings?.contractName}</h2>
   <Views.Divider />
   <Views.TextValue
@@ -62,7 +54,7 @@
     width: 100%;
     place-content: center;
   }
-  .settings > img {
+  .settings > :global(img) {
     font-size: 3em;
     width: 100%;
     max-width: 100%;

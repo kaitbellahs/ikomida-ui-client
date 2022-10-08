@@ -1,58 +1,58 @@
 <script lang="ts">
-  import Routes from '../../stores/Routes';
-  import { Views, Types, Utils, Stores } from '@ikomida/shared-frontend';
-  import { GetPaymentMethods, UpdateCreditCard, DeleteCreditCard } from '../../network/Payment';
-  import { onMount } from 'svelte';
+  import Routes from '../../stores/Routes'
+  import { Views, Types, Utils, Stores } from '@ikomida/shared-frontend'
+  import { GetPaymentMethods, UpdateCreditCard, DeleteCreditCard } from '../../network/Payment'
+  import { onMount } from 'svelte'
 
-  let payments: Types.Classes.CPaymentMethod[];
+  let payments: Types.Classes.CPaymentMethod[]
 
   function toggleNewCreditCard() {
-    Stores.Navigation.instance.goTo(Routes.newMethod);
+    Stores.Navigation.instance.goTo(Routes.newMethod)
   }
 
   async function updateCreditCard(id?: string) {
-    Stores.Loading.instance.start();
-    const response = await UpdateCreditCard(id);
+    Stores.Loading.instance.start()
+    const response = await UpdateCreditCard(id)
     if (response?.success) {
       for (const item of payments) {
-        item.selected = false;
+        item.selected = false
         if (item.id === id) {
-          item.selected = true;
+          item.selected = true
         }
       }
-      payments = [...payments];
+      payments = [...payments]
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   async function onRemoveClick(id?: string) {
-    Stores.Loading.instance.start();
-    const response = await DeleteCreditCard(id);
+    Stores.Loading.instance.start()
+    const response = await DeleteCreditCard(id)
     if (response?.success) {
-      payments = payments?.filter((item) => item.id !== id);
-      const length = payments?.length ?? 0;
+      payments = payments?.filter(item => item.id !== id)
+      const length = payments?.length ?? 0
       if (length <= 3 && length > 0) {
-        payments[0].selected = true;
-        payments = payments;
+        payments[0].selected = true
+        payments = payments
       }
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   onMount(async () => {
-    const response = await GetPaymentMethods();
+    const response = await GetPaymentMethods()
     if (response?.success) {
-      const data: Types.Classes.CPaymentMethod[] = Types.Classes.CPaymentMethod.fromObject(response.data);
-      payments = data.sort((i1, i2) => (i2.createdAt?.getTime() ?? 0) - (i1.createdAt?.getTime() ?? 0)) || [];
+      const data: Types.Classes.CPaymentMethod[] = Types.Classes.CPaymentMethod.fromObject(response.data)
+      payments = data.sort((i1, i2) => (i2.createdAt?.getTime() ?? 0) - (i1.createdAt?.getTime() ?? 0)) || []
     }
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
 
-  Stores.Title.instance.set('Meios de pagamento');
+  Stores.Title.instance.set('Meios de pagamento')
 </script>
 
 <Views.Divider />
@@ -77,7 +77,7 @@
         Pagar {type.description}
         <span class="brand">
           {#if type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
-            <img src="/assets/cardBrand/{brand}.svg" alt={brand} /> **** {lastDigits}
+            <Views.Image source="/assets/cardBrand/{brand}.svg" name={brand} /> **** {lastDigits}
           {/if}
         </span>
       </div>
@@ -112,8 +112,9 @@
     font-family: 'RobotoMedium';
     margin-bottom: 10px;
   }
-  .paymentCard > .content > .brand > img {
+  .paymentCard > .content > .brand > :global(img) {
     height: 14px;
+    width: auto;
   }
   .paymentCard > .content > .brand {
     font-weight: lighter;

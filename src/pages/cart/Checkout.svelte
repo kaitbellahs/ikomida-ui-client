@@ -1,69 +1,69 @@
 <script lang="ts">
-  import { Views, Utils, Types, Logics, Stores } from '@ikomida/shared-frontend';
-  import { Capacitor } from '@capacitor/core';
-  import { Geolocation } from '@capacitor/geolocation';
-  import { onMount } from 'svelte';
-  import { Cart } from '../../stores/Cart';
-  import type { IStore } from '../../stores/Cart';
-  import { Settings } from '../../stores/Setup';
-  import { GetPaymentMethods, AddCoupon } from '../../network/Payment';
-  import { NewOrders } from '../../network/Orders';
-  import { GetAddresses, GetSettings } from '../../network/User';
-  import Routes from '../../stores/Routes';
+  import { Views, Utils, Types, Logics, Stores } from '@ikomida/shared-frontend'
+  import { Capacitor } from '@capacitor/core'
+  import { Geolocation } from '@capacitor/geolocation'
+  import { onMount } from 'svelte'
+  import { Cart } from '../../stores/Cart'
+  import type { IStore } from '../../stores/Cart'
+  import { Settings } from '../../stores/Setup'
+  import { GetPaymentMethods, AddCoupon } from '../../network/Payment'
+  import { NewOrders } from '../../network/Orders'
+  import { GetAddresses, GetSettings } from '../../network/User'
+  import Routes from '../../stores/Routes'
 
-  let Products: IStore;
-  let location: Types.Classes.CLocation;
-  let coupon: string | undefined;
-  let couponObject: Types.Classes.CCoupon | undefined = undefined;
+  let Products: IStore
+  let location: Types.Classes.CLocation
+  let coupon: string | undefined
+  let couponObject: Types.Classes.CCoupon | undefined = undefined
 
-  let address: Types.Classes.CAddress | undefined;
-  let payment: Types.Classes.CPaymentMethod | undefined;
+  let address: Types.Classes.CAddress | undefined
+  let payment: Types.Classes.CPaymentMethod | undefined
 
   $: subtotalArray =
     $Products?.map(
-      (product) =>
+      product =>
         product.quantity *
-        (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType)),
-    ) ?? [];
-  $: subtotal = (subtotalArray?.length ?? 0) > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
-  $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0) : 0;
+        (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType))
+    ) ?? []
+  $: subtotal = (subtotalArray?.length ?? 0) > 0 ? subtotalArray.reduce((a, b) => a + b) : 0
+  $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0) : 0
   $: delivery = $Settings?.delivery?.free
     ? 0
     : calcDelivery < $Settings?.delivery?.min
     ? $Settings?.delivery?.min
-    : calcDelivery;
-  $: netTotal = subtotal + delivery;
-  $: discount = couponObject ? Logics.Finances.calcDiscount(subtotal, couponObject.value, couponObject.valueType) : 0;
-  $: total = netTotal - discount;
-  $: validate = address && payment;
-  $: businessTime = Logics.DateTime.isBusinessTime($Settings.business);
+    : calcDelivery
+  $: netTotal = subtotal + delivery
+  $: discount = couponObject ? Logics.Finances.calcDiscount(subtotal, couponObject.value, couponObject.valueType) : 0
+  $: total = netTotal - discount
+  $: validate = address && payment
+  $: businessTime = Logics.DateTime.isBusinessTime($Settings.business)
 
   function addMoreItems() {
-    Stores.Navigation.instance.pop(3);
+    Stores.Navigation.instance.pop(3)
   }
 
   async function getLocation() {
     if (Capacitor.isNativePlatform()) {
-      const res = await Geolocation.getCurrentPosition();
+      const res = await Geolocation.getCurrentPosition()
       location = Types.Classes.CLocation.fromObject({
         latitude: res.coords.latitude,
-        longitude: res.coords.longitude,
-      });
+        longitude: res.coords.longitude
+      })
     } else {
-      navigator.geolocation.getCurrentPosition((res) => {
+      navigator.geolocation.getCurrentPosition(res => {
         location = Types.Classes.CLocation.fromObject({
           latitude: res.coords.latitude,
-          longitude: res.coords.longitude,
-        });
-      });
+          longitude: res.coords.longitude
+        })
+      })
     }
   }
 
   async function forward() {
-    Stores.Loading.instance.start();
+    Stores.Loading.instance.start()
     if (!address || !payment?.type) {
-      Stores.Loading.instance.stop();
-      return;
+      Stores.Loading.instance.stop()
+      return
     }
     const payload: Types.Classes.COrder = Types.Classes.COrder.init(
       netTotal,
@@ -78,102 +78,102 @@
       undefined,
       undefined,
       undefined,
-      payment,
-    );
-    const response = await NewOrders(payload);
-    Stores.Loading.instance.stop();
+      payment
+    )
+    const response = await NewOrders(payload)
+    Stores.Loading.instance.stop()
     if (response && response?.success) {
-      await Cart.instance.reset();
+      await Cart.instance.reset()
       Stores.Navigation.instance.goTo(Routes.order, {
         newOrder: true,
-        order: response?.data,
-      });
+        order: response?.data
+      })
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
   }
 
   async function addCoupon() {
     if (coupon && coupon.length >= 3) {
-      Stores.Loading.instance.start();
-      const response = await AddCoupon(coupon);
+      Stores.Loading.instance.start()
+      const response = await AddCoupon(coupon)
       if (response?.success) {
-        couponObject = Types.Classes.CCoupon.fromObject(response.data);
+        couponObject = Types.Classes.CCoupon.fromObject(response.data)
       } else {
-        Stores.MessageAlert.instance?.show(response?.data);
+        Stores.MessageAlert.instance?.show(response?.data)
       }
-      Stores.Loading.instance.stop();
+      Stores.Loading.instance.stop()
     }
   }
 
   function removeCoupon() {
-    couponObject = undefined;
-    coupon = undefined;
+    couponObject = undefined
+    coupon = undefined
   }
 
   function manageCard() {
-    Stores.Navigation.instance.goTo(Routes.payments);
+    Stores.Navigation.instance.goTo(Routes.payments)
   }
 
   function manageAddress() {
-    Stores.Navigation.instance.goTo(Routes.addresses);
+    Stores.Navigation.instance.goTo(Routes.addresses)
   }
 
   onMount(async () => {
     try {
-      console.log('onMount');
-      Products = await Cart.instance.store();
-      let response = await GetSettings();
+      console.log('onMount')
+      Products = await Cart.instance.store()
+      let response = await GetSettings()
       if (response?.success && response?.data) {
         const settings: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject({
           ...Settings.get().toJSON(),
-          ...response?.data,
-        });
-        Settings.set(settings);
+          ...response?.data
+        })
+        Settings.set(settings)
       } else {
-        Stores.MessageAlert.instance.show(response?.data);
+        Stores.MessageAlert.instance.show(response?.data)
       }
-      response = await GetAddresses();
+      response = await GetAddresses()
       if (response?.success) {
-        const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response.data);
-        const addresses = data.filter((address) => address.selected);
-        address = (addresses?.length ?? 0) === 1 ? addresses[0] : undefined;
+        const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response.data)
+        const addresses = data.filter(address => address.selected)
+        address = (addresses?.length ?? 0) === 1 ? addresses[0] : undefined
       }
-      response = await GetPaymentMethods();
+      response = await GetPaymentMethods()
       if (response?.success) {
-        const data: Types.Classes.CPaymentMethod[] = Types.Classes.CPaymentMethod.fromObject(response.data);
-        const payments = data.filter((paymentMethod) => paymentMethod.selected);
-        payment = (payments?.length ?? 0) === 1 ? payments[0] : undefined;
+        const data: Types.Classes.CPaymentMethod[] = Types.Classes.CPaymentMethod.fromObject(response.data)
+        const payments = data.filter(paymentMethod => paymentMethod.selected)
+        payment = (payments?.length ?? 0) === 1 ? payments[0] : undefined
       }
       if (Capacitor.isNativePlatform()) {
-        const checkpermissions = await Geolocation.checkPermissions();
+        const checkpermissions = await Geolocation.checkPermissions()
         if (checkpermissions.location != 'prompt') {
-          const permissions = await Geolocation.requestPermissions();
+          const permissions = await Geolocation.requestPermissions()
           if (permissions.location != 'granted') {
-            await getLocation();
+            await getLocation()
           }
         } else {
-          await getLocation();
+          await getLocation()
         }
       } else {
         if (navigator.permissions && navigator.permissions.query) {
           const permission = await navigator.permissions.query({
-            name: 'geolocation',
-          });
+            name: 'geolocation'
+          })
           if (permission.state != 'denied') {
-            await getLocation();
+            await getLocation()
           }
         } else if (navigator.geolocation) {
-          await getLocation();
+          await getLocation()
         }
       }
     } catch (exception: any) {
-      console.error(exception);
+      console.error(exception)
     }
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
 
-  Stores.Title.instance.set('Resumo e pagamento');
+  Stores.Title.instance.set('Resumo e pagamento')
 </script>
 
 <table>
@@ -211,7 +211,7 @@
   </tbody>
 </table>
 {#if couponObject}
-  <Views.Button type="transparent" on:click={removeCoupon}>Remover o cupom</Views.Button>
+  <Views.Button type={Types.TButton.TRANSPARENT} on:click={removeCoupon}>Remover o cupom</Views.Button>
 {:else}
   <Views.TextEdit
     bind:value={coupon}
@@ -222,7 +222,7 @@
     upper={true}
   />
 {/if}
-<Views.Button type="transparent" on:click={addMoreItems}>Adicionar mais itens</Views.Button>
+<Views.Button type={Types.TButton.TRANSPARENT} on:click={addMoreItems}>Adicionar mais itens</Views.Button>
 <Views.Divider />
 <Views.Button on:click={manageAddress}>trocar endereço</Views.Button>
 {#if address === undefined}
@@ -251,7 +251,7 @@
       {payment?.type.description}
       <span class="brand">
         {#if payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
-          <img src="/assets/cardBrand/{payment?.brand}.svg" alt={payment?.brand} />
+          <Views.Image source="/assets/cardBrand/{payment?.brand}.svg" name={payment?.brand} />
           **** {payment?.lastDigits}
         {/if}
       </span>
@@ -268,7 +268,7 @@
         Types.Types.TPaymentMethod.CASH_ON_DELIVERY,
         Types.Types.TPaymentMethod.CREDIT_CARD_ON_DELIVERY,
         Types.Types.TPaymentMethod.DEBT_CARD_ON_DELIVERY,
-        Types.Types.TPaymentMethod.PIX_ON_DELIVERY,
+        Types.Types.TPaymentMethod.PIX_ON_DELIVERY
       ].includes(payment.type)
         ? 'pedido'
         : 'pagamento'}</span
@@ -296,8 +296,9 @@
     font-size: 0.9em;
     width: 100%;
   }
-  .paymentCard > .content > .brand > img {
+  .paymentCard > .content > .brand > :global(img) {
     height: 14px;
+    width: auto;
   }
   .paymentCard > .content > .brand {
     font-weight: lighter;

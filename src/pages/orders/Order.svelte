@@ -14,8 +14,6 @@
   const order: Types.Classes.COrder = Types.Classes.COrder.fromObject($router.options.order)
 
   let screenShot = false
-  let showImage = true
-  let showCardBrand = true
   let orderScreen: HTMLElement
 
   $: if (newOrder) {
@@ -24,10 +22,6 @@
     })
   }
   $: total = Number(order.subtotal ?? 0) + Number(order.delivery ?? 0) - Number(order.discount ?? 0)
-
-  function hideCardBrand() {
-    showCardBrand = false
-  }
 
   async function changeOrderStatus(status: Types.Types.TOrderStatus) {
     Stores.Loading.instance.start()
@@ -86,10 +80,6 @@
     })
   }
 
-  function erroLoadImage() {
-    showImage = false
-  }
-
   onMount(async () => {
     if (await Share.canShare()) {
       Stores.Menu.instance.addItem({
@@ -107,16 +97,15 @@
 <div class="order {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>
   <div class="avatar {screenShot ? 'screenShot' : ''}">
     <div class="avatar">
-      {#if $Settings?.profile?.mainPicture && showImage}
-        <img
-          on:error={erroLoadImage}
-          src={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
-          alt={$Settings?.profile?.contractName ?? 'iKomida'}
+      {#if $Settings?.profile?.mainPicture}
+        <Views.Image
+          source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+          name={$Settings?.profile?.contractName ?? 'iKomida'}
         />
       {:else if $Settings?.profile?.contractName}
         <h1>{$Settings?.profile?.contractName}</h1>
       {:else}
-        <img src="assets/icons/transparent-logo-1.svg" alt="iKomida" />
+        <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
         <h2>{$Settings?.profile?.contractName}</h2>
       {/if}
     </div>
@@ -200,16 +189,14 @@
     >
     <span class="brand">
       {#if order.payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
-        {#if showCardBrand}
-          <img on:error={hideCardBrand} src="/assets/cardBrand/{order.payment.brand}.svg" alt={order.payment.brand} />
-        {/if}
+        <Views.Image source="/assets/cardBrand/{order.payment.brand}.svg" name={order.payment.brand} />
         **** {order.payment.lastDigits}
       {/if}
     </span>
   </div>
   <div data-html2canvas-ignore class="buttonGroup">
     {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN].includes(order.status)}
-      <Views.Button sizeMultiplier={0.8} type="secondary" on:click={cancel}>Cancelar</Views.Button>
+      <Views.Button sizeMultiplier={0.8} type={Types.TButton.SECONDARY} on:click={cancel}>Cancelar</Views.Button>
     {/if}
     {#if order.status && [Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status)}
       <Views.Button on:click={delivered}>Confirmar<br />a entrega</Views.Button>
@@ -254,7 +241,7 @@
 
   <div class="signature {screenShot ? 'screenShot' : ''}">
     <Views.Divider height={30} />
-    <span>Feito com carinho por</span><img src="assets/icons/transparent-logo-1.svg" alt="iKomida" />
+    <span>Feito com carinho por</span><Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
   </div>
 </div>
 <Views.GTerms />
@@ -328,8 +315,9 @@
     display: flex;
     flex-direction: column;
   }
-  .paymentMethod > .brand > img {
+  .paymentMethod > .brand > :global(img) {
     height: 14px;
+    width: auto;
   }
   .paymentMethod > .brand {
     font-weight: lighter;
@@ -398,7 +386,7 @@
   .avatar.screenShot {
     display: flex;
   }
-  .avatar > img {
+  .avatar > :global(img) {
     font-size: 3em;
     width: 100%;
     max-width: 100%;
@@ -417,7 +405,8 @@
   .signature.screenShot {
     display: flex;
   }
-  .signature > img {
+  .signature > :global(img) {
     height: 45px;
+    width: auto;
   }
 </style>
