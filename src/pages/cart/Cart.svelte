@@ -11,6 +11,7 @@
   let Products: IStore
   let showAlert = false
   let address: Types.Classes.CAddress | null
+  let working: Types.Interfaces.IRecord<string, boolean> = {}
 
   $: optionsTotal = () => {
     const totalOptionsArray =
@@ -57,6 +58,41 @@
   }
 
   function forward() {
+    if (!('forward' in working) || !working.forward) {
+      working.forward = true
+      for (const cartProduct of $Products) {
+        const productOptionsCategoriesMandatories =
+          cartProduct.optionsCategories?.filter(optionsCategory => optionsCategory.min > 0) ?? []
+        for (const productOptionsCategoriesMandatory of productOptionsCategoriesMandatories) {
+          if (
+            getCartOptionsCount(cartProduct, productOptionsCategoriesMandatory) <
+            productOptionsCategoriesMandatory.min * cartProduct.quantity
+          ) {
+            Stores.MessageAlert.instance.show(
+              `Certifique-se de que selecionou no mínimo ${
+                productOptionsCategoriesMandatory.min * cartProduct.quantity
+              } ${productOptionsCategoriesMandatory.min * cartProduct.quantity > 1 ? 'opções' : 'opção'} na categoria ${
+                productOptionsCategoriesMandatory.name
+              }.`
+            )
+            working.forward = false
+            return
+          }
+        }
+        for (const optionsCategory of cartProduct.optionsCategories ?? []) {
+          if (getCartOptionsCount(cartProduct, optionsCategory) > optionsCategory.max * cartProduct.quantity) {
+            Stores.MessageAlert.instance.show(
+              `Diminua a quantidade das opções escolhidas, a categoria "${optionsCategory.name}" aceita no maximo ${
+                optionsCategory.max * cartProduct.quantity
+              } ${optionsCategory.max * cartProduct.quantity > 1 ? 'opções' : 'opção'}.`
+            )
+            working.forward = false
+            return
+          }
+        }
+      }
+      working.forward = false
+    }
     Stores.Navigation.instance.goTo(Routes.checkout)
   }
 
@@ -71,105 +107,123 @@
   }
 
   async function onRemoveClick(inputCartProduct?: Types.CCart, inputOption?: Types.CCartProductOption) {
-    if (inputCartProduct) {
-      const cartProduct = $Products.filter(product => product.equal(inputCartProduct))?.[0]
-      if (inputOption) {
-        const option = cartProduct.options.filter(option => option.equal(inputOption))?.[0]
-        const optionsCategories = cartProduct.optionsCategories?.filter(optionsCategory => {
-          const filtredOptionsCategory = optionsCategory.options.filter(productOption => productOption.id === option.id)
-          return filtredOptionsCategory.length === 1
-        })
-        const optionsCategory = optionsCategories?.[0]
-        if (optionsCategory && option) {
-          if (
-            getCartOptionsCount(cartProduct, optionsCategory) - inputOption.units <=
-            optionsCategory.min * cartProduct.quantity
-          ) {
-            Stores.MessageAlert.instance.show(
-              `Não será possível deletar esta opção nesta categoria, porque é obrigatório escolher no mínimo ${
-                optionsCategory.min * cartProduct.quantity
-              } ${optionsCategory.min * cartProduct.quantity > 1 ? 'opções' : 'opção'} na categoria "${
-                optionsCategory.name
-              }", tente adicionar outras opções nesta categoria e também pode excluir o produto.`
+    if (!('onRemoveClick' in working) || !working.onRemoveClick) {
+      working.onRemoveClick = true
+      if (inputCartProduct) {
+        const cartProduct = $Products.filter(product => product.equal(inputCartProduct))?.[0]
+        if (inputOption) {
+          const option = cartProduct.options.filter(option => option.equal(inputOption))?.[0]
+          const optionsCategories = cartProduct.optionsCategories?.filter(optionsCategory => {
+            const filtredOptionsCategory = optionsCategory.options.filter(
+              productOption => productOption.id === option.id
             )
-            return
+            return filtredOptionsCategory.length === 1
+          })
+          const optionsCategory = optionsCategories?.[0]
+          if (optionsCategory && option) {
+            if (
+              getCartOptionsCount(cartProduct, optionsCategory) - inputOption.units <=
+              optionsCategory.min * cartProduct.quantity
+            ) {
+              Stores.MessageAlert.instance.show(
+                `Não será possível deletar esta opção nesta categoria, porque é obrigatório escolher no mínimo ${
+                  optionsCategory.min * cartProduct.quantity
+                } ${optionsCategory.min * cartProduct.quantity > 1 ? 'opções' : 'opção'} na categoria "${
+                  optionsCategory.name
+                }", tente adicionar outras opções nesta categoria e também pode excluir o produto.`
+              )
+              working.onRemoveClick = false
+              return
+            }
+            const optionIndex = cartProduct.options.indexOf(option)
+            cartProduct.options.splice(optionIndex, 1)
+            await Cart.instance.update($Products)
           }
-          const optionIndex = cartProduct.options.indexOf(option)
-          cartProduct.options.splice(optionIndex, 1)
-          await Cart.instance.update($Products)
-        }
-      } else {
-        if (cartProduct) {
-          await Cart.instance.update($Products.filter(product => !product.equal(cartProduct)))
+        } else {
+          if (cartProduct) {
+            await Cart.instance.update($Products.filter(product => !product.equal(cartProduct)))
+          }
         }
       }
+      working.onRemoveClick = false
     }
   }
 
   async function onPlusClick(inputCartProduct?: Types.CCart, inputOption?: Types.CCartProductOption) {
-    let update = false
-    if (inputCartProduct) {
-      const cartProduct = $Products.filter(product => product.equal(inputCartProduct))?.[0]
-      if (inputOption) {
-        const option = cartProduct.options.filter(option => option.equal(inputOption))?.[0]
-        if (option && option.units < option.maxUnits * cartProduct.quantity) {
-          option.units++
-          update = true
-        }
-      } else {
-        if (cartProduct && cartProduct.quantity < cartProduct.leftQuantity) {
-          cartProduct.quantity++
-          update = true
-        }
-      }
-    }
-    if (update) {
-      await Cart.instance.update($Products)
-    }
-  }
-
-  async function onMinosClick(inputCartProduct?: Types.CCart, inputOption?: Types.CCartProductOption) {
-    if (inputCartProduct) {
+    if (!('onPlusClick' in working) || !working.onPlusClick) {
+      working.onPlusClick = true
       let update = false
-      const cartProduct = $Products.filter(product => product.equal(inputCartProduct))?.[0]
-      if (inputOption) {
-        const option = cartProduct.options.filter(option => option.equal(inputOption))?.[0]
-        const optionsCategories = cartProduct.optionsCategories?.filter(optionsCategory => {
-          const filtredOptionsCategory = optionsCategory.options.filter(productOption => productOption.id === option.id)
-          return filtredOptionsCategory.length === 1
-        })
-        const optionsCategory = optionsCategories?.[0]
-        if (optionsCategory && option) {
-          if (getCartOptionsCount(cartProduct, optionsCategory) <= optionsCategory.min * cartProduct.quantity) {
-            Stores.MessageAlert.instance.show(
-              `Não será possível diminuir a quantidade das opções, porque é obrigatório escolher no mínimo ${
-                optionsCategory.min * cartProduct.quantity
-              } ${optionsCategory.min * cartProduct.quantity > 1 ? 'opções' : 'opção'} na categoria "${
-                optionsCategory.name
-              }", tente adicionar outras opções nesta categoria e também pode excluir o produto.`
-            )
-            return
-          }
-          if (option.units > 1) {
-            option.units--
-            update = true
-          } else if (option) {
-            const optionIndex = cartProduct.options.indexOf(option)
-            cartProduct.options.splice(optionIndex, 1)
+      if (inputCartProduct) {
+        const cartProduct = $Products.filter(product => product.equal(inputCartProduct))?.[0]
+        if (inputOption) {
+          const option = cartProduct.options.filter(option => option.equal(inputOption))?.[0]
+          if (option && option.units < option.maxUnits * cartProduct.quantity) {
+            option.units++
             update = true
           }
-        }
-      } else {
-        if (cartProduct?.quantity > 1) {
-          cartProduct.quantity--
-          update = true
         } else {
-          await onRemoveClick(cartProduct)
+          if (cartProduct && cartProduct.quantity < cartProduct.leftQuantity) {
+            cartProduct.quantity++
+            update = true
+          }
         }
       }
       if (update) {
         await Cart.instance.update($Products)
       }
+      working.onPlusClick = false
+    }
+  }
+
+  async function onMinosClick(inputCartProduct?: Types.CCart, inputOption?: Types.CCartProductOption) {
+    if (!('onMinosClick' in working) || !working.onMinosClick) {
+      working.onMinosClick = true
+      if (inputCartProduct) {
+        let update = false
+        const cartProduct = $Products.filter(product => product.equal(inputCartProduct))?.[0]
+        if (inputOption) {
+          const option = cartProduct.options.filter(option => option.equal(inputOption))?.[0]
+          const optionsCategories = cartProduct.optionsCategories?.filter(optionsCategory => {
+            const filtredOptionsCategory = optionsCategory.options.filter(
+              productOption => productOption.id === option.id
+            )
+            return filtredOptionsCategory.length === 1
+          })
+          const optionsCategory = optionsCategories?.[0]
+          if (optionsCategory && option) {
+            if (getCartOptionsCount(cartProduct, optionsCategory) <= optionsCategory.min * cartProduct.quantity) {
+              Stores.MessageAlert.instance.show(
+                `Não será possível diminuir a quantidade das opções, porque é obrigatório escolher no mínimo ${
+                  optionsCategory.min * cartProduct.quantity
+                } ${optionsCategory.min * cartProduct.quantity > 1 ? 'opções' : 'opção'} na categoria "${
+                  optionsCategory.name
+                }", tente adicionar outras opções nesta categoria e também pode excluir o produto.`
+              )
+              working.onMinosClick = false
+              return
+            }
+            if (option.units > 1) {
+              option.units--
+              update = true
+            } else if (option) {
+              const optionIndex = cartProduct.options.indexOf(option)
+              cartProduct.options.splice(optionIndex, 1)
+              update = true
+            }
+          }
+        } else {
+          if (cartProduct?.quantity > 1) {
+            cartProduct.quantity--
+            update = true
+          } else {
+            await onRemoveClick(cartProduct)
+          }
+        }
+        if (update) {
+          await Cart.instance.update($Products)
+        }
+      }
+      working.onMinosClick = false
     }
   }
 

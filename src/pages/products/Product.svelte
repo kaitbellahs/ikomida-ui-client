@@ -16,6 +16,7 @@
 
   let cartProduct: Types.CCart
   let quantity = 1
+  let working: Types.Interfaces.IRecord<string, boolean> = {}
 
   $: optionsTotal = () => {
     let calcTotal = 0
@@ -54,29 +55,33 @@
   }
 
   function minos(productOption?: Types.Classes.CProductOption) {
-    try {
-      if (productOption) {
-        const cartOption = cartProduct.options.filter(option => option.id === productOption.id)?.[0]
-        if (cartOption && cartProduct.options) {
-          const cartOptionIndex = cartProduct.options.indexOf(cartOption)
-          if (cartOption.units > 1) {
-            cartProduct.options[cartOptionIndex].units--
+    if (!('minos' in working) || !working.minos) {
+      working.minos = true
+      try {
+        if (productOption) {
+          const cartOption = cartProduct.options.filter(option => option.id === productOption.id)?.[0]
+          if (cartOption && cartProduct.options) {
+            const cartOptionIndex = cartProduct.options.indexOf(cartOption)
+            if (cartOption.units > 1) {
+              cartProduct.options[cartOptionIndex].units--
+            } else {
+              cartProduct.options?.splice(cartOptionIndex, 1)
+            }
+            cartProduct = cartProduct
           } else {
-            cartProduct.options?.splice(cartOptionIndex, 1)
+            throw new Error(genericError)
           }
           cartProduct = cartProduct
-        } else {
-          throw new Error(genericError)
+        } else if (quantity > 1) {
+          quantity--
         }
-        cartProduct = cartProduct
-      } else if (quantity > 1) {
-        quantity--
+      } catch (exception: any) {
+        //TODO: -- report error
+        if (exception instanceof Error) {
+          Stores.MessageAlert.instance.show(exception.message)
+        }
       }
-    } catch (exception: any) {
-      //TODO: -- report error
-      if (exception instanceof Error) {
-        Stores.MessageAlert.instance.show(exception.message)
-      }
+      working.minos = false
     }
   }
 
@@ -84,117 +89,127 @@
     productOptionsCategory?: Types.Classes.CProductOptionsCategory,
     productOption?: Types.Classes.CProductOption
   ) {
-    try {
-      if (productOptionsCategory !== undefined && productOption !== undefined) {
-        const optionsCategoryIds = productOptionsCategory?.options.flatMap(option => option.id) ?? []
-        const cartFiltredOptions = cartProduct.options?.filter(option => optionsCategoryIds.includes(option.id)) ?? []
-        if (productOption) {
-          const cartOptions = cartFiltredOptions?.filter(cartOption => productOption.id === cartOption.id)
-          let cartOption = cartOptions?.[0]
-          if (
-            !cartOption &&
-            productOptionsCategory &&
-            getCartOptionsCount(productOptionsCategory) < productOptionsCategory.max * quantity
-          ) {
-            cartOption = Types.CCartProductOption.fromObject(productOption.toJSON())
-            if (cartOption) {
-              cartOption.units = 1
-              cartOption.maxUnits = productOption.units
-              if (!Array.isArray(cartProduct.options)) {
-                cartProduct.options = []
-              }
-              cartProduct.options?.push(cartOption)
-            } else {
-              throw new Error(genericError)
-            }
-          } else if (productOption && cartOption) {
-            cartOption.maxUnits = productOption.units
+    if (!('plus' in working) || !working.plus) {
+      working.plus = true
+      try {
+        if (productOptionsCategory && productOption) {
+          const optionsCategoryIds = productOptionsCategory?.options.flatMap(option => option.id) ?? []
+          const cartFiltredOptions = cartProduct.options?.filter(option => optionsCategoryIds.includes(option.id)) ?? []
+          if (productOption) {
+            const cartOptions = cartFiltredOptions?.filter(cartOption => productOption.id === cartOption.id)
+            let cartOption = cartOptions?.[0]
             if (
-              cartOption.units < cartOption.maxUnits * quantity &&
+              !cartOption &&
               productOptionsCategory &&
               getCartOptionsCount(productOptionsCategory) < productOptionsCategory.max * quantity
             ) {
-              cartOption.units++
+              cartOption = Types.CCartProductOption.fromObject(productOption.toJSON())
+              if (cartOption) {
+                cartOption.units = 1
+                cartOption.maxUnits = productOption.units
+                if (!Array.isArray(cartProduct.options)) {
+                  cartProduct.options = []
+                }
+                cartProduct.options?.push(cartOption)
+              } else {
+                throw new Error(genericError)
+              }
+            } else if (productOption && cartOption) {
+              cartOption.maxUnits = productOption.units
+              if (
+                cartOption.units < cartOption.maxUnits * quantity &&
+                productOptionsCategory &&
+                getCartOptionsCount(productOptionsCategory) < productOptionsCategory.max * quantity
+              ) {
+                cartOption.units++
+              }
             }
+            cartProduct = cartProduct
+          } else {
+            Stores.MessageAlert.instance.show(genericError)
+            throw new Error(genericError)
           }
-          cartProduct = cartProduct
         } else {
-          Stores.MessageAlert.instance.show(genericError)
-          throw new Error(genericError)
+          if (quantity < cartProduct.quantity) {
+            quantity++
+          }
         }
-      } else {
-        if (quantity < cartProduct.quantity) {
-          quantity++
+      } catch (exception: any) {
+        //TODO: report error
+        console.error(exception)
+        if (exception instanceof Error) {
+          Stores.MessageAlert.instance.show(exception.message)
         }
       }
-    } catch (exception: any) {
-      //TODO: report error
-      console.error(exception)
-      if (exception instanceof Error) {
-        Stores.MessageAlert.instance.show(exception.message)
-      }
+      working.plus = false
     }
   }
 
   const addProduct = async () => {
-    const cartProducts = await Cart.instance.products()
-    const filtredInitalCartProduct = cartProducts.filter(newCartProduct => {
-      if (newCartProduct.equal(initalProduct)) {
-        return true
-      }
-      const clonedCartProduct = Types.CCart.fromObject(newCartProduct.toJSON())
-      for (const option of clonedCartProduct.options) {
-        const cartOption = newCartProduct.options.filter(cartOption => cartOption.id === option.id)?.[0]
-        if (cartOption) {
-          option.units = cartOption.units
-          option.maxUnits = cartOption.maxUnits
+    if (!('addProduct' in working) || !working.addProduct) {
+      working.addProduct = true
+      const productOptionsCategoriesMandatories =
+        cartProduct.optionsCategories?.filter(optionsCategory => optionsCategory.min > 0) ?? []
+      for (const productOptionsCategoriesMandatory of productOptionsCategoriesMandatories) {
+        if (getCartOptionsCount(productOptionsCategoriesMandatory) < productOptionsCategoriesMandatory.min * quantity) {
+          Stores.MessageAlert.instance.show(
+            `Certifique-se de que selecionou no mínimo ${productOptionsCategoriesMandatory.min * quantity} ${
+              productOptionsCategoriesMandatory.min * quantity > 1 ? 'opções' : 'opção'
+            } na categoria ${productOptionsCategoriesMandatory.name}.`
+          )
+          working.addProduct = false
+          return
         }
       }
-      clonedCartProduct.id = cartProduct.id
-      return newCartProduct.equal(clonedCartProduct)
-    })?.[0]
-    const index = cartProducts.indexOf(filtredInitalCartProduct)
-    cartProduct.leftQuantity = cartProduct.quantity
-    cartProduct.quantity = quantity
-    const productOptionsCategoriesMandatories =
-      cartProduct.optionsCategories?.filter(optionsCategory => optionsCategory.min > 0) ?? []
-    for (const productOptionsCategoriesMandatory of productOptionsCategoriesMandatories) {
-      if (getCartOptionsCount(productOptionsCategoriesMandatory) < productOptionsCategoriesMandatory.min * quantity) {
-        Stores.MessageAlert.instance.show(
-          `Certifique-se de que selecionou no mínimo ${productOptionsCategoriesMandatory.min * quantity} ${
-            productOptionsCategoriesMandatory.min * quantity > 1 ? 'opções' : 'opção'
-          } na categoria ${productOptionsCategoriesMandatory.name}.`
-        )
-        return
-      }
-    }
-    for (const optionsCategory of cartProduct.optionsCategories ?? []) {
-      if (getCartOptionsCount(optionsCategory) > optionsCategory.max * quantity) {
-        Stores.MessageAlert.instance.show(
-          `Diminua a quantidade das opções escolhidas, a categoria "${optionsCategory.name}" aceita no maximo ${
-            optionsCategory.max * quantity
-          } ${optionsCategory.max * quantity > 1 ? 'opções' : 'opção'}.`
-        )
-        return
-      }
-    }
-    if (index >= 0) {
-      if (!Types.CCart.isInstance(initalProduct)) {
-        cartProduct.quantity = cartProducts[index].quantity + quantity
-        cartProduct.leftQuantity = cartProduct.quantity
-      }
-      for (const option of cartProduct.options) {
-        const cartOption = cartProducts[index].options.filter(cartOption => cartOption.id === option.id)?.[0]
-        if (cartOption) {
-          option.units += cartOption.units
+      for (const optionsCategory of cartProduct.optionsCategories ?? []) {
+        if (getCartOptionsCount(optionsCategory) > optionsCategory.max * quantity) {
+          Stores.MessageAlert.instance.show(
+            `Diminua a quantidade das opções escolhidas, a categoria "${optionsCategory.name}" aceita no maximo ${
+              optionsCategory.max * quantity
+            } ${optionsCategory.max * quantity > 1 ? 'opções' : 'opção'}.`
+          )
+          working.addProduct = false
+          return
         }
       }
-      cartProducts[index] = cartProduct
-      await Cart.instance.update(cartProducts)
-    } else {
-      await Cart.instance.addProduct(cartProduct)
+      const cartProducts = await Cart.instance.products()
+      const filtredInitalCartProduct = cartProducts.filter(newCartProduct => {
+        if (newCartProduct.equal(initalProduct)) {
+          return true
+        }
+        const clonedCartProduct = Types.CCart.fromObject(newCartProduct.toJSON())
+        for (const option of clonedCartProduct.options) {
+          const cartOption = newCartProduct.options.filter(cartOption => cartOption.id === option.id)?.[0]
+          if (cartOption) {
+            option.units = cartOption.units
+            option.maxUnits = cartOption.maxUnits
+          }
+        }
+        clonedCartProduct.id = cartProduct.id
+        return newCartProduct.equal(clonedCartProduct)
+      })?.[0]
+      cartProduct.leftQuantity = cartProduct.quantity
+      cartProduct.quantity = quantity
+      const index = cartProducts.indexOf(filtredInitalCartProduct)
+      if (index >= 0) {
+        if (!Types.CCart.isInstance(initalProduct)) {
+          cartProduct.quantity = cartProducts[index].quantity + quantity
+          cartProduct.leftQuantity = cartProduct.quantity
+        }
+        for (const option of cartProduct.options) {
+          const cartOption = cartProducts[index].options.filter(cartOption => cartOption.id === option.id)?.[0]
+          if (cartOption) {
+            option.units += cartOption.units
+          }
+        }
+        cartProducts[index] = cartProduct
+        await Cart.instance.update(cartProducts)
+      } else {
+        await Cart.instance.addProduct(cartProduct)
+      }
+      Stores.Navigation.instance.goTo(Routes.cart)
+      working.addProduct = false
     }
-    Stores.Navigation.instance.goTo(Routes.cart)
   }
 
   onMount(async () => {
@@ -309,7 +324,7 @@
                         on:click={() => minos(option)}
                       >
                         <Fa icon={faMinusSquare} /></Views.Button
-                      ><span>{getCartOptionUnitsById(option.id)}</span><Views.Button
+                      ><span>{getCartOptionUnitsById(option.id)}/{option.units * quantity}</span><Views.Button
                         type={Types.TButton.TRANSPARENT}
                         size="none"
                         height="16px"
