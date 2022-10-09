@@ -173,11 +173,16 @@
         }
       }
       const cartProducts = await Cart.instance.products()
+      let isEditing = false
       const filtredInitalCartProduct = cartProducts.filter(newCartProduct => {
         if (newCartProduct.equal(initalProduct)) {
+          isEditing = true
           return true
         }
-        const clonedCartProduct = Types.CCart.fromObject(newCartProduct.toJSON())
+        const clonedCartProductJSON = newCartProduct.toJSON()
+        clonedCartProductJSON.options = cartProduct.options
+        clonedCartProductJSON.id = cartProduct.id
+        const clonedCartProduct = Types.CCart.fromObject(clonedCartProductJSON)
         for (const option of clonedCartProduct.options) {
           const cartOption = newCartProduct.options.filter(cartOption => cartOption.id === option.id)?.[0]
           if (cartOption) {
@@ -185,7 +190,6 @@
             option.maxUnits = cartOption.maxUnits
           }
         }
-        clonedCartProduct.id = cartProduct.id
         return newCartProduct.equal(clonedCartProduct)
       })?.[0]
       cartProduct.leftQuantity = cartProduct.quantity
@@ -193,13 +197,15 @@
       const index = cartProducts.indexOf(filtredInitalCartProduct)
       if (index >= 0) {
         if (!Types.CCart.isInstance(initalProduct)) {
-          cartProduct.quantity = cartProducts[index].quantity + quantity
+          cartProduct.quantity = isEditing ? quantity : cartProducts[index].quantity + quantity
           cartProduct.leftQuantity = cartProduct.quantity
         }
-        for (const option of cartProduct.options) {
-          const cartOption = cartProducts[index].options.filter(cartOption => cartOption.id === option.id)?.[0]
-          if (cartOption) {
-            option.units += cartOption.units
+        if (!isEditing) {
+          for (const option of cartProduct.options) {
+            const cartOption = cartProducts[index].options.filter(cartOption => cartOption.id === option.id)?.[0]
+            if (cartOption) {
+              option.units += cartOption.units
+            }
           }
         }
         cartProducts[index] = cartProduct

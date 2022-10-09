@@ -39,6 +39,10 @@ export async function search(query: string): Promise<Types.Classes.CCategoryProd
     .filter(item => (item.products?.length ?? 0) > 0)
 }
 
+export async function getProduct(id?: string) {
+  return Network.instance?.get(`/product/${id}`, true)
+}
+
 function sortItems(items: Types.Classes.CCategoryProducts[]) {
   return items
     .map(category => {
