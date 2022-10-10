@@ -145,7 +145,7 @@
       </header>
       {#if (product.options?.length ?? 0) > 0}
         <div>
-          <h4>Opções do produto:</h4>
+          <!-- <h4>Opções do produto:</h4> -->
           {#each product.options ?? [] as option, optionIndex}
             <div class="option">
               <span class="units">{option.units}</span><span class="name">{option.name}</span><span class="price"
@@ -262,6 +262,9 @@
     display: flex;
     justify-content: space-between;
     border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
   }
   .product > header > .quantity {
     margin-right: 5px;
@@ -277,6 +280,12 @@
   .product > header > .price {
     margin-left: 5px;
     font-family: RobotoMedium;
+    font-size: 0.9em;
+  }
+  .product > div {
+    margin-left: 15px;
+    margin-bottom: 5px;
+    margin-top: 5px;
     font-size: 0.9em;
   }
   .product > div > .option > .units {

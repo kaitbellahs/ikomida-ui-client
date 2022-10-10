@@ -10,6 +10,7 @@
   import { NewOrders } from '../../network/Orders'
   import { GetAddresses, GetSettings } from '../../network/User'
   import Routes from '../../stores/Routes'
+  import Product from '../products/Product.svelte'
 
   let Products: IStore
   let location: Types.Classes.CLocation
@@ -19,12 +20,29 @@
   let address: Types.Classes.CAddress | undefined
   let payment: Types.Classes.CPaymentMethod | undefined
 
-  $: subtotalArray =
-    $Products?.map(
+  $: optionsTotal = () => {
+    const totalOptionsArray =
+      $Products?.map(product => {
+        let calcTotal = 0
+        for (const option of product?.options ?? []) {
+          calcTotal +=
+            option.units *
+            (option.price - Logics.Finances.calcDiscount(option.price, product.discount, product.discountType))
+        }
+        return calcTotal
+      }) ?? []
+    return (totalOptionsArray?.length ?? 0) > 0 ? totalOptionsArray.reduce((a, b) => a + b) : 0
+  }
+
+  $: subtotalArray = [
+    ...($Products?.map(
       product =>
         product.quantity *
         (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType))
-    ) ?? []
+    ) ?? []),
+    optionsTotal()
+  ]
+
   $: subtotal = (subtotalArray?.length ?? 0) > 0 ? subtotalArray.reduce((a, b) => a + b) : 0
   $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0) : 0
   $: delivery = $Settings?.delivery?.free
@@ -65,11 +83,21 @@
       Stores.Loading.instance.stop()
       return
     }
+    const products = (Types.CCart.fromObject($Products) as Types.CCart[]).map(product => {
+      product.optionsCategories = undefined
+      product.image = undefined
+      product.order = undefined
+      product.options = product.options.map(option => {
+        option.image = undefined
+        return option
+      })
+      return product
+    })
     const payload: Types.Classes.COrder = Types.Classes.COrder.init(
       netTotal,
       discount,
       delivery,
-      $Products,
+      products,
       address,
       payment?.type,
       $Settings.preparation,

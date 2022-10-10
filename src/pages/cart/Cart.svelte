@@ -275,6 +275,10 @@
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td class="resumeText">Subtotal</td>
+      <td class="resumeValue">{Utils.Strings.currency(subtotal)}</td>
+    </tr>
     {#if address}
       <tr>
         <td class="resumeText">Taxa de entrega</td>

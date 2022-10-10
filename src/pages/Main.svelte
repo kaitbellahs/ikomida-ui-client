@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount } from 'svelte'
   import {
     faHome,
     faList,
@@ -8,92 +8,110 @@
     faMoneyBill1Wave,
     faAddressCard,
     faHourglass,
-    faPhone,
-  } from '@fortawesome/free-solid-svg-icons';
-  import Routes from '../stores/Routes';
-  import { Views, Utils, Logics, Stores } from '@ikomida/shared-frontend';
-  import { Cart as CartStore } from '../stores/Cart';
-  import type { IStore } from '../stores/Cart';
-  import { StatusBar, Settings } from '../stores/Setup';
-  import Home from './products/Home.svelte';
-  import Orders from './orders/Orders.svelte';
-  import Order from './orders/Order.svelte';
-  import Search from './products/Search.svelte';
-  import Profile from './user/Profile.svelte';
-  import BusinessHours from './user/BusinessHours.svelte';
-  import Product from './products/Product.svelte';
-  import Checkout from './cart/Checkout.svelte';
-  import Cart from './cart/Cart.svelte';
-  import Addresses from './Addresses/Addresses.svelte';
-  import NewAddress from './Addresses/NewAddress.svelte';
-  import Payments from './payments/Payments.svelte';
-  import NewMethod from './payments/NewMethod.svelte';
-  import Contact from './unlogged/Contact.svelte';
+    faPhone
+  } from '@fortawesome/free-solid-svg-icons'
+  import Routes from '../stores/Routes'
+  import { Views, Utils, Logics, Stores } from '@ikomida/shared-frontend'
+  import { Cart as CartStore } from '../stores/Cart'
+  import type { IStore } from '../stores/Cart'
+  import { StatusBar, Settings } from '../stores/Setup'
+  import Home from './products/Home.svelte'
+  import Orders from './orders/Orders.svelte'
+  import Order from './orders/Order.svelte'
+  import Search from './products/Search.svelte'
+  import Profile from './user/Profile.svelte'
+  import BusinessHours from './user/BusinessHours.svelte'
+  import Product from './products/Product.svelte'
+  import Checkout from './cart/Checkout.svelte'
+  import Cart from './cart/Cart.svelte'
+  import Addresses from './Addresses/Addresses.svelte'
+  import NewAddress from './Addresses/NewAddress.svelte'
+  import Payments from './payments/Payments.svelte'
+  import NewMethod from './payments/NewMethod.svelte'
+  import Contact from './unlogged/Contact.svelte'
 
-  let Store: IStore;
-  let Layout = Stores.Layout.instance?.store;
-  let router = Stores.Navigation.instance.router;
+  let Store: IStore
+  let Layout = Stores.Layout.instance?.store
+  let router = Stores.Navigation.instance.router
   const tabs = [
     {
       name: 'Home',
       route: Routes.home,
-      icon: faHome,
+      icon: faHome
     },
     {
       name: 'Busca',
       route: Routes.search,
-      icon: faSearch,
+      icon: faSearch
     },
     {
       name: 'Pedidos',
       route: Routes.orders,
-      icon: faList,
-    },
-  ];
+      icon: faList
+    }
+  ]
   const menuHamburgerItems = [
     {
       name: 'Home',
       callback: () => Stores.Navigation.instance.reset(Routes.home),
-      icon: faHome,
+      icon: faHome
     },
     {
       name: 'Perfil',
       callback: () => Stores.Navigation.instance.goTo(Routes.profile),
-      icon: faUser,
+      icon: faUser
     },
     {
       name: 'Endereços',
       callback: () => Stores.Navigation.instance.goTo(Routes.addresses),
-      icon: faAddressCard,
+      icon: faAddressCard
     },
     {
       name: 'Meios de pagamento',
       callback: () => Stores.Navigation.instance.goTo(Routes.payments),
-      icon: faMoneyBill1Wave,
+      icon: faMoneyBill1Wave
     },
     {
       name: 'Horario de funcionamento',
       callback: () => Stores.Navigation.instance.goTo(Routes.businessHours),
-      icon: faHourglass,
+      icon: faHourglass
     },
     {
       name: 'Contato',
       callback: () => Stores.Navigation.instance.goTo(Routes.contact),
-      icon: faPhone,
-    },
-  ];
+      icon: faPhone
+    }
+  ]
 
-  $: styleHeight = `${Number($StatusBar.height) + 50}px`;
-  $: route = $router.route;
+  $: styleHeight = `${Number($StatusBar.height) + 50}px`
+  $: route = $router.route
 
-  $: subtotalArray =
-    $Store?.map(
-      (item) =>
-        item.quantity * (item.price - Logics.Finances.calcDiscount(item.price, item.discount, item.discountType)),
-    ) ?? [];
-  $: subtotal = subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0;
-  $: delivery = 0;
-  $: total = subtotal + delivery;
+  $: optionsTotal = () => {
+    const totalOptionsArray =
+      $Store?.map(product => {
+        let calcTotal = 0
+        for (const option of product?.options ?? []) {
+          calcTotal +=
+            option.units *
+            (option.price - Logics.Finances.calcDiscount(option.price, product.discount, product.discountType))
+        }
+        return calcTotal
+      }) ?? []
+    return (totalOptionsArray?.length ?? 0) > 0 ? totalOptionsArray.reduce((a, b) => a + b) : 0
+  }
+
+  $: subtotalArray = [
+    ...($Store?.map(
+      product =>
+        product.quantity *
+        (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType))
+    ) ?? []),
+    optionsTotal()
+  ]
+
+  $: subtotal = subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0
+  $: delivery = 0
+  $: total = subtotal + delivery
   $: showCart =
     ($Store?.length ?? 0) > 0 &&
     route !== Routes.cart &&
@@ -101,13 +119,13 @@
     route !== Routes.checkout &&
     route !== Routes.orders &&
     route !== Routes.order &&
-    route !== Routes.profile;
+    route !== Routes.profile
 
-  Stores.MenuHamburger.instance.reset();
-  menuHamburgerItems.forEach((page) => Stores.MenuHamburger.instance.addItem(page));
+  Stores.MenuHamburger.instance.reset()
+  menuHamburgerItems.forEach(page => Stores.MenuHamburger.instance.addItem(page))
 
   function goToCart() {
-    Stores.Navigation.instance.goTo(Routes.cart);
+    Stores.Navigation.instance.goTo(Routes.cart)
   }
   $: if (style)
     if (showCart) {
@@ -117,8 +135,8 @@
         --paddingTop: ${styleHeight};
         --paddingBottom: 115px;
       }
-    `;
-      document.head.appendChild(style);
+    `
+      document.head.appendChild(style)
     } else {
       style.innerHTML = `
       body {
@@ -126,15 +144,15 @@
         --paddingTop: ${styleHeight};
         --paddingBottom: 55px;
       }
-    `;
+    `
     }
-  let style: HTMLElement;
+  let style: HTMLElement
   onMount(async () => {
-    style = document.createElement('style');
-    document.head.appendChild(style);
-    Store = await CartStore.instance.store();
+    style = document.createElement('style')
+    document.head.appendChild(style)
+    Store = await CartStore.instance.store()
     // await CartStore.items();
-  });
+  })
 </script>
 
 <main
