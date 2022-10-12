@@ -295,7 +295,7 @@
     background: rgba(204, 204, 204, 0.356);
     width: 20px;
     height: 20px;
-    padding: 2px;
+    padding: 0 2px;
     text-align: center;
     vertical-align: middle;
   }

@@ -83,16 +83,21 @@
       Stores.Loading.instance.stop()
       return
     }
-    const products = (Types.CCart.fromObject($Products) as Types.CCart[]).map(product => {
-      product.optionsCategories = undefined
-      product.image = undefined
-      product.order = undefined
-      product.options = product.options.map(option => {
-        option.image = undefined
-        return option
+    const products: Types.CCart[] = []
+    products.push(
+      ...$Products.map(CartProduct => {
+        const product: Types.CCart = Types.CCart.fromObject(CartProduct.toJSON())
+        console.log('product:', product)
+        product.optionsCategories = undefined
+        product.image = undefined
+        product.order = undefined
+        product.options = product.options.map(option => {
+          option.image = undefined
+          return option
+        })
+        return product
       })
-      return product
-    })
+    )
     const payload: Types.Classes.COrder = Types.Classes.COrder.init(
       netTotal,
       discount,

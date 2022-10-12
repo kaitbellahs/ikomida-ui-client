@@ -13,7 +13,6 @@ import {
 } from 'svelte-as-markup-preprocessor';
 import replace from "@rollup/plugin-replace";
 import typescript from '@rollup/plugin-typescript';
-// import obfuscatorPlugin from 'rollup-plugin-javascript-obfuscator';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -25,9 +24,9 @@ function serve() {
 	}
 
 	return {
-		writeBundle() {
+		async writeBundle() {
 			if (server) return;
-			server = require('child_process').spawn('yarn', ['start', '--', '--dev'], {
+			server = (await import('child_process')).spawn('yarn', ['start', '--', '--dev'], {
 				stdio: ['ignore', 'inherit', 'inherit'],
 				shell: true
 			});
@@ -111,11 +110,11 @@ export default {
 
 		// Watch the `public` directory and refresh the
 		// browser on changes when not in production
-		!production && livereload('public'),
+		!production && livereload('App'),
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser()
+		production && terser({ compress: { ecma: 'ESNext', drop_console: true } })
 	],
 	watch: {
 		clearScreen: false
