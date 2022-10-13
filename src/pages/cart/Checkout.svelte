@@ -118,7 +118,7 @@
       await Cart.instance.reset()
       Stores.Navigation.instance.goTo(Routes.order, {
         newOrder: true,
-        order: response?.data
+        order: Types.Classes.COrder.fromObject(response?.data)
       })
     } else {
       Stores.MessageAlert.instance.show(response?.data)

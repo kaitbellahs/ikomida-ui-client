@@ -11,7 +11,7 @@
 
   const router = Stores.Navigation.instance.router
   const newOrder: boolean = $router.options.newOrder
-  const order: Types.Classes.COrder = Types.Classes.COrder.fromObject($router.options.order)
+  const order: Types.Classes.COrder = $router.options.order
 
   let screenShot = false
   let orderScreen: HTMLElement
