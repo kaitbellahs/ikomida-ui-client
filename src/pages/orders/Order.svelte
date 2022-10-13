@@ -159,6 +159,9 @@
           {/each}
         </div>
       {/if}
+      {#if product.observation}
+        <small><b>Obs:</b> {product.observation}</small>
+      {/if}
     </div>
   {/each}
   <Views.Divider />
@@ -265,6 +268,9 @@
     border-left: 1px solid #ccc;
     display: flex;
     flex-direction: column;
+  }
+  .product > small {
+    margin-left: 5px;
   }
   .product > header > .quantity {
     margin-right: 5px;

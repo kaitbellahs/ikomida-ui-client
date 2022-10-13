@@ -49,7 +49,7 @@
     const categoryOptions = cartProduct.options
       ?.filter(option => optionsCategoryIds.includes(option.id))
       ?.flatMap(option => option.units)
-    return categoryOptions.length > 0
+    return categoryOptions && categoryOptions.length > 0
       ? categoryOptions.reduce((previousValue, currentValue) => previousValue + currentValue)
       : 0
   }
@@ -59,7 +59,7 @@
       working.minos = true
       try {
         if (productOption) {
-          const cartOption = cartProduct.options.filter(option => option.id === productOption.id)?.[0]
+          const cartOption = cartProduct.options?.filter(option => option.id === productOption.id)?.[0]
           if (cartOption && cartProduct.options) {
             const cartOptionIndex = cartProduct.options.indexOf(cartOption)
             if (cartOption.units > 1) {
@@ -68,8 +68,6 @@
               cartProduct.options?.splice(cartOptionIndex, 1)
             }
             cartProduct = cartProduct
-          } else {
-            throw new Error(genericError)
           }
           cartProduct = cartProduct
         } else if (quantity > 1) {
@@ -97,7 +95,7 @@
           const cartFiltredOptions = cartProduct.options?.filter(option => optionsCategoryIds.includes(option.id)) ?? []
           if (productOption) {
             const cartOptions = cartFiltredOptions?.filter(cartOption => productOption.id === cartOption.id)
-            let cartOption = cartOptions?.[0]
+            let cartOption: Types.CCartProductOption = cartOptions?.[0]
             if (
               !cartOption &&
               productOptionsCategory &&
@@ -175,6 +173,7 @@
       const cartProducts = await Cart.instance.products()
       let isEditing = false
       const filtredInitalCartProduct = cartProducts.filter(newCartProduct => {
+        initalProduct.observation = newCartProduct.observation
         if (newCartProduct.equal(initalProduct)) {
           isEditing = true
           return true
@@ -448,7 +447,7 @@
     font-size: 1rem;
   }
   .product > .optionsCategory {
-    background-color: #d6d6d657;
+    background-color: #ccccccfa;
     border: #ccd;
     border-radius: 5px;
     padding: 10px;
@@ -496,7 +495,7 @@
     text-align: center;
   }
   .product > .optionsCategory > .option {
-    background-color: #d6d6d657;
+    background-color: #ffffff26;
     border: #ccd;
     border-radius: 5px;
     padding: 10px;

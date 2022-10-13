@@ -13,6 +13,10 @@ import {
 } from 'svelte-as-markup-preprocessor';
 import replace from "@rollup/plugin-replace";
 import typescript from '@rollup/plugin-typescript';
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+const tsconfig = require('./tsconfig.json')
+
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -98,11 +102,12 @@ export default {
 			exportConditions: ['browser'],
 			dedupe: ['svelte']
 		}),
-		commonjs(),
 		typescript({
+			...tsconfig,
 			sourceMap: !production,
 			inlineSources: !production
 		}),
+		commonjs(),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated

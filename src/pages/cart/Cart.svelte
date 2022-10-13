@@ -44,6 +44,10 @@
     : calcDelivery
   $: total = subtotal + delivery
 
+  $: if ($Products && $Products.length === 0) {
+    Stores.Navigation.instance.reset(Routes.home)
+  }
+
   function addMoreProducts() {
     Stores.Navigation.instance.pop(2)
   }
@@ -101,7 +105,7 @@
     const categoryOptions = cartProduct.options
       ?.filter(option => optionsCategoryIds.includes(option.id))
       ?.flatMap(option => option.units)
-    return categoryOptions.length > 0
+    return categoryOptions && categoryOptions.length > 0
       ? categoryOptions.reduce((previousValue, currentValue) => previousValue + currentValue)
       : 0
   }
@@ -112,10 +116,10 @@
       if (inputCartProduct) {
         const cartProduct = $Products.filter(product => product.equal(inputCartProduct))?.[0]
         if (inputOption) {
-          const option = cartProduct.options.filter(option => option.equal(inputOption))?.[0]
+          const option = cartProduct.options?.filter(option => option.equal(inputOption))?.[0]
           const optionsCategories = cartProduct.optionsCategories?.filter(optionsCategory => {
             const filtredOptionsCategory = optionsCategory.options.filter(
-              productOption => productOption.id === option.id
+              productOption => productOption.id === option?.id
             )
             return filtredOptionsCategory.length === 1
           })
@@ -135,9 +139,11 @@
               working.onRemoveClick = false
               return
             }
-            const optionIndex = cartProduct.options.indexOf(option)
-            cartProduct.options.splice(optionIndex, 1)
-            await Cart.instance.update($Products)
+            const optionIndex = cartProduct.options?.indexOf(option)
+            if (optionIndex) {
+              cartProduct.options?.splice(optionIndex, 1)
+              await Cart.instance.update($Products)
+            }
           }
         } else {
           if (cartProduct) {
@@ -155,9 +161,18 @@
       let update = false
       if (inputCartProduct) {
         const cartProduct = $Products.filter(product => product.equal(inputCartProduct))?.[0]
-        if (inputOption) {
-          const option = cartProduct.options.filter(option => option.equal(inputOption))?.[0]
-          if (option && option.units < option.maxUnits * cartProduct.quantity) {
+        if (inputOption && cartProduct) {
+          const option = cartProduct.options?.filter(option => option.equal(inputOption))?.[0]
+          const optionsCategory = cartProduct.optionsCategories?.filter(
+            optionsCategory =>
+              optionsCategory.options.filter(productOption => productOption.id === option.id).length === 1
+          )?.[0]
+          if (
+            optionsCategory &&
+            option &&
+            option.units < option.maxUnits * cartProduct.quantity &&
+            getCartOptionsCount(cartProduct, optionsCategory) < optionsCategory?.max * cartProduct.quantity
+          ) {
             option.units++
             update = true
           }

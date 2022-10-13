@@ -10,7 +10,6 @@
   import { NewOrders } from '../../network/Orders'
   import { GetAddresses, GetSettings } from '../../network/User'
   import Routes from '../../stores/Routes'
-  import Product from '../products/Product.svelte'
 
   let Products: IStore
   let location: Types.Classes.CLocation
@@ -91,7 +90,7 @@
         product.optionsCategories = undefined
         product.image = undefined
         product.order = undefined
-        product.options = product.options.map(option => {
+        product.options = product.options?.map(option => {
           option.image = undefined
           return option
         })
@@ -209,12 +208,41 @@
   Stores.Title.instance.set('Resumo e pagamento')
 </script>
 
+<h3 class="resumeHead">Resumo</h3>
+{#if $Products}
+  {#each $Products as product}
+    <div class="product">
+      <header>
+        <span class="quantity">{product.quantity}</span><span class="title">{product.title}</span><span class="price"
+          >{Utils.Strings.currency(
+            product.quantity *
+              (product.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType))
+          )}</span
+        >
+      </header>
+      {#if (product.options?.length ?? 0) > 0}
+        <div>
+          {#each product.options ?? [] as option, optionIndex}
+            <div class="option">
+              <span class="units">{option.units}</span><span class="name">{option.name}</span><span class="price"
+                >{Utils.Strings.currency(
+                  (option.units ?? 0) *
+                    ((option.price ?? 0) -
+                      Logics.Finances.calcDiscount(option.price ?? 0, product.discount ?? 0, product.discountType))
+                )}</span
+              >
+            </div>
+          {/each}
+        </div>
+      {/if}
+      {#if product.observation}
+        <small><b>Obs:</b> {product.observation}</small>
+      {/if}
+    </div>
+  {/each}
+  <Views.Divider />
+{/if}
 <table>
-  <thead>
-    <tr>
-      <th colspan="2" class="resumeHead">Resumo</th>
-    </tr>
-  </thead>
   <tbody>
     <tr>
       <td class="resumeText">Subtotal</td>
@@ -313,6 +341,59 @@
 <Views.GTerms />
 
 <style>
+  .product {
+    font-family: RobotoLight;
+    font-size: 0.9em;
+    margin-top: 10px;
+    margin-bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+  }
+  .product > small {
+    margin-left: 5px;
+  }
+  .product > header > .quantity {
+    margin-right: 5px;
+    font-family: RobotoMedium;
+    font-size: 1em;
+    background: #ccc;
+    width: 20px;
+    height: 20px;
+    padding: 2px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .product > header > .price {
+    margin-left: 5px;
+    font-family: RobotoMedium;
+    font-size: 0.9em;
+  }
+  .product > div {
+    margin-left: 15px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    font-size: 0.9em;
+  }
+  .product > div > .option > .units {
+    margin-right: 5px;
+    font-family: RobotoMedium;
+    font-size: 1em;
+    background: rgba(204, 204, 204, 0.356);
+    width: 20px;
+    height: 20px;
+    padding: 0 2px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .product > div > .option > .price {
+    margin-left: 5px;
+    font-family: RobotoMedium;
+    font-size: 0.9em;
+  }
   .paymentCard {
     width: 100%;
     display: flex;
@@ -373,6 +454,7 @@
   }
   .resumeHead {
     font-size: 1.1em;
+    text-align: center;
   }
   .resumeText {
     text-align: left;

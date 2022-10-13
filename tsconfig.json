@@ -1,14 +1,4 @@
 {
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules/*",
-    "**/*.spec.ts",
-    "__sapper__/*",
-    "public/*",
-    "App/*"
-  ],
   "compilerOptions": {
     "lib": [
       "dom",
@@ -25,5 +15,10 @@
     "declarationDir": "lib",
     "allowSyntheticDefaultImports": true,
     "target": "ESNext"
-  }
+  },
+  "plugins": [
+    {
+      "name": "typescript-svelte-plugin"
+    }
+  ]
 }
