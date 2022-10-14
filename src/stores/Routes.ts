@@ -18,5 +18,6 @@ export default {
   payments: Symbol('/payments'),
   businessHours: Symbol('businessHours'),
   pp: Symbol('privacyPolicy'),
+  pushNotifications: Symbol('pushNotifications'),
   newMethod: Symbol('newMethod')
 }

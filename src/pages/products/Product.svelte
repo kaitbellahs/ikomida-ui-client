@@ -292,7 +292,7 @@
     <h2>Personalize seu pedido</h2>
     {#if (cartProduct.optionsCategories?.length ?? 0) > 0}
       {#each cartProduct.optionsCategories ?? [] as optionsCategory, index}
-        <Views.Divider />
+        <Views.Divider height={10} />
         <div class="optionsCategory">
           <header>
             <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45px" width="45px" />
@@ -312,8 +312,8 @@
             </div>
           </header>
           {#if (optionsCategory.options?.length ?? 0) > 0}
-            {#each optionsCategory.options ?? [] as option, optionIndex}
-              <Views.Divider />
+            {#each optionsCategory.options ?? [] as option}
+              <Views.Divider height={15} />
               <div class="option">
                 <Views.Image source={option.image} name={option.name} height="45px" width="45px" />
                 <div>

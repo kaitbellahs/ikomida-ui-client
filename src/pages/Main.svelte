@@ -8,7 +8,8 @@
     faMoneyBill1Wave,
     faAddressCard,
     faHourglass,
-    faPhone
+    faPhone,
+    faRocket
   } from '@fortawesome/free-solid-svg-icons'
   import Routes from '../stores/Routes'
   import { Views, Utils, Logics, Stores } from '@ikomida/shared-frontend'
@@ -29,6 +30,7 @@
   import Payments from './payments/Payments.svelte'
   import NewMethod from './payments/NewMethod.svelte'
   import Contact from './unlogged/Contact.svelte'
+  import PushNotifications from './PushNotifications/PushNotifications.svelte'
 
   let Store: IStore
   let Layout = Stores.Layout.instance?.store
@@ -70,6 +72,11 @@
       name: 'Meios de pagamento',
       callback: () => Stores.Navigation.instance.goTo(Routes.payments),
       icon: faMoneyBill1Wave
+    },
+    {
+      name: 'Mensagens',
+      callback: () => Stores.Navigation.instance.goTo(Routes.pushNotifications),
+      icon: faRocket
     },
     {
       name: 'Horario de funcionamento',
@@ -188,6 +195,8 @@
     <NewMethod />
   {:else if route == Routes.contact}
     <Contact />
+  {:else if route == Routes.pushNotifications}
+    <PushNotifications />
   {:else}
     <Home />
   {/if}
