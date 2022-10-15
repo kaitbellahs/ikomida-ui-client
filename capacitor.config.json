@@ -3,7 +3,7 @@
   "appName": "${{appName}}$",
   "webDir": "App",
   "bundledWebRuntime": false,
-  "loggingBehavior": "none",
+  "loggingBehavior": "debug",
   "npmClient": "yarn",
   "overrideUserAgent": "iKomida",
   "plugins": {
