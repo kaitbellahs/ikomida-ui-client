@@ -14,7 +14,7 @@
     "outDir": "lib",
     "declarationDir": "lib",
     "allowSyntheticDefaultImports": true,
-    "target": "ESNext"
+    "target": "ES2021"
   },
   "plugins": [
     {

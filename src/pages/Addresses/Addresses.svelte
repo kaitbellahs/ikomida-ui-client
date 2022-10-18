@@ -1,52 +1,52 @@
 <script lang="ts">
-  import { Views, Stores, Types } from '@ikomida/shared-frontend';
-  import { GetAddresses, UpdateAddress, DeleteAddress } from '../../network/User';
-  import { onMount } from 'svelte';
-  import Routes from '../../stores/Routes';
+  import { Views, Stores, Types } from '@ikomida/shared-frontend'
+  import { GetAddresses, UpdateAddress, DeleteAddress } from '../../network/User'
+  import { onMount } from 'svelte'
+  import Routes from '../../stores/Routes'
 
-  let addresses: Types.Classes.CAddress[];
+  let addresses: Types.Classes.CAddress[]
 
   function toggleNewAddress() {
-    Stores.Navigation.instance.goTo(Routes.newAddress);
+    Stores.Navigation.instance.goTo(Routes.newAddress)
   }
 
   async function updateAddress(id?: string) {
-    Stores.Loading.instance.start();
-    const response = await UpdateAddress(id);
+    Stores.Loading.instance.start()
+    const response = await UpdateAddress(id)
     if (response?.success) {
       for (const item of addresses) {
-        item.selected = false;
+        item.selected = false
         if (item.id === id) {
-          item.selected = true;
+          item.selected = true
         }
       }
-      addresses = [...addresses];
+      addresses = [...addresses]
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   async function onRemoveClick(id?: string) {
-    Stores.Loading.instance.start();
-    const response = await DeleteAddress(id);
+    Stores.Loading.instance.start()
+    const response = await DeleteAddress(id)
     if (response?.success) {
-      addresses = addresses?.filter((item) => item.id !== id);
+      addresses = addresses?.filter(item => item.id !== id)
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   onMount(async () => {
-    let response = await GetAddresses();
+    let response = await GetAddresses()
     if (response?.success) {
-      addresses = response?.data;
+      addresses = Types.Classes.CAddress.fromObject(response?.data)
     }
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
 
-  Stores.Title.instance.set('Endereços');
+  Stores.Title.instance.set('Endereços')
 </script>
 
 <Views.Divider />
@@ -66,6 +66,7 @@
         >
         <span class="neighborhood">{address?.neighborhood}</span>
         <span class="city">{address?.city}/{address?.stat} CEP: {address?.postalCode}</span>
+        <small style="text-align:left;">{address.kind?.name ?? '-'}, {address.reference}</small>
       </div>
       <div class="checkbox" on:click={() => updateAddress(address.id)}>
         <Views.Checkbox bind:checked={address.selected} />

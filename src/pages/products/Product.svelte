@@ -7,7 +7,6 @@
   import { Views, Utils, Logics, Types, Stores } from '@ikomida/shared-frontend'
   import { getProduct } from '../../network/Products'
   import { onMount } from 'svelte'
-  import CartItem from '@ikomida/shared-frontend/lib/components/CartItem.svelte'
 
   const router = Stores.Navigation.instance.router
   const initalProduct = $router.options
@@ -242,10 +241,21 @@
 
 {#if cartProduct}
   <div class="product">
+    {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
+      <span class="discount"
+        >-{Types.Types.TDiscount.VALUE === cartProduct.discountType
+          ? Utils.Strings.currency(cartProduct.discount)
+          : Utils.Strings.percent(cartProduct.discount)}</span
+      >
+    {/if}
     <Views.Image source={cartProduct.image} name={cartProduct.title} />
     <h2>{cartProduct.title}</h2>
     <p>{cartProduct.description}</p>
-    <span class="serves">Aproximadamente {Logics.Finances.formatWeight(cartProduct.weight ?? 0)}</span>
+    <span class="serves"
+      >Aproximadamente {cartProduct.measureUnit && cartProduct.measure
+        ? Logics.Finances.formatMeasure(cartProduct.measure, cartProduct.measureUnit)
+        : '-'}</span
+    >
     <Views.Divider />
     <div class="price">
       <div>
@@ -291,7 +301,7 @@
     <Views.Divider />
     <h2>Personalize seu pedido</h2>
     {#if (cartProduct.optionsCategories?.length ?? 0) > 0}
-      {#each cartProduct.optionsCategories ?? [] as optionsCategory, index}
+      {#each cartProduct.optionsCategories ?? [] as optionsCategory}
         <Views.Divider height={10} />
         <div class="optionsCategory">
           <header>
@@ -398,7 +408,22 @@
 
 <style>
   .product {
+    position: relative;
     padding-bottom: 50px;
+  }
+  .product > .discount {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    border-radius: 20.5px;
+    min-width: 60px;
+    border: 1px solid #4c0708;
+    background: #4c0708;
+    color: white;
+    line-height: 21px;
+    padding: 0px 8px;
+    text-shadow: 0.5px 1px #00000055;
+    box-shadow: 2px 3px #00000099;
   }
   .quantity {
     margin-top: 10px;
