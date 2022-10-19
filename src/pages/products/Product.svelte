@@ -276,15 +276,9 @@
         <h4>Total</h4>
         <div>
           {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
-            <span class="oldPrice">{Utils.Strings.currency(quantity * cartProduct.price)}</span>
+            <span class="oldPrice">{Utils.Strings.currency(total)}</span>
           {/if}
-          <span class="current"
-            >{Utils.Strings.currency(
-              quantity *
-                (cartProduct.price -
-                  Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType))
-            )}</span
-          >
+          <span class="current">{Utils.Strings.currency(total)}</span>
         </div>
       </div>
     </div>
