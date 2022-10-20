@@ -56,7 +56,11 @@
 
   function validateCardValidation(date: string) {
     const dateString = `20${date.substring(2, 4)}-${date.substring(0, 2)}-28`
-    if (date.length !== 4 || !Logics.Validations.validateDate(dateString) || new Date(dateString) < new Date()) {
+    if (
+      date.length !== 4 ||
+      !Logics.Validations.validateDate(dateString) ||
+      new Date(Number(`20${date.substring(2, 4)}`), Number(date.substring(0, 2)), 0) < new Date()
+    ) {
       return false
     }
     return true
@@ -117,7 +121,7 @@
   bind:value={newCreditCardObject.validity}
   bind:isValid={newCreditCardObjectValidation.validity}
   validation={validateCardValidation}
-  error="Por favor preencha uma data válida usando este formato dd/YY."
+  error="A data de validade do cartão deve ser uma data válida (12/26) maior que a data atual."
 />
 <Views.TextEdit
   mask={cardCodeMask}
