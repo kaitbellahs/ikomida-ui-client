@@ -38,8 +38,7 @@
   let logedIn = false
   let isActive = false
   $: route = $router.route
-  $: if ($auth && isActive) {
-    logedIn = false
+  $: if ($auth) {
     Utils.Jws.extractToken($auth).then(async token => {
       logedIn = token !== null
     })
@@ -194,6 +193,13 @@
 
   onMount(async () => {
     auth = await Stores.Auth.Auth.instance.store()
+    if ($auth) {
+      logedIn = false
+      const token = await Utils.Jws.extractToken($auth)
+      logedIn = token !== null
+    } else {
+      logedIn = false
+    }
     let response = await GetSettings()
     if (response?.success && response?.data) {
       Settings.set({ ...$Settings, ...response?.data })

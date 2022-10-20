@@ -10,10 +10,11 @@
     "noImplicitAny": true,
     "strict": true,
     "declaration": true,
-    "rootDir": "src",
-    "outDir": "lib",
+    "rootDir": "./src",
+    "outDir": "./lib",
     "declarationDir": "lib",
     "allowSyntheticDefaultImports": true,
+    "moduleResolution": "Node",
     "target": "ES2021"
   },
   "plugins": [

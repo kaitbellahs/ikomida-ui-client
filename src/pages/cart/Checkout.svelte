@@ -16,7 +16,7 @@
   let coupon: string | undefined
   let couponObject: Types.Classes.CCoupon | undefined = undefined
 
-  let address: Types.Classes.CAddress | undefined
+  let address: Types.Classes.CAddress | undefined | null
   let payment: Types.Classes.CPaymentMethod | undefined
 
   $: optionsTotal = () => {
@@ -167,7 +167,9 @@
       if (response?.success) {
         const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response.data)
         const addresses = data.filter(address => address.selected)
-        address = (addresses?.length ?? 0) === 1 ? addresses[0] : undefined
+        address = (addresses?.length ?? 0) === 1 ? addresses[0] : null
+      } else {
+        address = null
       }
       response = await GetPaymentMethods()
       if (response?.success) {

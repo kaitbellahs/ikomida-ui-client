@@ -178,6 +178,8 @@
       <span class="city"
         >{order.address?.city ?? '-'}/{order.address?.stat ?? '-'} CEP: {order.address?.postalCode ?? '-'}</span
       >
+      <span class="city">Tipo: {order?.address?.kind?.name ?? '-'}</span>
+      <span class="city">Ref: {order?.address?.reference ?? '-'}</span>
     </span>
   </div>
   <Views.Divider />

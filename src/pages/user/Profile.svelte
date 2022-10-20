@@ -2,9 +2,11 @@
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import { onMount } from 'svelte'
   import { updatePassword, logout } from '../../network/Auth'
+  import { UpdateAvatar, profile } from '../../network/User'
   const Layout = Stores.Layout.instance.store
 
   let userInfo: Types.Classes.CUser
+  let avatar: string | undefined = undefined
 
   let passwordObject: Types.Classes.CUser = Types.Classes.CUser.fillWith(null)
   let passwordValidationObject = {
@@ -12,8 +14,21 @@
     reNewPass: false
   }
 
-  $: if (userInfo?.avatar) {
-    // update()
+  $: if (userInfo?.avatar && userInfo?.avatar !== avatar) {
+    updateAvatar()
+  }
+
+  async function updateAvatar() {
+    Stores.Loading.instance.start()
+    let response = await UpdateAvatar(userInfo)
+    if (response.success) {
+      avatar = userInfo?.avatar
+      Stores.MessageAlert.instance.show('A sua foto de perfil foi atualizada com sucesso!')
+    } else {
+      userInfo.avatar = avatar
+      Stores.MessageAlert.instance.show(response?.data)
+    }
+    Stores.Loading.instance.stop()
   }
 
   async function out() {
@@ -36,14 +51,19 @@
       Stores.MessageAlert.instance.show('Senha atualizada com sucesso!')
     } else {
       Stores.MessageAlert.instance.show(response?.data)
-      Stores.Loading.instance.stop()
-      return
     }
     Stores.Loading.instance.stop()
   }
 
   onMount(async () => {
-    userInfo = await Utils.Jws.extractToken((await Stores.Auth.Auth.instance.data()) ?? '')
+    let response = await profile()
+    if (response?.success) {
+      userInfo = Types.Classes.CUser.fromObject(response?.data)
+      avatar = userInfo.avatar
+    } else {
+      Stores.MessageAlert.instance.show('Não foi possível carregar os dados do seu perfil!')
+      userInfo = await Utils.Jws.extractToken((await Stores.Auth.Auth.instance.data()) ?? '')
+    }
     Stores.Loading.instance.stop()
   })
 
@@ -57,7 +77,7 @@
 {#if userInfo}
   <Views.UploadablePhoto
     type={Types.TUploadablePhoto.PROFILE}
-    image={userInfo?.avatar}
+    bind:image={userInfo.avatar}
     name={userInfo.name[0]}
     lastName={userInfo.lastName[0]}
   />
