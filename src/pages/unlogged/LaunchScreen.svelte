@@ -16,7 +16,7 @@
     align-items: center;
     place-content: center;
   }
-  :global(img) {
+  main > :global(img) {
     width: 100%;
     padding: 20px;
   }
