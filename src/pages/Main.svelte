@@ -90,7 +90,7 @@
     }
   ]
 
-  $: styleHeight = `${Number($StatusBar.height) + 50}px`
+  $: styleHeight = `${Number($StatusBar.height + ($StatusBar.topMargin ?? 0)) + 50}px`
   $: route = $router.route
 
   $: optionsTotal = () => {

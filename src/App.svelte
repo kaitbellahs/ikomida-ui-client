@@ -47,9 +47,9 @@
     logedIn = false
   }
 
-  $: if (networkStatus == null || !networkStatus.connected) {
+  $: if (!networkStatus?.connected) {
     const statusBar = $_StatusBar
-    statusBar.topMargin = 20
+    statusBar.topMargin = 22
     _StatusBar.setStatusBar(statusBar)
   } else {
     const statusBar = $_StatusBar
