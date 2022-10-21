@@ -1,8 +1,8 @@
 {
   "project_info": {
-    "project_number": "981415290588",
-    "project_id": "ikomida-prod",
-    "storage_bucket": "ikomida-prod.appspot.com"
+    "project_number": "507904932701",
+    "project_id": "ikomida-dev",
+    "storage_bucket": "ikomida-dev.appspot.com"
   },
   "client": [
     {
@@ -14,21 +14,28 @@
       },
       "oauth_client": [
         {
-          "client_id": "981415290588-n7e8jqecsdo2viusgbskfi7sirjj683l.apps.googleusercontent.com",
+          "client_id": "507904932701-117b9b54utnmqt4oio1nle9v95d7jtsh.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA11J9e4P7E076Yf1HPWbP5y65uX2g0JNs"
+          "current_key": "AIzaSyD2tIhniq8qpjrAoGuA239FKCF2HkOG-pc"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "981415290588-n7e8jqecsdo2viusgbskfi7sirjj683l.apps.googleusercontent.com",
+              "client_id": "507904932701-117b9b54utnmqt4oio1nle9v95d7jtsh.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "507904932701-5edj4cfo1tsb93v5dikeq8ao0octojh9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ikomida.br.tialtonivel"
+              }
             }
           ]
         }
