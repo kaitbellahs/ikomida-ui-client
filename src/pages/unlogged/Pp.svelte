@@ -1,17 +1,20 @@
 <script lang="ts">
-  import { StatusBar } from '../../stores/Setup';
-  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
-  import { onMount } from 'svelte';
-  import { getPrivacyPolicy } from '../../network/Terms';
+  import { StatusBar } from '../../stores/Setup'
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
+  import { onMount } from 'svelte'
+  import { getPrivacyPolicy } from '../../network/Terms'
 
-  $: styleHeight = `${Number($StatusBar.height) + 50}px`;
-  let term: Types.Classes.CTerm;
+  $: styleHeight = `${Number($StatusBar.height) + 50}px`
+  let term: Types.Classes.CTerm
 
   onMount(async () => {
-    term = Types.Classes.CTerm.fromObject(await getPrivacyPolicy());
-    Stores.Loading.instance.stop();
-  });
-  $: Stores.Title.instance.set(term?.name ?? 'Política de privacidade');
+    const response = await getPrivacyPolicy()
+    if (response && response?.success) {
+      term = Types.Classes.CTerm.fromObject(response?.data)
+    }
+    Stores.Loading.instance.stop()
+  })
+  $: Stores.Title.instance.set(term?.name ?? 'Política de privacidade')
 </script>
 
 <Views.NavigationBar paddingTop={$StatusBar.height} />

@@ -126,6 +126,8 @@
     route !== Routes.checkout &&
     route !== Routes.orders &&
     route !== Routes.order &&
+    route !== Routes.newAddress &&
+    route !== Routes.newMethod &&
     route !== Routes.profile
 
   Stores.MenuHamburger.instance.reset()

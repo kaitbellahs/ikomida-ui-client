@@ -23,6 +23,7 @@
   import type { IAlertButton } from '@ikomida/shared-frontend/lib/components/Alert.svelte'
   import { getOrder } from './network/Orders'
 
+  let initialazation = true
   let auth: Stores.Auth.IStore
   let router = Stores.Navigation.instance.router
   let notificationIds: string[] = []
@@ -216,7 +217,7 @@
       statusBar.topMargin = statusBar?.topMargin ?? 0
       _StatusBar.setStatusBar(statusBar)
     }
-
+    initialazation = false
     //MARK: --test push notification
     // await actionPerformedCallBack({
     //   notification: {
@@ -245,7 +246,7 @@
 </script>
 
 <Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
-{#if !isActive}
+{#if initialazation}
   <LaunchScreen />
 {:else if !isActive}
   <NoService />
