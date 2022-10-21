@@ -288,8 +288,13 @@
     top: 0;
     left: 0;
     right: 0;
+    padding-top: 1px;
+    padding-bottom: 1px;
     padding-left: 10px;
     padding-right: 10px;
+    z-index: 9999999999;
+    text-align: center;
+    border-bottom: 1px solid white;
   }
   :global(.grecaptcha-badge) {
     visibility: hidden;
