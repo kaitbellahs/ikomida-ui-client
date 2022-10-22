@@ -43,7 +43,7 @@
     Utils.Jws.extractToken($auth).then(async token => {
       logedIn = token !== null
     })
-  } else {
+  } else if (!$auth && logedIn) {
     logedIn = false
   }
 
@@ -195,7 +195,6 @@
   onMount(async () => {
     auth = await Stores.Auth.Auth.instance.store()
     if ($auth) {
-      logedIn = false
       const token = await Utils.Jws.extractToken($auth)
       logedIn = token !== null
     } else {

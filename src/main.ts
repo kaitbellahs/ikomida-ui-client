@@ -13,13 +13,6 @@ const url: any = {
   homologation: 'https://hmlg.api.ikomida.com'
 }
 Stores.Cache.createInstance()
-Network.createInstance(
-  url[window.environment],
-  '${{iKomidaId}}$',
-  agent,
-  '6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS',
-  appVersion
-)
 Stores.Auth.Auth.createInstance(agent)
 Stores.MenuHamburger.createInstance()
 Stores.Menu.createInstance()
@@ -29,6 +22,13 @@ Stores.Navigation.createInstance(Routes.home)
 Stores.LoadMore.createInstance()
 Stores.Layout.createInstance()
 Cart.createInstance()
+Network.createInstance(
+  url[window.environment],
+  'com.ikomida.br.tialtonivel',
+  agent,
+  '6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS',
+  appVersion
+)
 
 const app = new App({
   target: document.body
