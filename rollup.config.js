@@ -5,7 +5,7 @@ import livereload from 'rollup-plugin-livereload';
 import {
 	terser
 } from 'rollup-plugin-terser';
-import css from 'rollup-plugin-css-only';
+import postcss from 'rollup-plugin-postcss'
 import cssModules from 'svelte-preprocess-cssmodules';
 import sveltePreprocess from 'svelte-preprocess';
 import {
@@ -48,7 +48,7 @@ export default {
 				return;
 			}
 		}
-		// if (warning.code === 'THIS_IS_UNDEFINED') { return; }
+		if (warning.code === 'THIS_IS_UNDEFINED') { return; }
 		warn(warning);
 	},
 	input: 'src/main.ts',
@@ -66,37 +66,22 @@ export default {
 		}),
 		svelte({
 			preprocess: [
-				// obfuscatorPlugin({
-				// 	compact: true,
-				// 	controlFlowFlattening: true,
-				// 	deadCodeInjection: true,
-				// 	debugProtection: true,
-				// 	identifierNamesGenerator: 'mangled-shuffled',
-				// 	log: false,
-				// 	numbersToExpressions: true,
-				// 	optionsPreset: 'medium-obfuscation',
-				// }),
 				asMarkupPreprocessor([
 					sveltePreprocess({ sourceMap: !production })
 				]),
 				cssModules(),
 			],
 			compilerOptions: {
-				// enable run-time checks when not in production
-				dev: !production
-			}
+				dev: !production,
+				cssHash: ({ hash, css }) => `iKomida-${hash(css)}`
+			},
+			emitCss: true
 		}),
-		// we'll extract any component CSS out into
-		// a separate file - better for performance
-		css({
-			output: 'bundle.css'
+		postcss({
+			minimize: true,
+			extensions: ['.css'],
+			extract: 'bundle.css',
 		}),
-
-		// If you have external dependencies installed from
-		// npm, you'll most likely need these plugins. In
-		// some cases you'll need additional configuration -
-		// consult the documentation for details:
-		// https://github.com/rollup/plugins/tree/master/packages/commonjs
 		resolve({
 			browser: true,
 			exportConditions: ['browser'],
@@ -108,17 +93,8 @@ export default {
 			inlineSources: !production
 		}),
 		commonjs(),
-
-		// In dev mode, call `npm run start` once
-		// the bundle has been generated
 		!production && serve(),
-
-		// Watch the `public` directory and refresh the
-		// browser on changes when not in production
 		!production && livereload('App'),
-
-		// If we're building for production (npm run build
-		// instead of npm run dev), minify
 		production && terser({ compress: { ecma: 'ESNext', drop_console: true } })
 	],
 	watch: {
