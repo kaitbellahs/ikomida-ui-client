@@ -2,6 +2,7 @@ import { Subscriber, Unsubscriber, writable } from 'svelte/store'
 import { Preferences } from '@capacitor/preferences'
 import { get } from 'svelte/store'
 import { Stores, Types, Utils } from '@ikomida/shared-frontend'
+import OrderType from './OrderType'
 
 export interface IStore {
   subscribe: (
@@ -34,15 +35,23 @@ export class Cart {
   private name = 'Cart'
   private storeValue?: IStore
   constructor() {
-    Stores.Auth.Auth.instance.store().then(store => {
-      store.subscribe(async token => {
-        const user: Types.Classes.CUser = Types.Classes.CUser.fromObject(await Utils.Jws.extractToken(token))
-        if (user) {
-          this.name = `Cart-${user.id}`
-        }
-      })
-    })
+    this.updateType()
   }
+
+  async updateType() {
+    const token = await Stores.Auth.Auth.instance.data()
+    if (token) {
+      const user: Types.Classes.CUser = Types.Classes.CUser.fromObject(await Utils.Jws.extractToken(token))
+      if (user) {
+        this.name = `Cart-${user.id}`
+        const orderType = await OrderType.get()
+        if (orderType) {
+          this.name += `-${orderType.id}`
+        }
+      }
+    }
+  }
+
   setter(setter: Subscriber<Types.CCart[]>): void | Unsubscriber {
     let products: Types.CCart[] | null = null
     Preferences.get({

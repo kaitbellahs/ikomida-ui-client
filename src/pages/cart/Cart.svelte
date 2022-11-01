@@ -5,12 +5,14 @@
   import { faTrash } from '@fortawesome/free-solid-svg-icons'
   import { Views, Utils, Logics, Stores, Types } from '@ikomida/shared-frontend'
   import { Settings } from '../../stores/Setup'
-  import { GetAddresses } from '../../network/User'
+  import { GetAddresses, GetSettings } from '../../network/User'
   import { onMount } from 'svelte'
+  import OrderType from '../../stores/OrderType'
 
   let Products: IStore
   let showAlert = false
   let address: Types.Classes.CAddress | null
+  let orderType: Types.Types.TOrderType | undefined = undefined
   let working: Types.Interfaces.IRecord<string, boolean> = {}
 
   $: optionsTotal = () => {
@@ -40,7 +42,10 @@
   $: delivery = Math.ceil(
     $Settings?.delivery?.free ? 0 : calcDelivery < $Settings?.delivery?.min ? $Settings?.delivery?.min : calcDelivery
   )
-  $: total = subtotal + delivery
+  $: tip = Logics.Finances.calcDiscount(subtotal, $Settings?.tip, Types.Types.TDiscount.PERCENT)
+  $: total =
+    subtotal +
+    (orderType === Types.Types.TOrderType.DELIVERY ? delivery : orderType === Types.Types.TOrderType.LOCAL ? tip : 0)
 
   $: if ($Products && $Products.length === 0) {
     Stores.Navigation.instance.reset(Routes.home)
@@ -247,7 +252,18 @@
   }
 
   onMount(async () => {
-    let response = await GetAddresses()
+    orderType = await OrderType.get()
+    let response = await GetSettings()
+    if (response?.success && response?.data) {
+      const settings: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject({
+        ...Settings.get().toJSON(),
+        ...response?.data
+      })
+      Settings.set(settings)
+    } else {
+      Stores.MessageAlert.instance.show(response?.data)
+    }
+    response = await GetAddresses()
     if (response?.success) {
       const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response?.data)
       const addresses = data.filter(address => address.selected)
@@ -292,13 +308,21 @@
       <td class="resumeText">Subtotal</td>
       <td class="resumeValue">{Utils.Strings.currency(subtotal)}</td>
     </tr>
-    {#if address}
+    {#if orderType === Types.Types.TOrderType.DELIVERY}
+      {#if address}
+        <tr>
+          <td class="resumeText">Taxa de entrega</td>
+          <td class="resumeValue"
+            ><span class:deliveryFree={delivery == 0}
+              >{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
+            ></td
+          >
+        </tr>
+      {/if}
+    {:else if orderType === Types.Types.TOrderType.LOCAL}
       <tr>
-        <td class="resumeText">Taxa de entrega</td>
-        <td class="resumeValue"
-          ><span class:deliveryFree={delivery == 0}>{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
-          ></td
-        >
+        <td class="resumeText">Gorjeta sugerida ({Utils.Strings.percent($Settings?.tip ?? 0)})</td>
+        <td class="resumeValue"><span class:deliveryFree={tip == 0}>{Utils.Strings.currency(tip ?? 0)}</span></td>
       </tr>
     {/if}
     <tr>

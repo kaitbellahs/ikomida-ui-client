@@ -21,7 +21,18 @@
       Stores.Navigation.instance.reset(Routes.orders)
     })
   }
-  $: total = Number(order.subtotal ?? 0) + Number(order.delivery ?? 0) - Number(order.discount ?? 0)
+
+  $: tip = Number(Logics.Finances.calcDiscount(order.subtotal, order.tip ?? 0, Types.Types.TDiscount.PERCENT))
+  $: total =
+    Number(order.subtotal ?? 0) +
+    Number(
+      order.orderType === Types.Types.TOrderType.DELIVERY
+        ? order.delivery
+        : order.orderType === Types.Types.TOrderType.LOCAL
+        ? Logics.Finances.calcDiscount(order.subtotal ?? 0, tip ?? 0, Types.Types.TDiscount.PERCENT)
+        : 0
+    ) -
+    Number(order.discount ?? 0)
 
   async function changeOrderStatus(status: Types.Types.TOrderStatus) {
     Stores.Loading.instance.start()
@@ -123,6 +134,10 @@
   <Views.Divider />
   <h3 class="title">Pedido N˚: {order.customID}</h3>
   <Views.Divider />
+  <Views.Status type={Types.Status.INFO} showIcon={false}
+    >Pedido para {order.orderType?.description ?? '-'}</Views.Status
+  >
+  <Views.Divider />
 
   {#if !order.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(order.status)}
     <Views.Status>
@@ -164,24 +179,36 @@
       {/if}
     </div>
   {/each}
-  <Views.Divider />
-  <h3>Dados da entrega</h3>
-  <div class="address">
-    Endereço:
-    <span class="street"
-      >{order.address?.street ?? '-'}, {order.address?.number ?? '-'}{order.address?.complement
-        ? ` - ${order.address?.complement}`
-        : ''}</span
-    ><br />
-    <span class="neighborhood"
-      >{order.address?.neighborhood ?? '-'}<br />
-      <span class="city"
-        >{order.address?.city ?? '-'}/{order.address?.stat ?? '-'} CEP: {order.address?.postalCode ?? '-'}</span
-      >
-      <span class="city">Tipo: {order?.address?.kind?.name ?? '-'}</span>
-      <span class="city">Ref: {order?.address?.reference ?? '-'}</span>
-    </span>
-  </div>
+  {#if order.orderType === Types.Types.TOrderType.DELIVERY}
+    <Views.Divider />
+    <h3>Dados da entrega</h3>
+    <div class="address">
+      Endereço:
+      <span class="street"
+        >{order.address?.street ?? '-'}, {order.address?.number ?? '-'}{order.address?.complement
+          ? ` - ${order.address?.complement}`
+          : ''}</span
+      ><br />
+      <span class="neighborhood"
+        >{order.address?.neighborhood ?? '-'}<br />
+        <span class="city"
+          >{order.address?.city ?? '-'}/{order.address?.stat ?? '-'} CEP: {order.address?.postalCode ?? '-'}</span
+        >
+        <span class="city">Tipo: {order?.address?.kind?.name ?? '-'}</span>
+        <span class="city">Ref: {order?.address?.reference ?? '-'}</span>
+      </span>
+    </div>
+  {:else if order.orderType === Types.Types.TOrderType.PICKUP}
+    <Views.Divider />
+    <h3>Seu cliente vai retirar o pedido no seu estabelecimento.</h3>
+  {:else if order.orderType === Types.Types.TOrderType.LOCAL}
+    <Views.Divider />
+    <h3>Leva o pedido até a mesa: <b>{order.table}</b></h3>
+  {:else}
+    <Views.Status type={Types.Status.ERROR}
+      >Não foi possível definir o tipo do pedido, entre em contato com o suporte.</Views.Status
+    >
+  {/if}
   <Views.Divider />
   <h3>Dados de pagamento</h3>
   <Views.Divider />
@@ -231,12 +258,20 @@
           >
         </tr>
       {/if}
-      <tr>
-        <td class="resumeText">Taxa de entrega</td>
-        <td class="resumeValue"
-          ><span class:deliveryFree={order.delivery == 0}>{Utils.Strings.currency(order.delivery)}</span></td
-        >
-      </tr>
+
+      {#if order.orderType === Types.Types.TOrderType.DELIVERY}
+        <tr>
+          <td class="resumeText">Taxa de entrega</td>
+          <td class="resumeValue"
+            ><span class:deliveryFree={order?.delivery == 0}>{Utils.Strings.currency(order?.delivery)}</span></td
+          >
+        </tr>
+      {:else if order.orderType === Types.Types.TOrderType.LOCAL}
+        <tr>
+          <td class="resumeText">Gorjeta sugerida ({Utils.Strings.percent(order?.tip ?? 0)})</td>
+          <td class="resumeValue"><span class:deliveryFree={order?.tip == 0}>{Utils.Strings.currency(tip)}</span></td>
+        </tr>
+      {/if}
       <tr>
         <td class="resumeText"><b>Total</b></td>
         <td class="resumeValue"><b>{Utils.Strings.currency(total)}</b></td>
@@ -355,7 +390,7 @@
   }
   .resumeText {
     text-align: left;
-    width: 50%;
+    width: 70%;
     font-size: 1em;
     font-weight: lighter;
   }

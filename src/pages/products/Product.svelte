@@ -9,7 +9,8 @@
   import { onMount } from 'svelte'
 
   const router = Stores.Navigation.instance.router
-  const initalProduct = $router.options
+  const initalProduct = $router.options.product
+  const isActive = $router.options.active
   const genericError =
     'Ocorreu um erro interno, por favor entre em contato conosco pelo e-mail contact@tialtonivel.com.br. Eesvazia o seu carrinho de compras e repita a compra novamente! ou reinicie o app se o erro persiste.'
 
@@ -216,7 +217,13 @@
     }
   }
 
+  $: hasOptions = () => {
+    return (cartProduct.optionsCategories?.filter(category => (category.options?.length ?? 0) > 0) ?? []).length > 0
+  }
+
   onMount(async () => {
+    Stores.Loading.instance.reset()
+    Stores.Loading.instance.start()
     if (!initalProduct.id) {
       Stores.Loading.instance.stop()
       return
@@ -293,110 +300,112 @@
       >
     </div>
     <Views.Divider />
-    <h2>Personalize seu pedido</h2>
     {#if (cartProduct.optionsCategories?.length ?? 0) > 0}
-      {#each cartProduct.optionsCategories ?? [] as optionsCategory}
-        <Views.Divider height={10} />
-        <div class="optionsCategory">
-          <header>
-            <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45px" width="45px" />
-            <div>
-              <h3>{optionsCategory.name}</h3>
-              <div>
-                <div>
-                  <span>Mínimo: {optionsCategory.min * quantity}</span><span
-                    >Máximo: {optionsCategory.max * quantity}</span
-                  >
-                </div>
-                <div><span>Escolheu</span><span class="selected">{getCartOptionsCount(optionsCategory)}</span></div>
-              </div>
-              {#if optionsCategory.min > 0}
-                <span class="mandatory">Mandatório</span>
-              {/if}
-            </div>
-          </header>
+      {#if hasOptions()}
+        <h2>Personalize seu pedido</h2>
+        {#each cartProduct.optionsCategories ?? [] as optionsCategory}
           {#if (optionsCategory.options?.length ?? 0) > 0}
-            {#each optionsCategory.options ?? [] as option}
-              <Views.Divider height={15} />
-              <div class="option">
-                <Views.Image source={option.image} name={option.name} height="45px" width="45px" />
+            <Views.Divider height={10} />
+            <div class="optionsCategory">
+              <header>
+                <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45px" width="45px" />
                 <div>
-                  <h3>{option.name}</h3>
+                  <h3>{optionsCategory.name}</h3>
                   <div>
-                    <div class="units">
-                      <Views.Button
-                        type={Types.TButton.TRANSPARENT}
-                        size="none"
-                        height="16px"
-                        sizeMultiplier={1.3}
-                        margin="0"
-                        on:click={() => minos(option)}
-                      >
-                        <Fa icon={faMinusSquare} /></Views.Button
-                      ><span>{getCartOptionUnitsById(option.id)}/{option.units * quantity}</span><Views.Button
-                        type={Types.TButton.TRANSPARENT}
-                        size="none"
-                        height="16px"
-                        margin="0"
-                        sizeMultiplier={1.3}
-                        on:click={() => plus(optionsCategory, option)}><Fa icon={faPlusSquare} /></Views.Button
+                    <div>
+                      <span>Mínimo: {optionsCategory.min * quantity}</span><span
+                        >Máximo: {optionsCategory.max * quantity}</span
                       >
                     </div>
-                    {#if option.price > 0}
-                      <div class="price">
-                        <h5>Valor</h5>
-                        {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType) && option.price > 0}
-                          <span class="oldPrice">{Utils.Strings.currency(option.price * quantity)}</span>
-                        {/if}
-                        {Utils.Strings.currency(
-                          quantity *
-                            (option.price -
-                              Logics.Finances.calcDiscount(
-                                option.price,
-                                cartProduct.discount,
-                                cartProduct.discountType
-                              ))
-                        )}
+                    <div><span>Escolheu</span><span class="selected">{getCartOptionsCount(optionsCategory)}</span></div>
+                  </div>
+                  {#if optionsCategory.min > 0}
+                    <span class="mandatory">Mandatório</span>
+                  {/if}
+                </div>
+              </header>
+              {#each optionsCategory.options ?? [] as option}
+                <Views.Divider height={15} />
+                <div class="option">
+                  <Views.Image source={option.image} name={option.name} height="45px" width="45px" />
+                  <div>
+                    <h3>{option.name}</h3>
+                    <div>
+                      <div class="units">
+                        <Views.Button
+                          type={Types.TButton.TRANSPARENT}
+                          size="none"
+                          height="16px"
+                          sizeMultiplier={1.3}
+                          margin="0"
+                          on:click={() => minos(option)}
+                        >
+                          <Fa icon={faMinusSquare} /></Views.Button
+                        ><span>{getCartOptionUnitsById(option.id)}/{option.units * quantity}</span><Views.Button
+                          type={Types.TButton.TRANSPARENT}
+                          size="none"
+                          height="16px"
+                          margin="0"
+                          sizeMultiplier={1.3}
+                          on:click={() => plus(optionsCategory, option)}><Fa icon={faPlusSquare} /></Views.Button
+                        >
                       </div>
-                      <div class="price">
-                        <h5>Total</h5>
-                        {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType) && option.price > 0}
-                          <span class="oldPrice"
-                            >{Utils.Strings.currency(getCartOptionUnitsById(option.id) * option.price * quantity)}</span
-                          >
-                        {/if}
-                        {Utils.Strings.currency(
-                          quantity *
-                            getCartOptionUnitsById(option.id) *
-                            (option.price -
-                              Logics.Finances.calcDiscount(
-                                option.price,
-                                cartProduct.discount,
-                                cartProduct.discountType
-                              ))
-                        )}
-                      </div>
-                    {:else}
-                      <span class="current">Gratuito</span>
-                    {/if}
+                      {#if option.price > 0}
+                        <div class="price">
+                          <h5>Valor</h5>
+                          {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType) && option.price > 0}
+                            <span class="oldPrice">{Utils.Strings.currency(option.price * quantity)}</span>
+                          {/if}
+                          {Utils.Strings.currency(
+                            quantity *
+                              (option.price -
+                                Logics.Finances.calcDiscount(
+                                  option.price,
+                                  cartProduct.discount,
+                                  cartProduct.discountType
+                                ))
+                          )}
+                        </div>
+                        <div class="price">
+                          <h5>Total</h5>
+                          {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType) && option.price > 0}
+                            <span class="oldPrice"
+                              >{Utils.Strings.currency(
+                                getCartOptionUnitsById(option.id) * option.price * quantity
+                              )}</span
+                            >
+                          {/if}
+                          {Utils.Strings.currency(
+                            quantity *
+                              getCartOptionUnitsById(option.id) *
+                              (option.price -
+                                Logics.Finances.calcDiscount(
+                                  option.price,
+                                  cartProduct.discount,
+                                  cartProduct.discountType
+                                ))
+                          )}
+                        </div>
+                      {:else}
+                        <span class="current">Gratuito</span>
+                      {/if}
+                    </div>
                   </div>
                 </div>
-              </div>
-            {/each}
-          {:else}
-            <Views.Divider />
-            <Views.Status>Não há opções cadastradas nesta categoria de opções.</Views.Status>
+              {/each}
+            </div>
           {/if}
-        </div>
-      {/each}
-    {:else}
-      <Views.Divider />
-      <Views.Status>Não há opções para customizar este produto.</Views.Status>
+        {/each}
+      {/if}
     {/if}
-    <Views.Button isFloat={true} on:click={addProduct} bottomPadding={$StatusBar.bottomPadding}
+    <Views.Button disabled={!isActive} isFloat={true} on:click={addProduct} bottomPadding={$StatusBar.bottomPadding}
       ><Fa icon={faCartPlus} /> <span>{Types.CCart.isInstance(initalProduct) ? 'Atualizar' : 'Adicionar'}</span>
       <span>({total})</span></Views.Button
     >
+    {#if !isActive}
+      <Views.Divider />
+      <Views.Status>Por enquanto este produto está disponível apenas para consulta.</Views.Status>
+    {/if}
   </div>
 {/if}
 

@@ -1,15 +1,17 @@
 import { Network, Types, Stores } from '@ikomida/shared-frontend'
+import OrderType from '../stores/OrderType'
 const cache = Stores.Cache.createInstance('Products')
-let timeout: Date
+let timeout: number
 export async function all(): Promise<Types.Classes.CCategoryProducts[]> {
-  if (!timeout || timeout < new Date(new Date().setMinutes(new Date().getMinutes() + 2))) {
-    const response = await Network.instance?.get('/products', true)
+  if (!timeout || timeout < new Date().getTime() + 2 * 60 * 1000) {
+    const orderType = await OrderType.get()
+    const response = await Network.instance?.get(`/products?orderType=${orderType?.id ?? ''}`, true)
     if (response?.success) {
       const data = (
         Types.Classes.CCategoryProducts.fromObject(response?.data) as Types.Classes.CCategoryProducts[]
       ).filter(item => (item.products?.length ?? 0) > 0)
       cache.setObject('Products', data)
-      timeout = new Date()
+      timeout = new Date().getTime()
       return data
     } else {
       return []

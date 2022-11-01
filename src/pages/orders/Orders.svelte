@@ -1,30 +1,30 @@
 <script lang="ts">
-  import Routes from '../../stores/Routes';
-  import { OrderStatus } from '../../network/Orders';
-  import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend';
-  import { onMount } from 'svelte';
+  import Routes from '../../stores/Routes'
+  import { OrderStatus } from '../../network/Orders'
+  import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend'
+  import { onMount } from 'svelte'
 
-  let items: Types.Classes.COrder[];
+  let items: Types.Classes.COrder[]
 
   $: if (items) {
     for (let index = 0; index < items.length; index++) {
-      items[index] = Types.Classes.COrder.fromObject(items[index]);
+      items[index] = Types.Classes.COrder.fromObject(items[index])
     }
-    items = items;
+    items = items
   }
 
   onMount(async () => {
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
 
   function goToOrder(order: Types.Classes.COrder) {
     Stores.Navigation.instance.goTo(Routes.order, {
       newOrder: false,
-      order,
-    });
+      order
+    })
   }
 
-  Stores.Title.instance.set('Pedidos');
+  Stores.Title.instance.set('Pedidos')
 </script>
 
 <Views.LoadMoreReusableList
@@ -37,6 +37,7 @@
   let:index
 >
   <div class="leftShadow orderContainer">
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div on:click={() => goToOrder(items[index])}>
       <h3 class="title">Pedido N˚: {items[index].customID}</h3>
       {#if items[index].status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(items[index].status ?? Types.Types.TOrderStatus.CANCELED) && new Date((items[index].createdAt?.getTime() ?? 0) + items[index].preparation?.max * 1000) < new Date()}
@@ -48,6 +49,10 @@
       {#if items[index].status && [Types.Types.TOrderStatus.CANCELED].includes(items[index].status ?? Types.Types.TOrderStatus.CANCELED)}
         <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}>Pedido cancelado</Views.Status>
       {/if}
+      <Views.Divider height={5} />
+      <Views.Status type={Types.Status.INFO} showIcon={false}
+        >Pedido para {items[index].orderType?.description ?? '-'}</Views.Status
+      >
       <Views.Divider height={5} />
       {#if !items[index].status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(items[index].status ?? Types.Types.TOrderStatus.CANCELED)}
         <Views.Status>
@@ -68,10 +73,22 @@
           {items[index].products?.length - 1 == 1 ? 'item' : 'itens'}
         </div>
       {/if}
-      <Views.Divider height={5} />
-      <div class="address">
-        Entregua na: <b>{items[index].address.street ?? '-'}</b>
-      </div>
+      {#if items[index].orderType === Types.Types.TOrderType.DELIVERY}
+        <Views.Divider height={5} />
+        <div class="address">
+          Entregua na: <b>{items[index].address?.street ?? '-'}</b>
+        </div>
+      {:else if items[index].orderType === Types.Types.TOrderType.PICKUP}
+        <Views.Divider height={5} />
+        <h3>Seu cliente vai retirar o pedido no seu estabelecimento.</h3>
+      {:else if items[index].orderType === Types.Types.TOrderType.LOCAL}
+        <Views.Divider height={5} />
+        <h3>Leva o pedido até a mesa: <b>{items[index].table}</b></h3>
+      {:else}
+        <Views.Status type={Types.Status.ERROR}
+          >Não foi possível definir o tipo do pedido, entre em contato com o suporte.</Views.Status
+        >
+      {/if}
       <div class="paymentMethod">
         Forma de pagamento: <b
           >{items[index].payment?.type.name}
@@ -83,7 +100,7 @@
     <div class="value">
       Total:&nbsp;<span
         >{Utils.Strings.currency(
-          Number(items[index].subtotal ?? 0) + Number(items[index].delivery ?? 0) - Number(items[index].discount ?? 0),
+          Number(items[index].subtotal ?? 0) + Number(items[index].delivery ?? 0) - Number(items[index].discount ?? 0)
         )}</span
       >
     </div>

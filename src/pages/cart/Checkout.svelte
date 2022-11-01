@@ -10,11 +10,14 @@
   import { NewOrders } from '../../network/Orders'
   import { GetAddresses, GetSettings } from '../../network/User'
   import Routes from '../../stores/Routes'
+  import OrderType from '../../stores/OrderType'
 
   let Products: IStore
   let location: Types.Classes.CLocation
   let coupon: string | undefined
+  let table: string | undefined
   let couponObject: Types.Classes.CCoupon | undefined = undefined
+  let orderType: Types.Types.TOrderType | undefined = undefined
 
   let address: Types.Classes.CAddress | undefined | null
   let payment: Types.Classes.CPaymentMethod | undefined
@@ -47,7 +50,10 @@
   $: delivery = Math.ceil(
     $Settings?.delivery?.free ? 0 : calcDelivery < $Settings?.delivery?.min ? $Settings?.delivery?.min : calcDelivery
   )
-  $: netTotal = subtotal + delivery
+  $: tip = Logics.Finances.calcDiscount(subtotal, $Settings?.tip, Types.Types.TDiscount.PERCENT)
+  $: netTotal =
+    subtotal +
+    (orderType === Types.Types.TOrderType.DELIVERY ? delivery : orderType === Types.Types.TOrderType.LOCAL ? tip : 0)
   $: discount = couponObject ? Logics.Finances.calcDiscount(subtotal, couponObject.value, couponObject.valueType) : 0
   $: total = netTotal - discount
   $: validate = address && payment
@@ -84,7 +90,6 @@
     products.push(
       ...$Products.map(CartProduct => {
         const product: Types.CCart = Types.CCart.fromObject(CartProduct.toJSON())
-        console.log('product:', product)
         product.optionsCategories = undefined
         product.image = undefined
         product.order = undefined
@@ -98,7 +103,7 @@
     const payload: Types.Classes.COrder = Types.Classes.COrder.init(
       netTotal,
       discount,
-      delivery,
+      orderType === Types.Types.TOrderType.DELIVERY ? delivery : 0,
       products,
       address,
       payment?.type,
@@ -108,7 +113,12 @@
       undefined,
       undefined,
       undefined,
-      payment
+      payment,
+      undefined,
+      location,
+      orderType,
+      orderType === Types.Types.TOrderType.LOCAL ? $Settings.tip : 0,
+      orderType === Types.Types.TOrderType.LOCAL ? table : undefined
     )
     const response = await NewOrders(payload)
     Stores.Loading.instance.stop()
@@ -129,8 +139,15 @@
       const response = await AddCoupon(coupon)
       if (response?.success) {
         couponObject = Types.Classes.CCoupon.fromObject(response.data)
+        if ((couponObject?.minValue ?? 0) > subtotal) {
+          Stores.MessageAlert.instance?.show(
+            `Este cupom é válido apenas para compras assim do ${Utils.Strings.currency(couponObject?.minValue ?? 0)}`
+          )
+          couponObject = undefined
+        }
       } else {
-        Stores.MessageAlert.instance?.show(response?.data)
+        couponObject = undefined
+        Stores.MessageAlert.instance?.show(response?.data ?? 'E')
       }
       Stores.Loading.instance.stop()
     }
@@ -151,7 +168,7 @@
 
   onMount(async () => {
     try {
-      console.log('onMount')
+      orderType = await OrderType.get()
       Products = await Cart.instance.store()
       let response = await GetSettings()
       if (response?.success && response?.data) {
@@ -258,13 +275,24 @@
         <td class="resumeValue"><span class="deliveryFree">- {Utils.Strings.currency(discount)}</span></td>
       </tr>
     {/if}
-    <tr>
-      <td class="resumeText">Taxa de entrega</td>
-      <td class="resumeValue"
-        ><span class:deliveryFree={delivery == 0}>{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
-        ></td
-      >
-    </tr><tr class="spacer" />
+    {#if orderType === Types.Types.TOrderType.DELIVERY}
+      {#if address}
+        <tr>
+          <td class="resumeText">Taxa de entrega</td>
+          <td class="resumeValue"
+            ><span class:deliveryFree={delivery == 0}
+              >{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
+            ></td
+          >
+        </tr>
+      {/if}
+    {:else if orderType === Types.Types.TOrderType.LOCAL}
+      <tr>
+        <td class="resumeText">Gorjeta sugerida ({Utils.Strings.percent($Settings?.tip ?? 0)})</td>
+        <td class="resumeValue"><span class:deliveryFree={tip == 0}>{Utils.Strings.currency(tip ?? 0)}</span></td>
+      </tr>
+    {/if}
+    <tr class="spacer" />
     <tr class="total">
       <td class="resumeText">Total</td>
       <td class="resumeValue total">{Utils.Strings.currency(total)}</td>
@@ -284,21 +312,36 @@
   />
 {/if}
 <Views.Button type={Types.TButton.TRANSPARENT} on:click={addMoreItems}>Adicionar mais itens</Views.Button>
-<Views.Divider />
-<Views.Button on:click={manageAddress}>trocar endereço</Views.Button>
-{#if address === undefined}
-  <Views.LocalLoading size={2} />
-{:else if address}
-  <div class="address">
-    <div class="content">
-      <span class="delivery">A entrega será realizada na</span>
-      <span>{address?.street}, {address?.number}{address?.complement ? ` - ${address?.complement}` : ''}</span>
-      <span class="neighborhood">{address?.neighborhood} </span>
-      <span class="city">{address?.city}/{address?.stat} CEP: {address?.postalCode}</span>
+{#if orderType === Types.Types.TOrderType.DELIVERY}
+  <Views.Divider />
+  <Views.Button on:click={manageAddress}>trocar endereço</Views.Button>
+  {#if address === undefined}
+    <Views.LocalLoading size={2} />
+  {:else if address}
+    <div class="address">
+      <div class="content">
+        <span class="delivery">A entrega será realizada na</span>
+        <span>{address?.street}, {address?.number}{address?.complement ? ` - ${address?.complement}` : ''}</span>
+        <span class="neighborhood">{address?.neighborhood} </span>
+        <span class="city">{address?.city}/{address?.stat} CEP: {address?.postalCode}</span>
+      </div>
     </div>
-  </div>
-{:else}
-  <h3>Para continuar precisa selecionar ou adicionar um endereço</h3>
+  {:else}
+    <h3>Para continuar precisa selecionar ou adicionar um endereço</h3>
+  {/if}
+{:else if orderType === Types.Types.TOrderType.LOCAL}
+  <Views.TextEdit
+    placeHolder="Número da mesa"
+    bind:value={table}
+    initialValue={table}
+    type={Types.TTextEdit.ALPHA_NUMERIC}
+    min={1}
+    max={50}
+  />
+  {#if !table}
+    <Views.Divider height={10} />
+    <h3>Para continuar precisa digitar o número da mesa.</h3>
+  {/if}
 {/if}
 <Views.Divider />
 <Views.Button on:click={manageCard}>Trocar meio de pagamento</Views.Button>
