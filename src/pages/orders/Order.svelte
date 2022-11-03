@@ -8,6 +8,8 @@
   import Routes from '../../stores/Routes'
   import { OrderStatus, ChangeOrderStatus } from '../../network/Orders'
   import { Settings } from '../../stores/Setup'
+  import { Capacitor } from '@capacitor/core'
+  import { GetSettings } from '../../network/User'
 
   const router = Stores.Navigation.instance.router
   const newOrder: boolean = $router.options.newOrder
@@ -15,6 +17,14 @@
 
   let screenShot = false
   let orderScreen: HTMLElement
+  let loadImagesComplete = {
+    mainPicture: false,
+    ikomida: false
+  }
+  let loadImagesError = {
+    mainPicture: true,
+    ikomida: true
+  }
 
   $: if (newOrder) {
     Stores.Navigation.instance.setBack(() => {
@@ -64,10 +74,33 @@
     await changeOrderStatus(Types.Types.TOrderStatus.CANCELED)
   }
 
+  async function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  async function isImageReady() {
+    let ready = false
+    return new Promise(async (resolve, reject) => {
+      const startTime = new Date().getTime()
+      do {
+        ready =
+          loadImagesComplete.ikomida === true &&
+          loadImagesComplete.mainPicture === true &&
+          loadImagesError.ikomida === false &&
+          loadImagesError.mainPicture === false
+        if (!ready) {
+          await sleep(100)
+        }
+      } while (!ready && startTime < new Date().getTime() - 40 * 1000)
+      resolve(ready)
+    })
+  }
+
   async function share() {
     Stores.Loading.instance.start()
     screenShot = true
     await tick()
+    await isImageReady()
     const canvas = await html2canvas(orderScreen, {
       logging: false,
       backgroundColor: '#dfdfdf'
@@ -75,20 +108,29 @@
     screenShot = false
     await tick()
     Stores.Loading.instance.stop()
-    const data = canvas.toDataURL().split(',')
-    const screenShotFile = await Filesystem.writeFile({
-      path: `screenshots/order-${order.customID}.jpg`,
-      data: data?.[1],
-      directory: Directory.Cache,
-      recursive: true
-    })
-    //TODO: -- report identifier of the app that received the share action. Can be an empty string in some cases. On web it will be undefined.
-    const activityType = await Share.share({
-      title: `Pedido #${order.customID}`,
-      text: 'Eu estou compartilhando com você meu pedido',
-      url: `file://${screenShotFile?.uri}`,
-      dialogTitle: 'Compartilhar o pedido'
-    })
+    if (Capacitor.isNativePlatform()) {
+      const data = canvas.toDataURL().split(',')
+      const screenShotFile = await Filesystem.writeFile({
+        path: `screenshots/order-${order.customID}.jpg`,
+        data: data?.[1],
+        directory: Directory.Cache,
+        recursive: true
+      })
+      //TODO: -- report identifier of the app that received the share action. Can be an empty string in some cases. On web it will be undefined.
+      const activityType = await Share.share({
+        title: `Pedido #${order.customID}`,
+        text: 'Olha o que eu comprei!',
+        url: `file://${screenShotFile?.uri}`,
+        dialogTitle: 'Compartilhar o pedido'
+      })
+    } else {
+      canvas.toBlob(function (blob) {
+        if (blob) {
+          const url = URL.createObjectURL(blob)
+          window.open(url, '_blank')
+        }
+      })
+    }
   }
 
   onMount(async () => {
@@ -99,6 +141,14 @@
         callback: share
       })
     }
+    if (!('PROFILE' in $Settings) || !$Settings?.profile) {
+      const response = await GetSettings()
+      if (response?.success) {
+        $Settings.profile = response.data.profile
+        Settings.set($Settings)
+      }
+    }
+    await tick()
     Stores.Loading.instance.stop()
   })
 
@@ -110,6 +160,8 @@
     <div class="avatar">
       {#if $Settings?.profile?.mainPicture}
         <Views.Image
+          bind:loadComplete={loadImagesComplete.mainPicture}
+          bind:showImage={loadImagesError.mainPicture}
           source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
           name={$Settings?.profile?.contractName ?? 'iKomida'}
         />
@@ -281,7 +333,12 @@
 
   <div class="signature {screenShot ? 'screenShot' : ''}">
     <Views.Divider height={30} />
-    <span>Feito com carinho por</span><Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
+    <span>Feito com carinho por</span><Views.Image
+      bind:loadComplete={loadImagesComplete.ikomida}
+      bind:showImage={loadImagesError.ikomida}
+      source="assets/icons/transparent-logo-1.svg"
+      name="iKomida"
+    />
   </div>
 </div>
 <Views.GTerms />
