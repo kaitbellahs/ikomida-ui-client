@@ -56,7 +56,12 @@
     (orderType === Types.Types.TOrderType.DELIVERY ? delivery : orderType === Types.Types.TOrderType.LOCAL ? tip : 0)
   $: discount = couponObject ? Logics.Finances.calcDiscount(subtotal, couponObject.value, couponObject.valueType) : 0
   $: total = netTotal - discount
-  $: validate = address && payment
+  $: validate =
+    payment && orderType === Types.Types.TOrderType.DELIVERY
+      ? address
+      : orderType === Types.Types.TOrderType.LOCAL
+      ? table
+      : true && subtotal >= (couponObject?.minValue ?? 0)
   $: businessTime = Logics.DateTime.isBusinessTime($Settings.business)
 
   function addMoreItems() {
