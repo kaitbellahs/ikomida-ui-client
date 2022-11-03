@@ -139,9 +139,12 @@
   }
 
   async function addCoupon() {
-    if (coupon && coupon.length >= 3) {
+    if (coupon && orderType && coupon.length >= 3) {
       Stores.Loading.instance.start()
-      const response = await AddCoupon(coupon)
+      const payload = Types.Classes.CCoupon.init(coupon, 0, subtotal, Types.Types.TDiscount.NO, undefined, undefined, [
+        orderType
+      ])
+      const response = await AddCoupon(payload)
       if (response?.success) {
         couponObject = Types.Classes.CCoupon.fromObject(response.data)
         if ((couponObject?.minValue ?? 0) > subtotal) {

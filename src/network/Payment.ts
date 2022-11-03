@@ -16,6 +16,6 @@ export async function DeleteCreditCard(id?: string) {
   return Network.instance?.remove(`/payment/${id ?? '-'}`, true)
 }
 
-export async function AddCoupon(coupon: string) {
-  return Network.instance?.post(`/coupon`, true, { coupon })
+export async function AddCoupon(coupon: Types.Classes.CCoupon) {
+  return Network.instance?.post(`/coupon`, true, coupon)
 }
