@@ -1,6 +1,6 @@
 <script lang="ts">
   import Routes from '../../stores/Routes'
-  import { all } from '../../network/Products'
+  import { all, resetTimeout } from '../../network/Products'
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import { GetSettings } from '../../network/User'
   import { Settings } from '../../stores/Setup'
@@ -18,6 +18,7 @@
   }
   async function updateAll() {
     Stores.Loading.instance.start()
+    resetTimeout()
     await Cart.instance.updateType()
     await Cart.instance.products()
     categoriesAndProducts = await all()

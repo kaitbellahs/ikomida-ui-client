@@ -1,7 +1,12 @@
 import { Network, Types, Stores } from '@ikomida/shared-frontend'
 import OrderType from '../stores/OrderType'
 const cache = Stores.Cache.createInstance('Products')
-let timeout: number
+let timeout = 0
+
+export function resetTimeout() {
+  timeout = 0
+}
+
 export async function all(): Promise<Types.Classes.CCategoryProducts[]> {
   if (!timeout || timeout < new Date().getTime() - 2 * 60 * 1000) {
     const orderType = await OrderType.get()
