@@ -3,21 +3,21 @@ import OrderType from '../stores/OrderType'
 const cache = Stores.Cache.createInstance('Products')
 let timeout: number
 export async function all(): Promise<Types.Classes.CCategoryProducts[]> {
-  if (!timeout || timeout < new Date().getTime() + 2 * 60 * 1000) {
+  if (!timeout || timeout < new Date().getTime() - 2 * 60 * 1000) {
     const orderType = await OrderType.get()
     const response = await Network.instance?.get(`/products?orderType=${orderType?.id ?? ''}`, true)
     if (response?.success) {
-      const data = (
-        Types.Classes.CCategoryProducts.fromObject(response?.data) as Types.Classes.CCategoryProducts[]
-      ).filter(item => (item.products?.length ?? 0) > 0)
+      const data = (Types.Classes.CCategoryProducts.fromObject(response?.data) as Types.Classes.CCategoryProducts[])
+        .filter(item => (item.products?.length ?? 0) > 0)
+        .map(item => item.toJSON())
       cache.setObject('Products', data)
       timeout = new Date().getTime()
-      return data
+      return Types.Classes.CCategoryProducts.fromObject(data)
     } else {
       return []
     }
   } else {
-    return cache.getObject('Products')
+    return Types.Classes.CCategoryProducts.fromObject(cache.getObject('Products'))
   }
 }
 

@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "${{firebaseAppId}}$",
+        "mobilesdk_app_id": "1:981415290588:android:4f2a10d1b3aedda35d3619",
         "android_client_info": {
-          "package_name": "${{iKomidaId}}$"
+          "package_name": "com.ikomida.br.tialtonivel"
         }
       },
       "oauth_client": [
@@ -29,13 +29,6 @@
             {
               "client_id": "507904932701-117b9b54utnmqt4oio1nle9v95d7jtsh.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "507904932701-5edj4cfo1tsb93v5dikeq8ao0octojh9.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.ikomida.br.tialtonivel"
-              }
             }
           ]
         }

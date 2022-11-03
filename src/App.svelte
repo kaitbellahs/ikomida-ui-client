@@ -128,7 +128,8 @@
         if (response?.success) {
           order = Types.Classes.COrder.fromObject(response?.data)
         }
-        let cachedOrders = (cache.getObject(Stores.Cache.Types.ORDERS) ?? []) as Types.Classes.COrder[]
+        let cachedOrders: Types.Classes.COrder[] =
+          Types.Classes.COrder.fromObject(cache.getObject(Stores.Cache.Types.ORDERS)) ?? []
         if (order) {
           const cachedOrder = cachedOrders.filter(cachedOrder => cachedOrder.id === order?.id)?.[0]
           if (cachedOrder) {

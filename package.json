@@ -81,7 +81,7 @@
     "svelte-preprocess": "^4.10.7",
     "svelte-preprocess-cssmodules": "^2.2.3",
     "tslib": "^2.4.1",
-    "typedoc": "^0.23.19",
+    "typedoc": "^0.23.20",
     "typescript": "^4.8.4",
     "typescript-svelte-plugin": "^0.3.10"
   },
@@ -103,7 +103,7 @@
     "@capacitor/share": "^4.0.1",
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@ikomida/capacitor-plugin-status-bar": "github:TIAltoNivel/capacitor-plugin-statusbar",
-    "@ikomida/shared-frontend": "^1.5.10",
+    "@ikomida/shared-frontend": "^1.5.13",
     "credit-card-type": "^9.1.0",
     "html2canvas": "^1.4.1",
     "uuid": "^9.0.0"

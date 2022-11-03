@@ -1,10 +1,17 @@
 <script lang="ts">
   import Routes from '../../stores/Routes'
   import { OrderStatus } from '../../network/Orders'
-  import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend'
+  import { Views, Utils, Types, Stores, Logics } from '@ikomida/shared-frontend'
   import { onMount } from 'svelte'
+  import { Writable } from 'svelte/store'
+  let Layout: Writable<Types.Classes.CLayout | undefined> = Stores.Layout.instance.store
 
+  let orderType: Types.Types.TOrderType | undefined = undefined
   let items: Types.Classes.COrder[]
+
+  $: if (orderType) {
+    Stores.LoadMore.instance.refresh()
+  }
 
   $: if (items) {
     for (let index = 0; index < items.length; index++) {
@@ -27,16 +34,20 @@
   Stores.Title.instance.set('Pedidos')
 </script>
 
+<div class="filters">
+  <Views.Selector bind:selected={orderType} options={Types.Types.TOrderType.values()} name="Tipo dos pedidos" />
+</div>
 <Views.LoadMoreReusableList
   noItems="Não há pedido para exibir por enquanto, aproveite e faça seu primeiro pedido agora!"
   cache={Stores.Cache.Types.ORDERS}
   url="/orders"
+  params={orderType ? { orderType: orderType?.id } : undefined}
   bind:items
   hasRecaptcha={true}
   let:item
   let:index
 >
-  <div class="leftShadow orderContainer">
+  <div class="leftShadow orderContainer" style="--itemBackground: {$Layout?.itemBackground || '#ffffffab'};">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div on:click={() => goToOrder(items[index])}>
       <h3 class="title">Pedido N˚: {items[index].customID}</h3>
@@ -100,7 +111,19 @@
     <div class="value">
       Total:&nbsp;<span
         >{Utils.Strings.currency(
-          Number(items[index].subtotal ?? 0) + Number(items[index].delivery ?? 0) - Number(items[index].discount ?? 0)
+          Number(items[index].subtotal ?? 0) +
+            Number(
+              items[index].orderType === Types.Types.TOrderType.DELIVERY
+                ? items[index].delivery
+                : items[index].orderType === Types.Types.TOrderType.LOCAL
+                ? Logics.Finances.calcDiscount(
+                    items[index].subtotal ?? 0,
+                    items[index].tip ?? 0,
+                    Types.Types.TDiscount.PERCENT
+                  )
+                : 0
+            ) -
+            Number(items[index].discount ?? 0)
         )}</span
       >
     </div>
@@ -113,7 +136,7 @@
     border-radius: 4px;
     border: 1px solid #ccc;
     padding: 20px;
-    background: #eeeeee33;
+    background: var(--itemBackground);
     display: flex;
     flex-direction: column;
   }
