@@ -7,7 +7,9 @@
   import { onMount } from 'svelte'
   import OrderType from '../../stores/OrderType'
   import { Cart } from '../../stores/Cart'
+  import Image from '@ikomida/shared-frontend/lib/components/Image.svelte'
 
+  let userInfo: Types.Classes.CUser | undefined = undefined
   let categoriesAndProducts: Types.Classes.CCategoryProducts[] | undefined = undefined
   let orderType: Types.Types.TOrderType | undefined | null = null
   $: if (orderType !== null) {
@@ -25,6 +27,10 @@
     Stores.Loading.instance.stop()
   }
   onMount(async () => {
+    const auth = await Stores.Auth.Auth.instance.data()
+    if (auth) {
+      userInfo = await Utils.Jws.extractToken(auth)
+    }
     orderType = await OrderType.get()
     let response = await GetSettings()
     if (response?.success && response?.data) {
@@ -36,7 +42,7 @@
     } else {
       Stores.MessageAlert.instance.show(response?.data)
     }
-    if (!$Settings.orderTypes.includes(orderType)) {
+    if (!orderType || !$Settings.orderTypes?.includes(orderType)) {
       orderType = undefined
     }
     Stores.Loading.instance.stop()
@@ -46,8 +52,8 @@
 
 <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
 <div class="preparationTime">
-  entre {Utils.Strings.timeToString($Settings?.preparation?.min * 60)}, e {Utils.Strings.timeToString(
-    $Settings?.preparation?.max * 60
+  entre {Utils.Strings.timeToString(($Settings?.preparation?.min ?? 0) * 60)}, e {Utils.Strings.timeToString(
+    ($Settings?.preparation?.max ?? 0) * 60
   )}
 </div>
 <Views.Divider height={10} />
@@ -67,12 +73,27 @@
     />
   {/if}
 {:else}
+  <div class="mainPicture">
+    <Views.Image source={$Settings.profile?.mainPicture} name={$Settings.profile?.contractName} />
+  </div>
+  <Views.Divider />
+  <h2>Bem vindo {userInfo?.name ?? '-'}</h2>
   <Views.CentredMessage
     text="Pra começarmos precisa escolher o tipo do seu pedido para podermos lhe exibir os produtos certos!"
   />
 {/if}
 
 <style>
+  h2 {
+    text-align: center;
+  }
+  .mainPicture > :global(img) {
+    border-radius: 40px;
+    height: 210px;
+    max-width: 500px;
+    object-fit: contain;
+    width: 100%;
+  }
   .preparationTitle,
   .preparationTime {
     text-align: center;

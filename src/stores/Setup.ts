@@ -42,7 +42,7 @@ function createSettings() {
         days: []
       },
       isActive: ''
-    })
+    }) as Types.Classes.CVendorSettings
   )
 
   return {

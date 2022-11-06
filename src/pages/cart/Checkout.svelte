@@ -28,6 +28,7 @@
         let calcTotal = 0
         for (const option of product?.options ?? []) {
           calcTotal +=
+            product.quantity *
             option.units *
             (option.price - Logics.Finances.calcDiscount(option.price, product.discount, product.discountType))
         }
@@ -48,9 +49,13 @@
   $: subtotal = (subtotalArray?.length ?? 0) > 0 ? subtotalArray.reduce((a, b) => a + b) : 0
   $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0) : 0
   $: delivery = Math.ceil(
-    $Settings?.delivery?.free ? 0 : calcDelivery < $Settings?.delivery?.min ? $Settings?.delivery?.min : calcDelivery
+    $Settings?.delivery?.free
+      ? 0
+      : calcDelivery < ($Settings.delivery?.min ?? 0)
+      ? $Settings.delivery?.min ?? 0
+      : calcDelivery
   )
-  $: tip = Logics.Finances.calcDiscount(subtotal, $Settings?.tip, Types.Types.TDiscount.PERCENT)
+  $: tip = Logics.Finances.calcDiscount(subtotal, $Settings.tip ?? 0, Types.Types.TDiscount.PERCENT)
   $: netTotal =
     subtotal +
     (orderType === Types.Types.TOrderType.DELIVERY ? delivery : orderType === Types.Types.TOrderType.LOCAL ? tip : 0)
@@ -62,7 +67,7 @@
       : orderType === Types.Types.TOrderType.LOCAL
       ? table
       : true && subtotal >= (couponObject?.minValue ?? 0)
-  $: businessTime = Logics.DateTime.isBusinessTime($Settings.business)
+  $: businessTime = $Settings.business && Logics.DateTime.isBusinessTime($Settings.business)
 
   function addMoreItems() {
     Stores.Navigation.instance.pop(3)
@@ -112,7 +117,7 @@
       products,
       address,
       payment?.type,
-      $Settings.preparation,
+      $Settings.preparation ?? Types.Classes.CVendorPreparation.fillWith(undefined),
       couponObject,
       undefined,
       undefined,
@@ -251,7 +256,8 @@
             <div class="option">
               <span class="units">{option.units}</span><span class="name">{option.name}</span><span class="price"
                 >{Utils.Strings.currency(
-                  (option.units ?? 0) *
+                  (product.quantity ?? 0) *
+                    (option.units ?? 0) *
                     ((option.price ?? 0) -
                       Logics.Finances.calcDiscount(option.price ?? 0, product.discount ?? 0, product.discountType))
                 )}</span
@@ -339,7 +345,7 @@
   {/if}
 {:else if orderType === Types.Types.TOrderType.LOCAL}
   <Views.TextEdit
-    placeHolder="Número da mesa"
+    placeHolder="Símbolo da mesa"
     bind:value={table}
     initialValue={table}
     type={Types.TTextEdit.ALPHA_NUMERIC}

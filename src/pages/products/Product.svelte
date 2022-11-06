@@ -10,10 +10,10 @@
 
   const router = Stores.Navigation.instance.router
   const initalProduct = $router.options.product
-  const isActive = $router.options.active
   const genericError =
     'Ocorreu um erro interno, por favor entre em contato conosco pelo e-mail contact@tialtonivel.com.br. Eesvazia o seu carrinho de compras e repita a compra novamente! ou reinicie o app se o erro persiste.'
 
+  let isActive = $router.options.active
   let cartProduct: Types.CCart
   let quantity = 1
   let working: Types.Interfaces.IRecord<string, boolean> = {}
@@ -67,7 +67,6 @@
             } else {
               cartProduct.options?.splice(cartOptionIndex, 1)
             }
-            cartProduct = cartProduct
           }
           cartProduct = cartProduct
         } else if (quantity > 1) {
@@ -99,7 +98,7 @@
             if (
               !cartOption &&
               productOptionsCategory &&
-              getCartOptionsCount(productOptionsCategory) < productOptionsCategory.max * quantity
+              getCartOptionsCount(productOptionsCategory) < productOptionsCategory.max
             ) {
               cartOption = Types.CCartProductOption.fromObject(productOption.toJSON())
               if (cartOption) {
@@ -115,9 +114,9 @@
             } else if (productOption && cartOption) {
               cartOption.maxUnits = productOption.units
               if (
-                cartOption.units < cartOption.maxUnits * quantity &&
+                cartOption.units < cartOption.maxUnits &&
                 productOptionsCategory &&
-                getCartOptionsCount(productOptionsCategory) < productOptionsCategory.max * quantity
+                getCartOptionsCount(productOptionsCategory) < productOptionsCategory.max
               ) {
                 cartOption.units++
               }
@@ -149,10 +148,10 @@
       const productOptionsCategoriesMandatories =
         cartProduct.optionsCategories?.filter(optionsCategory => optionsCategory.min > 0) ?? []
       for (const productOptionsCategoriesMandatory of productOptionsCategoriesMandatories) {
-        if (getCartOptionsCount(productOptionsCategoriesMandatory) < productOptionsCategoriesMandatory.min * quantity) {
+        if (getCartOptionsCount(productOptionsCategoriesMandatory) < productOptionsCategoriesMandatory.min) {
           Stores.MessageAlert.instance.show(
-            `Certifique-se de que selecionou no mínimo ${productOptionsCategoriesMandatory.min * quantity} ${
-              productOptionsCategoriesMandatory.min * quantity > 1 ? 'opções' : 'opção'
+            `Certifique-se de que selecionou no mínimo ${productOptionsCategoriesMandatory.min} ${
+              productOptionsCategoriesMandatory.min > 1 ? 'opções' : 'opção'
             } na categoria ${productOptionsCategoriesMandatory.name}.`
           )
           working.addProduct = false
@@ -160,11 +159,11 @@
         }
       }
       for (const optionsCategory of cartProduct.optionsCategories ?? []) {
-        if (getCartOptionsCount(optionsCategory) > optionsCategory.max * quantity) {
+        if (getCartOptionsCount(optionsCategory) > optionsCategory.max) {
           Stores.MessageAlert.instance.show(
             `Diminua a quantidade das opções escolhidas, a categoria "${optionsCategory.name}" aceita no maximo ${
-              optionsCategory.max * quantity
-            } ${optionsCategory.max * quantity > 1 ? 'opções' : 'opção'}.`
+              optionsCategory.max
+            } ${optionsCategory.max > 1 ? 'opções' : 'opção'}.`
           )
           working.addProduct = false
           return
@@ -237,6 +236,7 @@
       cartProduct.optionsCategories = cartProduct.optionsCategories?.sort(
         (category1, category2) => category2.min - category1.min
       )
+      isActive = isActive && cartProduct.active
     } else {
       Stores.MessageAlert.instance.show(response?.data)
     }
@@ -313,9 +313,7 @@
                   <h3>{optionsCategory.name}</h3>
                   <div>
                     <div>
-                      <span>Mínimo: {optionsCategory.min * quantity}</span><span
-                        >Máximo: {optionsCategory.max * quantity}</span
-                      >
+                      <span>Mínimo: {optionsCategory.min}</span><span>Máximo: {optionsCategory.max}</span>
                     </div>
                     <div><span>Escolheu</span><span class="selected">{getCartOptionsCount(optionsCategory)}</span></div>
                   </div>
@@ -341,7 +339,7 @@
                           on:click={() => minos(option)}
                         >
                           <Fa icon={faMinusSquare} /></Views.Button
-                        ><span>{getCartOptionUnitsById(option.id)}/{option.units * quantity}</span><Views.Button
+                        ><span>{getCartOptionUnitsById(option.id)}/{option.units}</span><Views.Button
                           type={Types.TButton.TRANSPARENT}
                           size="none"
                           height="16px"
