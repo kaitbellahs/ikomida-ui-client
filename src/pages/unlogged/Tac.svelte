@@ -17,28 +17,25 @@
   $: Stores.Title.instance.set(term?.name ?? 'Termos de uso')
 </script>
 
-<Views.NavigationBar paddingTop={$StatusBar.height} />
-<main style="margin-top:{styleHeight};padding: 20px; padding-bottom: 0; overflow: hidden;max-width: 100%;">
-  <Views.Divider />
-  <div class="container">
-    {#if term}
-      <div class="jambtron">
-        <h1>{term?.name}</h1>
-        <Views.Divider />
-        <h2>id: #{term?.id}</h2>
-        <h3>
-          Grava esse código de identificação em algum lugar, ele é a identificação do termo que você está assinando.
-        </h3>
-      </div>
-      <div class="content">
-        {@html term?.text}
-      </div>
-      <small>Data do termo: {Utils.Strings.dateToDateString(term?.createdAt)}</small>
-    {:else}
-      <h2 class="error">Ocorreu um erro, não conclua o seu pedido sem ler o termo e entre em contato com a gente</h2>
-    {/if}
-  </div>
-</main>
+<Views.Divider />
+<div class="container">
+  {#if term}
+    <div class="jambtron">
+      <h1>{term?.name}</h1>
+      <Views.Divider />
+      <h2>id: #{term?.id}</h2>
+      <h3>
+        Grava esse código de identificação em algum lugar, ele é a identificação do termo que você está assinando.
+      </h3>
+    </div>
+    <div class="content">
+      {@html term?.text}
+    </div>
+    <small>Data do termo: {Utils.Strings.dateToDateString(term?.createdAt)}</small>
+  {:else}
+    <h2 class="error">Ocorreu um erro, não conclua o seu pedido sem ler o termo e entre em contato com a gente</h2>
+  {/if}
+</div>
 
 <style>
   .jambtron {

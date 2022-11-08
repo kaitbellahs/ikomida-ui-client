@@ -49,56 +49,40 @@
   })
 </script>
 
-<main style="background: {$Layout.background};height: 100%;">
-  <div class="avatar">
-    {#if $Settings?.profile?.mainPicture}
-      <Views.Image
-        source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
-        name={$Settings?.profile?.contractName ?? 'iKomida'}
-      />
-    {:else if $Settings?.profile?.contractName}
-      <div class="avatarCircle">
-        {$Settings?.profile?.contractName?.[0]}{$Settings?.profile?.contractName?.[1]}
-      </div>
-      <h2>{$Settings?.profile?.contractName}</h2>
-    {:else}
-      <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
-      <h2>{$Settings?.profile?.contractName}</h2>
-    {/if}
-  </div>
-  <h3>
-    Se você ainda não tem uma conta, <span on:click={doSubscribe} style="color: #4c0708;">clique aqui</span> é rápido e fácil.
-  </h3>
-  <Views.TextEdit
-    bind:value={phone}
-    icon={faPhone}
-    type={Types.TTextEdit.PHONE}
-    placeHolder="Número de celular"
-    bind:isValid={isValidPhone}
-  />
-  <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Senha" type={Types.TTextEdit.PASSWORD} />
-  <div />
-  <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
-  <Views.Button type={Types.TButton.TRANSPARENT} on:click={doSubscribe}>Criar conta</Views.Button>
-  <Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
-  <Views.GTerms />
-</main>
+<div class="avatar">
+  {#if $Settings?.profile?.mainPicture}
+    <Views.Image
+      source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+      name={$Settings?.profile?.contractName ?? 'iKomida'}
+    />
+  {:else if $Settings?.profile?.contractName}
+    <div class="avatarCircle">
+      {$Settings?.profile?.contractName?.[0]}{$Settings?.profile?.contractName?.[1]}
+    </div>
+    <h2>{$Settings?.profile?.contractName}</h2>
+  {:else}
+    <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
+    <h2>{$Settings?.profile?.contractName}</h2>
+  {/if}
+</div>
+<h3>
+  Se você ainda não tem uma conta, <span on:click={doSubscribe} style="color: #4c0708;">clique aqui</span> é rápido e fácil.
+</h3>
+<Views.TextEdit
+  bind:value={phone}
+  icon={faPhone}
+  type={Types.TTextEdit.PHONE}
+  placeHolder="Número de celular"
+  bind:isValid={isValidPhone}
+/>
+<Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Senha" type={Types.TTextEdit.PASSWORD} />
+<div />
+<Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
+<Views.Button type={Types.TButton.TRANSPARENT} on:click={doSubscribe}>Criar conta</Views.Button>
+<Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
+<Views.GTerms />
 
 <style>
-  main {
-    text-align: center;
-    padding: 1em;
-    min-width: 90%;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    place-content: center;
-  }
-
-  main > div {
-    margin-bottom: 30px;
-  }
   .avatar {
     display: flex;
     align-items: center;

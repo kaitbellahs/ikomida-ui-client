@@ -13,7 +13,7 @@
 </script>
 
 <div class="settings">
-  <Views.Image source={settings.mainPicture} name={settings?.contractName} />
+  <Views.Image source={$Settings.profile?.mainPicture} name={settings?.contractName} />
   <Views.Divider />
   <h2>{settings?.contractName}</h2>
   <Views.Divider />

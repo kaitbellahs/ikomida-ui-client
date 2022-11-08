@@ -5,10 +5,10 @@
   import { StatusBar as _StatusBar, Settings } from './stores/Setup'
   import type { StatusBarType } from './stores/Setup'
   import Routes from './stores/Routes'
+  import { Cart as CartStore } from './stores/Cart'
   import { registerPushNotificationToken } from './network/PushNotification'
   import { getLayout } from './network/Layout'
   import { GetSettings } from './network/User'
-  import Login from './pages/unlogged/Login.svelte'
   import ForgotPassword from './pages/unlogged/ForgotPassword.svelte'
   import Subscribe from './pages/unlogged/Subscribe.svelte'
   import ConfirmSubscribe from './pages/unlogged/ConfirmSubscribe.svelte'
@@ -18,12 +18,31 @@
   import LaunchScreen from './pages/unlogged/LaunchScreen.svelte'
   import Main from './pages/Main.svelte'
   import type { ConnectionStatus } from '@capacitor/network'
-  import { Utils, Views, Network as iKomidaNetwork, Stores, Types } from '@ikomida/shared-frontend'
+  import { Utils, Views, Network as iKomidaNetwork, Stores, Types, Logics } from '@ikomida/shared-frontend'
   import { Capacitor } from '@capacitor/core'
   import type { IAlertButton } from '@ikomida/shared-frontend/lib/components/Alert.svelte'
   import { getOrder } from './network/Orders'
+  import {
+    faHome,
+    faList,
+    faUser,
+    faSearch,
+    faMoneyBill1Wave,
+    faAddressCard,
+    faHourglass,
+    faPhone,
+    faRocket
+  } from '@fortawesome/free-solid-svg-icons'
+  import BusinessHours from './pages/user/BusinessHours.svelte'
+  import Home from './pages/products/Home.svelte'
+  import Search from './pages/products/Search.svelte'
+  import Product from './pages/products/Product.svelte'
+  import Contact from './pages/unlogged/Contact.svelte'
+  import type { IStore } from './stores/Cart'
 
   let initialazation = true
+  let logedIn = false
+  let Store: IStore
   let auth: Stores.Auth.IStore
   let router = Stores.Navigation.instance.router
   let notificationIds: string[] = []
@@ -36,8 +55,32 @@
     buttons: [] as IAlertButton[]
   }
   let showNotificationPopup = false
-  let logedIn = false
-  let isActive = false
+  let isActive = true
+
+  let Layout = Stores.Layout.instance?.store
+  let style: HTMLElement
+
+  $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 50}px`
+
+  $: if (style)
+    if (showCart) {
+      style.innerHTML = `
+      body {
+        --backgroundColor: ${$Layout.background};
+        --paddingTop: ${styleHeight};
+        --paddingBottom: 115px;
+      }
+    `
+      document.head.appendChild(style)
+    } else {
+      style.innerHTML = `
+      body {
+        --backgroundColor: ${$Layout.background};
+        --paddingTop: ${styleHeight};
+        --paddingBottom: 55px;
+      }
+    `
+    }
   $: route = $router.route
   $: if ($auth) {
     Utils.Jws.extractToken($auth).then(async token => {
@@ -55,6 +98,47 @@
     const statusBar = $_StatusBar
     statusBar.topMargin = 0
     _StatusBar.setStatusBar(statusBar)
+  }
+  $: optionsTotal = () => {
+    const totalOptionsArray =
+      $Store?.map(product => {
+        let calcTotal = 0
+        for (const option of product?.options ?? []) {
+          calcTotal +=
+            product.quantity *
+            option.units *
+            (option.price - Logics.Finances.calcDiscount(option.price, product.discount, product.discountType))
+        }
+        return calcTotal
+      }) ?? []
+    return (totalOptionsArray?.length ?? 0) > 0 ? totalOptionsArray.reduce((a, b) => a + b) : 0
+  }
+
+  $: subtotalArray = [
+    ...($Store?.map(
+      product =>
+        product.quantity *
+        (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType))
+    ) ?? []),
+    optionsTotal()
+  ]
+
+  $: subtotal = subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0
+  $: delivery = 0
+  $: total = subtotal + delivery
+  $: showCart =
+    ($Store?.length ?? 0) > 0 &&
+    route !== Routes.cart &&
+    route !== Routes.product &&
+    route !== Routes.checkout &&
+    route !== Routes.orders &&
+    route !== Routes.order &&
+    route !== Routes.newAddress &&
+    route !== Routes.newMethod &&
+    route !== Routes.profile
+
+  function goToCart() {
+    Stores.Navigation.instance.goTo(Routes.cart)
   }
 
   async function togglePushNotificationPopup() {
@@ -193,7 +277,67 @@
     permissionStatus
   )
 
+  Stores.MenuHamburger.instance.reset()
+  const tabs = [
+    {
+      name: 'Home',
+      route: Routes.home,
+      icon: faHome
+    },
+    {
+      name: 'Busca',
+      route: Routes.search,
+      icon: faSearch
+    },
+    {
+      name: 'Pedidos',
+      route: Routes.orders,
+      icon: faList
+    }
+  ]
+  const menuHamburgerItems = [
+    {
+      name: 'Home',
+      callback: () => Stores.Navigation.instance.reset(Routes.home),
+      icon: faHome
+    },
+    {
+      name: 'Perfil',
+      callback: () => Stores.Navigation.instance.goTo(Routes.profile),
+      icon: faUser
+    },
+    {
+      name: 'Endereços',
+      callback: () => Stores.Navigation.instance.goTo(Routes.addresses),
+      icon: faAddressCard
+    },
+    {
+      name: 'Meios de pagamento',
+      callback: () => Stores.Navigation.instance.goTo(Routes.payments),
+      icon: faMoneyBill1Wave
+    },
+    {
+      name: 'Mensagens',
+      callback: () => Stores.Navigation.instance.goTo(Routes.pushNotifications),
+      icon: faRocket
+    },
+    {
+      name: 'Horario de funcionamento',
+      callback: () => Stores.Navigation.instance.goTo(Routes.businessHours),
+      icon: faHourglass
+    },
+    {
+      name: 'Contato',
+      callback: () => Stores.Navigation.instance.goTo(Routes.contact),
+      icon: faPhone
+    }
+  ]
+  menuHamburgerItems.forEach(page => Stores.MenuHamburger.instance.addItem(page))
+
   onMount(async () => {
+    style = document.createElement('style')
+    document.head.appendChild(style)
+    Store = await CartStore.instance.store()
     auth = await Stores.Auth.Auth.instance.store()
     if ($auth) {
       const token = await Utils.Jws.extractToken($auth)
@@ -204,6 +348,7 @@
     let response = await GetSettings()
     if (response?.success && response?.data) {
       Settings.set({ ...$Settings, ...response?.data })
+      console.log('$Settings:', $Settings)
       isActive = $Settings?.isActive ?? true
     }
     response = await getLayout()
@@ -245,26 +390,54 @@
   // });
 </script>
 
-<Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
 {#if initialazation}
   <LaunchScreen />
 {:else if !isActive}
   <NoService />
-{:else if logedIn}
-  <Main />
-{:else if route == Routes.subscribe}
-  <Subscribe />
-{:else if route == Routes.forgotPassword}
-  <ForgotPassword />
-{:else if route == Routes.confirmSubscribe}
-  <ConfirmSubscribe />
-{:else if route == Routes.tac}
-  <Tac />
-{:else if route == Routes.pp}
-  <Pp />
 {:else}
-  <Login />
+  <main
+    style="margin-top:{styleHeight};padding: 20px; padding-bottom: {showCart
+      ? '140px'
+      : '70px'}; overflow: scroll;max-width: 100%;background: {$Layout.background};height: 100%;"
+  >
+    {#if route == Routes.home}
+      <Home />
+    {:else if route == Routes.search}
+      <Search />
+    {:else if route == Routes.product}
+      <Product />
+    {:else if route == Routes.businessHours}
+      <BusinessHours />
+    {:else if route == Routes.subscribe}
+      <Subscribe />
+    {:else if route == Routes.forgotPassword}
+      <ForgotPassword />
+    {:else if route == Routes.confirmSubscribe}
+      <ConfirmSubscribe />
+    {:else if route == Routes.tac}
+      <Tac />
+    {:else if route == Routes.pp}
+      <Pp />
+    {:else if route == Routes.contact}
+      <Contact />
+    {:else}
+      <Main />
+    {/if}
+    {#if showCart}
+      <Views.Button bottomPadding={$_StatusBar.bottomPadding} on:click={goToCart} isFloat={true}
+        >Ver sacola {Utils.Strings.currency(total)}</Views.Button
+      >
+    {/if}
+  </main>
+  <Views.NavigationBar
+    logo={$Settings?.profile?.mainPicture || 'assets/icons/transparent-logo-1.svg'}
+    paddingTop={$_StatusBar.height}
+    topMargin={$_StatusBar.topMargin}
+  />
+  <Views.Tabs {tabs} bottomPadding={$_StatusBar.bottomPadding} />
 {/if}
+
+<Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
 <Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
 {#if networkStatus == null || !networkStatus.connected}
   <div id="internetError">Esperando por conexão a internet...</div>
