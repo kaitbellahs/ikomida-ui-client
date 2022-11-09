@@ -14,7 +14,6 @@
   let isValidEmail = false
   let isValidPassword = false
 
-  $: styleHeight = `${Number($StatusBar.height) + 50}px`
   $: canContinue =
     subscribeObject?.name &&
     (subscribeObject?.name?.length ?? 0) <= 255 &&
@@ -29,6 +28,14 @@
     Stores.Navigation.instance.goTo(Routes.confirmSubscribe, subscribeObject)
   }
 
+  async function goToTAC() {
+    Stores.Navigation.instance.goTo(Routes.tac)
+  }
+
+  async function goToPP() {
+    Stores.Navigation.instance.goTo(Routes.pp)
+  }
+
   onMount(async () => {
     const term = await getTermOfUse()
     if (term) {
@@ -41,6 +48,8 @@
   Stores.Title.instance.set('Criar conta')
 </script>
 
+<h2>Falta pouco para se tornar um usuário digital do nosso estabelecimento.</h2>
+<small>É só preencher todas as informações do formulário e depois clicar em <b>“continuar”</b>.</small>
 <Views.TextEdit
   icon={faUser}
   bind:value={subscribeObject.name}
@@ -77,4 +86,9 @@
 />
 <Views.Divider />
 <Views.Button disabled={!canContinue} on:click={doSubscribe}>Cadastrar</Views.Button>
+
 <Views.Divider />
+<small
+  >Ao confirmar você concorda com <a href="#/" on:click={goToTAC}>termos de uso</a>
+  e nossa <a on:click={goToPP} href="#/">politica de privacidade</a></small
+>

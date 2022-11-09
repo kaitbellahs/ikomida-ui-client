@@ -14,6 +14,8 @@
   let address: Types.Classes.CAddress | null
   let orderType: Types.Types.TOrderType | undefined = undefined
   let working: Types.Interfaces.IRecord<string, boolean> = {}
+  let auth: Stores.Auth.IStore
+  let logedIn = false
 
   $: optionsTotal = () => {
     const totalOptionsArray =
@@ -50,7 +52,11 @@
   $: tip = Logics.Finances.calcDiscount(subtotal, $Settings.tip ?? 0, Types.Types.TDiscount.PERCENT)
   $: total =
     subtotal +
-    (orderType === Types.Types.TOrderType.DELIVERY ? delivery : orderType === Types.Types.TOrderType.LOCAL ? tip : 0)
+    (logedIn && orderType === Types.Types.TOrderType.DELIVERY
+      ? delivery
+      : logedIn && orderType === Types.Types.TOrderType.LOCAL
+      ? tip
+      : 0)
 
   $: if ($Products && $Products.length === 0) {
     Stores.Navigation.instance.reset(Routes.home)
@@ -252,6 +258,13 @@
 
   onMount(async () => {
     orderType = await OrderType.get()
+    auth = await Stores.Auth.Auth.instance.store()
+    if ($auth) {
+      const token = await Utils.Jws.extractToken($auth)
+      logedIn = token !== null
+    } else {
+      logedIn = false
+    }
     let response = await GetSettings()
     if (response?.success && response?.data) {
       const settings: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject({
@@ -262,11 +275,13 @@
     } else {
       Stores.MessageAlert.instance.show(response?.data)
     }
-    response = await GetAddresses()
-    if (response?.success) {
-      const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response?.data)
-      const addresses = data.filter(address => address.selected)
-      address = (addresses?.length ?? 0) === 1 ? addresses[0] : null
+    if (logedIn) {
+      response = await GetAddresses()
+      if (response?.success) {
+        const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response?.data)
+        const addresses = data.filter(address => address.selected)
+        address = (addresses?.length ?? 0) === 1 ? addresses[0] : null
+      }
     }
     Products = await Cart.instance.store()
     Stores.Loading.instance.stop()

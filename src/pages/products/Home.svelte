@@ -7,11 +7,11 @@
   import { onMount } from 'svelte'
   import OrderType from '../../stores/OrderType'
   import { Cart } from '../../stores/Cart'
-  import Image from '@ikomida/shared-frontend/lib/components/Image.svelte'
 
   let userInfo: Types.Classes.CUser | undefined = undefined
   let categoriesAndProducts: Types.Classes.CCategoryProducts[] | undefined = undefined
   let orderType: Types.Types.TOrderType | undefined | null = null
+  let working = false
   $: if (orderType !== null) {
     OrderType.set(orderType)
     if (orderType) {
@@ -19,12 +19,16 @@
     }
   }
   async function updateAll() {
-    Stores.Loading.instance.start()
-    resetTimeout()
-    await Cart.instance.updateType()
-    await Cart.instance.products()
-    categoriesAndProducts = await all()
-    Stores.Loading.instance.stop()
+    if (!working) {
+      working = true
+      Stores.Loading.instance.start()
+      resetTimeout()
+      await Cart.instance.updateType()
+      await Cart.instance.products()
+      categoriesAndProducts = await all()
+      Stores.Loading.instance.stop()
+      working = false
+    }
   }
   onMount(async () => {
     const auth = await Stores.Auth.Auth.instance.data()
@@ -52,7 +56,7 @@
 
 <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
 <div class="preparationTime">
-  entre {Utils.Strings.timeToString(($Settings?.preparation?.min ?? 0) * 60)}, e {Utils.Strings.timeToString(
+  entre {Utils.Strings.timeToString(($Settings?.preparation?.min ?? 0) * 60)} até {Utils.Strings.timeToString(
     ($Settings?.preparation?.max ?? 0) * 60
   )}
 </div>

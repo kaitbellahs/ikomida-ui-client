@@ -3,15 +3,18 @@
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import { faUnlock } from '@fortawesome/free-solid-svg-icons'
   import { requestPhoneValidation, validatePhoneValidationCode, subscribe } from '../../network/Auth'
-  import { StatusBar } from '../../stores/Setup'
   import { onDestroy, onMount } from 'svelte'
+  import { registerPushNotificationToken } from '../../network/PushNotification'
+  import LastRoute from '../../stores/LastRoute'
 
+  const navigation: Stores.Navigation = Stores.Navigation.instance
   const countdownWaitTime = 60
-  const router = Stores.Navigation.instance.router
+  const router = navigation.router
   const Layout = Stores.Layout.instance.store
+  let pushNotificationToken = Stores.PushNotificationToken.instance?.store
 
   let showRequestValidatingCodeAlert = false
-  let subscribeObject: Types.Classes.CUser = $router.options
+  let subscribeObject: Types.Classes.CUser = $router?.options
   let canDigitValidationCode = false
   let canSubscribe = false
   let canRequestCode = false
@@ -28,7 +31,6 @@
     countdownCanRequestCode = true
     countdown = countdownWaitTime
   }
-  $: styleHeight = `${Number($StatusBar.height) + 50}px`
 
   async function doSubscribe() {
     Stores.Loading.instance.start()
@@ -37,7 +39,7 @@
       callbackId = 'doSubscribe'
       Stores.MessageAlert.instance.show(
         'Seu cadastro foi concluído com sucesso, agora é só você usar seu número de telefone como usuário e sua senha para acessar a área logada e usufruir dos nossos produtos e serviços.',
-        closeCallBack
+        await closeCallBack(response.data)
       )
     } else {
       Stores.MessageAlert.instance.show(response?.data)
@@ -45,10 +47,30 @@
     Stores.Loading.instance.stop()
   }
 
-  function closeCallBack() {
-    if (callbackId === 'doSubscribe') {
-      callbackId = null
-      Stores.Navigation.instance.reset(Routes.login)
+  async function closeCallBack(data: string) {
+    const route = await LastRoute.get()
+    const token = await Utils.Jws.extractToken(data)
+    if (token !== null) {
+      await Stores.Auth.Auth.instance.setToken(data)
+      if ($pushNotificationToken) {
+        await registerPushNotificationToken($pushNotificationToken)
+      }
+    }
+    return async () => {
+      if (callbackId === 'doSubscribe') {
+        callbackId = null
+        if (token !== null && $pushNotificationToken) {
+          await registerPushNotificationToken($pushNotificationToken)
+        }
+        if (route) {
+          console.log('route:', route)
+          if ([Routes.home, Routes.search, Routes.orders].includes(route)) {
+            navigation.reset(route)
+          } else {
+            navigation.goTo(route)
+          }
+        }
+      }
     }
   }
 
@@ -97,11 +119,11 @@
   }
 
   async function goToTAC() {
-    Stores.Navigation.instance.goTo(Routes.tac)
+    navigation.goTo(Routes.tac)
   }
 
   async function goToPP() {
-    Stores.Navigation.instance.goTo(Routes.pp)
+    navigation.goTo(Routes.pp)
   }
 
   onMount(() => {
@@ -117,7 +139,7 @@
   Stores.Title.instance.set('Cadastro')
 </script>
 
-<h2>Por favor informe seu número de telefone cadastrado</h2>
+<h2>Por favor informe seu número de telefone para o cadastrado</h2>
 <small>clique em "<b>Solicitar</b>" para solicitar o código de validação</small>
 <Views.TextEdit
   type={Types.TTextEdit.PHONE}
@@ -149,7 +171,7 @@
 <Views.Divider />
 <small
   >Ao confirmar você concorda com <a href="#/" on:click={goToTAC}>termos de uso</a>
-  e nossa <a on:click={goToTAC} href="#/">politica de privacidade</a></small
+  e nossa <a on:click={goToPP} href="#/">politica de privacidade</a></small
 >
 <Views.GTerms />
 

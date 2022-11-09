@@ -43,7 +43,7 @@ export class Cart {
     if (token) {
       const user: Types.Classes.CUser = Types.Classes.CUser.fromObject(await Utils.Jws.extractToken(token))
       if (user) {
-        this.name = `Cart-${user.id}`
+        this.name = `Cart`
         const orderType = await OrderType.get()
         if (orderType) {
           this.name += `-${orderType.id}`

@@ -14,13 +14,14 @@
 
   let Products: IStore
   let location: Types.Classes.CLocation
-  let coupon: string | undefined
-  let table: string | undefined
+  let coupon: string | undefined = undefined
+  let table: string | undefined = undefined
+  let change: number | undefined | 'undefined' = undefined
   let couponObject: Types.Classes.CCoupon | undefined = undefined
   let orderType: Types.Types.TOrderType | undefined = undefined
 
-  let address: Types.Classes.CAddress | undefined | null
-  let payment: Types.Classes.CPaymentMethod | undefined
+  let address: Types.Classes.CAddress | undefined | null = undefined
+  let payment: Types.Classes.CPaymentMethod | undefined = undefined
 
   $: optionsTotal = () => {
     const totalOptionsArray =
@@ -62,11 +63,14 @@
   $: discount = couponObject ? Logics.Finances.calcDiscount(subtotal, couponObject.value, couponObject.valueType) : 0
   $: total = netTotal - discount
   $: validate =
-    payment && orderType === Types.Types.TOrderType.DELIVERY
+    payment &&
+    (orderType === Types.Types.TOrderType.DELIVERY
       ? address
       : orderType === Types.Types.TOrderType.LOCAL
       ? table
-      : true && subtotal >= (couponObject?.minValue ?? 0)
+      : true) &&
+    subtotal >= (couponObject?.minValue ?? 0) &&
+    (payment?.type === Types.Types.TPaymentMethod.CASH_ON_DELIVERY ? Number(change) > 0 : true)
   $: businessTime = $Settings.business && Logics.DateTime.isBusinessTime($Settings.business)
 
   function addMoreItems() {
@@ -341,7 +345,7 @@
       </div>
     </div>
   {:else}
-    <h3>Para continuar precisa selecionar ou adicionar um endereço</h3>
+    <Views.Status type={Types.Status.ERROR}>Para continuar precisa selecionar ou adicionar um endereço</Views.Status>
   {/if}
 {:else if orderType === Types.Types.TOrderType.LOCAL}
   <Views.TextEdit
@@ -354,7 +358,7 @@
   />
   {#if !table}
     <Views.Divider height={10} />
-    <h3>Para continuar precisa digitar o número da mesa.</h3>
+    <Views.Status type={Types.Status.ERROR}>Para continuar precisa digitar o símbolo da mesa.</Views.Status>
   {/if}
 {/if}
 <Views.Divider />
@@ -371,12 +375,29 @@
         {#if payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
           <Views.Image source="/assets/cardBrand/{payment?.brand}.svg" name={payment?.brand} />
           **** {payment?.lastDigits}
+        {:else if payment?.type === Types.Types.TPaymentMethod.CASH_ON_DELIVERY}
+          <Views.TextEdit
+            placeHolder="Troco para quanto?"
+            bind:value={change}
+            initialValue={change}
+            type={Types.TTextEdit.CURRENCY}
+          />
+          <!-- //TODO: -- 'undefined' bug fix -->
+          {#if isNaN(Number(change)) || Number(change) <= 0}
+            <Views.Divider height={10} />
+            <Views.Status type={Types.Status.ERROR}
+              >Para continuar precisa digitar o valor total das notas ou cédulas que vai usar para o pagamento, para que
+              o garçom ou entregador já leva o seu troco.</Views.Status
+            >
+          {/if}
         {/if}
       </span>
     </div>
   </div>
 {:else}
-  <h3>Para continuar precisa selecionar ou adicionar um novo cartão de crédito</h3>
+  <Views.Status type={Types.Status.ERROR}
+    >Para continuar precisa selecionar ou adicionar uma forma de pagamento.</Views.Status
+  >
 {/if}
 {#if businessTime}
   <Views.Button disabled={!validate} isFloat={true} on:click={forward}>
@@ -396,6 +417,7 @@
   <h2 class="businessHoursError">Estámos fora do horario do funcionamento, confire os nossos horários</h2>
 {/if}
 <Views.GTerms />
+<Views.Divider height={60} />
 
 <style>
   .product {

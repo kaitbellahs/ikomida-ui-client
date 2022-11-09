@@ -6,17 +6,23 @@
   import { registerPushNotificationToken } from '../../network/PushNotification'
   import { Settings } from '../../stores/Setup'
   import { onMount } from 'svelte'
+  import LastRoute from '../../stores/LastRoute'
+  import type { Readable } from 'svelte/store'
+  import type { INavigation } from '@ikomida/shared-frontend/lib/Stores/Navigation'
 
   let pushNotificationToken = Stores.PushNotificationToken.instance?.store
-  let Layout = Stores.Layout.instance?.store
 
   let phone: string
   let password: string
   let isValidPhone = false
+  const router: Readable<INavigation | undefined> = Stores.Navigation.instance.router
 
   $: canLogin = isValidPhone
 
   async function doSubscribe() {
+    console.log('$router?.route:', $router?.route)
+    await LastRoute.set($router?.route)
+    console.log('await LastRoute.get():', await LastRoute.get())
     Stores.Navigation.instance.goTo(Routes.subscribe)
   }
 
@@ -34,7 +40,6 @@
         if ($pushNotificationToken) {
           await registerPushNotificationToken($pushNotificationToken)
         }
-        Stores.Navigation.instance.reset(Routes.home)
       } else {
         Stores.MessageAlert.instance.show('O token de acesso não é válido')
       }
@@ -49,40 +54,54 @@
   })
 </script>
 
-<div class="avatar">
-  {#if $Settings?.profile?.mainPicture}
-    <Views.Image
-      source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
-      name={$Settings?.profile?.contractName ?? 'iKomida'}
-    />
-  {:else if $Settings?.profile?.contractName}
-    <div class="avatarCircle">
-      {$Settings?.profile?.contractName?.[0]}{$Settings?.profile?.contractName?.[1]}
-    </div>
-    <h2>{$Settings?.profile?.contractName}</h2>
-  {:else}
-    <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
-    <h2>{$Settings?.profile?.contractName}</h2>
-  {/if}
-</div>
-<h3>
-  Se você ainda não tem uma conta, <span on:click={doSubscribe} style="color: #4c0708;">clique aqui</span> é rápido e fácil.
-</h3>
-<Views.TextEdit
-  bind:value={phone}
-  icon={faPhone}
-  type={Types.TTextEdit.PHONE}
-  placeHolder="Número de celular"
-  bind:isValid={isValidPhone}
-/>
-<Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Senha" type={Types.TTextEdit.PASSWORD} />
-<div />
-<Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
-<Views.Button type={Types.TButton.TRANSPARENT} on:click={doSubscribe}>Criar conta</Views.Button>
-<Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
+<section>
+  <div class="avatar">
+    {#if $Settings?.profile?.mainPicture}
+      <Views.Image
+        source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+        name={$Settings?.profile?.contractName ?? 'iKomida'}
+      />
+    {:else if $Settings?.profile?.contractName}
+      <div class="avatarCircle">
+        {$Settings?.profile?.contractName?.[0]}{$Settings?.profile?.contractName?.[1]}
+      </div>
+      <h2>{$Settings?.profile?.contractName}</h2>
+    {:else}
+      <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
+      <h2>{$Settings?.profile?.contractName}</h2>
+    {/if}
+  </div>
+  <Views.Divider />
+  <h3>
+    Se você ainda não tem uma conta, <span on:click={doSubscribe} style="color: #4c0708;">clique aqui</span> é rápido e fácil.
+  </h3>
+  <Views.TextEdit
+    bind:value={phone}
+    icon={faPhone}
+    type={Types.TTextEdit.PHONE}
+    placeHolder="Número de celular"
+    bind:isValid={isValidPhone}
+  />
+  <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Senha" type={Types.TTextEdit.PASSWORD} />
+  <div />
+  <Views.Divider />
+  <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
+  <Views.Button type={Types.TButton.TRANSPARENT} on:click={doSubscribe}>Criar conta</Views.Button>
+  <Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
+</section>
 <Views.GTerms />
 
 <style>
+  section {
+    height: 100%;
+    text-align: center;
+    min-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    place-content: center;
+  }
   .avatar {
     display: flex;
     align-items: center;

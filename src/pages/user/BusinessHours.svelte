@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { Views, Stores, Types } from '@ikomida/shared-frontend';
-  import { onMount } from 'svelte';
-  import { Settings } from '../../stores/Setup';
-  const Layout = Stores.Layout.instance.store;
+  import { Views, Stores, Types } from '@ikomida/shared-frontend'
+  import { onMount } from 'svelte'
+  import { Settings } from '../../stores/Setup'
+  const Layout = Stores.Layout.instance.store
 
   const days = [
     { name: 'Domingo', checked: false },
@@ -11,21 +11,21 @@
     { name: 'Quarta-feira', checked: false },
     { name: 'Quinta-feira', checked: false },
     { name: 'Sexta-feira', checked: false },
-    { name: 'Sabado', checked: false },
-  ];
+    { name: 'Sabado', checked: false }
+  ]
 
   $: twintyFourHours =
-    $Settings?.business?.hours?.filter((item: Types.Classes.CBusinessTimeHours) => {
-      return item.start === '0000' && item.end === '2359';
-    }).length > 0;
+    ($Settings?.business?.hours?.filter(item => {
+      return item.start === '0000' && item.end === '2359'
+    })?.length ?? 0) > 0
 
   function numerToTime(object: string) {
-    return `${object?.substring(0, 2)}h${object?.substring(2, 4)}`;
+    return `${object?.substring(0, 2)}h${object?.substring(2, 4)}`
   }
 
-  onMount(() => Stores.Loading.instance.stop());
+  onMount(() => Stores.Loading.instance.stop())
 
-  Stores.Title.instance.set('Horario de funcionamento');
+  Stores.Title.instance.set('Horario de funcionamento')
 </script>
 
 {#if !$Settings?.business}
@@ -62,7 +62,7 @@
         <span>24h por dia</span>
       {:else}
         {#each $Settings?.business?.hours as businessHour}
-          <span>das {numerToTime(businessHour?.start)} até {numerToTime(businessHour?.end)} </span>
+          <span>das {numerToTime(businessHour?.start ?? '')} até {numerToTime(businessHour?.end ?? '')} </span>
         {/each}
       {/if}
     </div>

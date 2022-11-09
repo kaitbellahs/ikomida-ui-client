@@ -1,15 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import Routes from '../stores/Routes'
-  import { Views, Utils, Logics, Stores } from '@ikomida/shared-frontend'
-  import { Cart as CartStore } from '../stores/Cart'
-  import { StatusBar, Settings } from '../stores/Setup'
+  import { Utils, Stores } from '@ikomida/shared-frontend'
   import Login from './unlogged/Login.svelte'
   import Orders from './orders/Orders.svelte'
   import Order from './orders/Order.svelte'
   import Profile from './user/Profile.svelte'
   import Checkout from './cart/Checkout.svelte'
-  import Cart from './cart/Cart.svelte'
   import Addresses from './Addresses/Addresses.svelte'
   import NewAddress from './Addresses/NewAddress.svelte'
   import Payments from './payments/Payments.svelte'
@@ -21,6 +18,10 @@
   let logedIn = false
 
   $: route = $router.route
+  $: if (!logedIn && route) {
+    Stores.Title.instance.set('Login')
+    Stores.Loading.instance.stop()
+  }
   $: if ($auth) {
     Utils.Jws.extractToken($auth).then(async token => {
       logedIn = token !== null
@@ -47,8 +48,6 @@
     <Order />
   {:else if route == Routes.profile}
     <Profile />
-  {:else if route == Routes.cart}
-    <Cart />
   {:else if route == Routes.checkout}
     <Checkout />
   {:else if route == Routes.addresses}

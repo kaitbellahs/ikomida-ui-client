@@ -39,6 +39,7 @@
   import Product from './pages/products/Product.svelte'
   import Contact from './pages/unlogged/Contact.svelte'
   import type { IStore } from './stores/Cart'
+  import Cart from './pages/cart/Cart.svelte'
 
   let initialazation = true
   let logedIn = false
@@ -348,7 +349,6 @@
     let response = await GetSettings()
     if (response?.success && response?.data) {
       Settings.set({ ...$Settings, ...response?.data })
-      console.log('$Settings:', $Settings)
       isActive = $Settings?.isActive ?? true
     }
     response = await getLayout()
@@ -402,6 +402,8 @@
   >
     {#if route == Routes.home}
       <Home />
+    {:else if route == Routes.cart}
+      <Cart />
     {:else if route == Routes.search}
       <Search />
     {:else if route == Routes.product}

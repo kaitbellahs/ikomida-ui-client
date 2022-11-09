@@ -127,7 +127,7 @@
             throw new Error(genericError)
           }
         } else {
-          if (quantity < cartProduct.quantity) {
+          if (quantity < cartProduct.quantity && quantity < 10) {
             quantity++
           }
         }
@@ -236,7 +236,7 @@
       cartProduct.optionsCategories = cartProduct.optionsCategories?.sort(
         (category1, category2) => category2.min - category1.min
       )
-      isActive = isActive && cartProduct.active
+      isActive = isActive && cartProduct.active && cartProduct.quantity > 0
     } else {
       Stores.MessageAlert.instance.show(response?.data)
     }
