@@ -132,7 +132,8 @@
       location,
       orderType,
       orderType === Types.Types.TOrderType.LOCAL ? $Settings.tip : 0,
-      orderType === Types.Types.TOrderType.LOCAL ? table : undefined
+      orderType === Types.Types.TOrderType.LOCAL ? table : undefined,
+      payment.type === Types.Types.TPaymentMethod.CASH_ON_DELIVERY ? Number(change) : undefined
     )
     const response = await NewOrders(payload)
     Stores.Loading.instance.stop()
@@ -345,7 +346,7 @@
       </div>
     </div>
   {:else}
-    <Views.Status type={Types.Status.ERROR}>Para continuar precisa selecionar ou adicionar um endereço</Views.Status>
+    <Views.Status type={Types.Status.WARNING}>Para continuar precisa selecionar ou adicionar um endereço</Views.Status>
   {/if}
 {:else if orderType === Types.Types.TOrderType.LOCAL}
   <Views.TextEdit
@@ -358,7 +359,7 @@
   />
   {#if !table}
     <Views.Divider height={10} />
-    <Views.Status type={Types.Status.ERROR}>Para continuar precisa digitar o símbolo da mesa.</Views.Status>
+    <Views.Status type={Types.Status.WARNING}>Para continuar precisa digitar o símbolo da mesa.</Views.Status>
   {/if}
 {/if}
 <Views.Divider />
@@ -385,7 +386,7 @@
           <!-- //TODO: -- 'undefined' bug fix -->
           {#if isNaN(Number(change)) || Number(change) <= 0}
             <Views.Divider height={10} />
-            <Views.Status type={Types.Status.ERROR}
+            <Views.Status type={Types.Status.WARNING}
               >Para continuar precisa digitar o valor total das notas ou cédulas que vai usar para o pagamento, para que
               o garçom ou entregador já leva o seu troco.</Views.Status
             >
@@ -395,7 +396,7 @@
     </div>
   </div>
 {:else}
-  <Views.Status type={Types.Status.ERROR}
+  <Views.Status type={Types.Status.WARNING}
     >Para continuar precisa selecionar ou adicionar uma forma de pagamento.</Views.Status
   >
 {/if}
