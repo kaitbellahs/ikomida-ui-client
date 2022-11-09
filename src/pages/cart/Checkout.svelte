@@ -19,7 +19,7 @@
   let change: number | undefined | 'undefined' = undefined
   let couponObject: Types.Classes.CCoupon | undefined = undefined
   let orderType: Types.Types.TOrderType | undefined = undefined
-
+  let showLocationAlertAlert = false
   let address: Types.Classes.CAddress | undefined | null = undefined
   let payment: Types.Classes.CPaymentMethod | undefined = undefined
 
@@ -94,12 +94,42 @@
     }
   }
 
-  async function forward() {
-    Stores.Loading.instance.start()
-    if (!address || !payment?.type) {
-      Stores.Loading.instance.stop()
+  async function canForward() {
+    if (!payment?.type || !$Settings.profile?.address) {
       return
     }
+    if (!location && orderType === Types.Types.TOrderType.LOCAL) {
+      Stores.MessageAlert.instance.show(
+        'Para continuar, precisa habilitar a sua geolocalização para que possamos validar o local do seu pedido.'
+      )
+      await requestGeoLocation()
+      return
+    }
+    if (
+      location &&
+      orderType === Types.Types.TOrderType.LOCAL &&
+      $Settings.profile?.address.location &&
+      Logics.GeoLocation.distanceBetweenTwoLocations($Settings.profile?.address.location, location) > 500
+    ) {
+      Stores.MessageAlert.instance.show(
+        'Você está longe do estabelecimento, para usar o garçom digital, por favor vá até o estabelecimento e escolha uma mesa, para que você possa concluir o seu pedido, ou troque o tipo do pedido para entrega a domicílio ou retirada no local.'
+      )
+      return
+    }
+    if (
+      location &&
+      orderType === Types.Types.TOrderType.LOCAL &&
+      address?.location &&
+      Logics.GeoLocation.distanceBetweenTwoLocations(address.location, location) > 500
+    ) {
+      toggleShowLocationAlertAlert()
+      return
+    }
+    await forward()
+  }
+
+  async function forward() {
+    Stores.Loading.instance.start()
     const products: Types.CCart[] = []
     products.push(
       ...$Products.map(CartProduct => {
@@ -119,8 +149,8 @@
       discount,
       orderType === Types.Types.TOrderType.DELIVERY ? delivery : 0,
       products,
-      address,
-      payment?.type,
+      address!,
+      payment!.type!,
       $Settings.preparation ?? Types.Classes.CVendorPreparation.fillWith(undefined),
       couponObject,
       undefined,
@@ -133,7 +163,7 @@
       orderType,
       orderType === Types.Types.TOrderType.LOCAL ? $Settings.tip : 0,
       orderType === Types.Types.TOrderType.LOCAL ? table : undefined,
-      payment.type === Types.Types.TPaymentMethod.CASH_ON_DELIVERY ? Number(change) : undefined
+      payment!.type! === Types.Types.TPaymentMethod.CASH_ON_DELIVERY ? Number(change) : undefined
     )
     const response = await NewOrders(payload)
     Stores.Loading.instance.stop()
@@ -176,12 +206,41 @@
     coupon = undefined
   }
 
+  function toggleShowLocationAlertAlert() {
+    showLocationAlertAlert = !showLocationAlertAlert
+  }
+
   function manageCard() {
     Stores.Navigation.instance.goTo(Routes.payments)
   }
 
   function manageAddress() {
     Stores.Navigation.instance.goTo(Routes.addresses)
+  }
+
+  async function requestGeoLocation() {
+    if (Capacitor.isNativePlatform()) {
+      const checkpermissions = await Geolocation.checkPermissions()
+      if (checkpermissions.location != 'prompt') {
+        const permissions = await Geolocation.requestPermissions()
+        if (permissions.location != 'granted') {
+          await getLocation()
+        }
+      } else {
+        await getLocation()
+      }
+    } else {
+      if (navigator.permissions && navigator.permissions.query) {
+        const permission = await navigator.permissions.query({
+          name: 'geolocation'
+        })
+        if (permission.state != 'denied') {
+          await getLocation()
+        }
+      } else if (navigator.geolocation) {
+        await getLocation()
+      }
+    }
   }
 
   onMount(async () => {
@@ -198,13 +257,15 @@
       } else {
         Stores.MessageAlert.instance.show(response?.data)
       }
-      response = await GetAddresses()
-      if (response?.success) {
-        const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response.data)
-        const addresses = data.filter(address => address.selected)
-        address = (addresses?.length ?? 0) === 1 ? addresses[0] : null
-      } else {
-        address = null
+      if (orderType === Types.Types.TOrderType.DELIVERY) {
+        response = await GetAddresses()
+        if (response?.success) {
+          const data: Types.Classes.CAddress[] = Types.Classes.CAddress.fromObject(response.data)
+          const addresses = data.filter(address => address.selected)
+          address = (addresses?.length ?? 0) === 1 ? addresses[0] : null
+        } else {
+          address = null
+        }
       }
       response = await GetPaymentMethods()
       if (response?.success) {
@@ -212,28 +273,7 @@
         const payments = data.filter(paymentMethod => paymentMethod.selected)
         payment = (payments?.length ?? 0) === 1 ? payments[0] : undefined
       }
-      if (Capacitor.isNativePlatform()) {
-        const checkpermissions = await Geolocation.checkPermissions()
-        if (checkpermissions.location != 'prompt') {
-          const permissions = await Geolocation.requestPermissions()
-          if (permissions.location != 'granted') {
-            await getLocation()
-          }
-        } else {
-          await getLocation()
-        }
-      } else {
-        if (navigator.permissions && navigator.permissions.query) {
-          const permission = await navigator.permissions.query({
-            name: 'geolocation'
-          })
-          if (permission.state != 'denied') {
-            await getLocation()
-          }
-        } else if (navigator.geolocation) {
-          await getLocation()
-        }
-      }
+      await requestGeoLocation()
     } catch (exception: any) {
       console.error(exception)
     }
@@ -401,7 +441,7 @@
   >
 {/if}
 {#if businessTime}
-  <Views.Button disabled={!validate} isFloat={true} on:click={forward}>
+  <Views.Button disabled={!validate} isFloat={true} on:click={canForward}>
     <span
       >Confirmar o {!payment?.type ||
       [
@@ -419,6 +459,24 @@
 {/if}
 <Views.GTerms />
 <Views.Divider height={60} />
+{#if showLocationAlertAlert}
+  <Views.Alert
+    title="Alerta"
+    message={`Você está longe do endereço da entrega cadastrado, verifique se o endereço da entrega está correto.`}
+    closeCallBack={toggleShowLocationAlertAlert}
+    buttons={[
+      {
+        name: 'Quero verificar',
+        callback: toggleShowLocationAlertAlert,
+        principal: true
+      },
+      {
+        name: 'Continuar',
+        callback: forward
+      }
+    ]}
+  />
+{/if}
 
 <style>
   .product {

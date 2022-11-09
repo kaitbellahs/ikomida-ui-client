@@ -35,6 +35,7 @@
         : 0
     ) -
     Number(order.discount ?? 0)
+  $: change = (order.change ?? 0) - total
 
   async function changeOrderStatus(status: Types.Types.TOrderStatus) {
     Stores.Loading.instance.start()
@@ -243,6 +244,8 @@
       {#if order.payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
         <Views.Image source="/assets/cardBrand/{order.payment.brand}.svg" name={order.payment.brand} />
         **** {order.payment.lastDigits}
+      {:else if order.payment?.type === Types.Types.TPaymentMethod.CASH_ON_DELIVERY}
+        Você daria <b>{Utils.Strings.currency(order.change)}</b> e receberia <b>{Utils.Strings.currency(change)}</b> de troco.
       {/if}
     </span>
   </div>

@@ -127,7 +127,7 @@
             throw new Error(genericError)
           }
         } else {
-          if (quantity < cartProduct.quantity && quantity < 10) {
+          if (quantity < cartProduct.quantity && quantity < (cartProduct.maxQuantityPerOrder ?? 10)) {
             quantity++
           }
         }

@@ -185,7 +185,11 @@
             update = true
           }
         } else {
-          if (cartProduct && cartProduct.quantity < cartProduct.leftQuantity) {
+          if (
+            cartProduct &&
+            cartProduct.quantity < cartProduct.leftQuantity &&
+            cartProduct.quantity < (cartProduct.maxQuantityPerOrder ?? 10)
+          ) {
             cartProduct.quantity++
             update = true
           }

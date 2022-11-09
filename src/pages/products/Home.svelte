@@ -63,7 +63,7 @@
 <Views.Divider height={10} />
 <div class="filters">
   {#if orderType !== null}
-    <Views.Selector bind:selected={orderType} options={$Settings.orderTypes} name="Tipo do seu pedido" />
+    <Views.Selector bind:selected={orderType} options={$Settings.orderTypes ?? []} name="Tipo do seu pedido" />
   {/if}
 </div>
 <Views.Divider height={30} />
@@ -81,7 +81,7 @@
     <Views.Image source={$Settings.profile?.mainPicture} name={$Settings.profile?.contractName} />
   </div>
   <Views.Divider />
-  <h2>Bem vindo {userInfo?.name ?? '-'}</h2>
+  <h2>{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
   <Views.CentredMessage
     text="Pra começarmos precisa escolher o tipo do seu pedido para podermos lhe exibir os produtos certos!"
   />
