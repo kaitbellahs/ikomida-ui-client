@@ -128,14 +128,11 @@
       >
     </div>
   </div>
-  <Views.Divider />
 </Views.LoadMoreReusableList>
 
 <style>
   .orderContainer {
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    padding: 20px;
+    padding: 16pt;
     background: var(--itemBackground);
     display: flex;
     flex-direction: column;

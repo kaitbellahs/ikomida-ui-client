@@ -94,10 +94,10 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
-    box-shadow: 1px 2px #cccccc66;
-    margin-top: 30px;
-    padding: 10px;
+    box-shadow: 0 4pt 8pt #0000009e;
+    margin-top: 24pt;
+    padding: 16pt;
+    border-radius: 8pt;
   }
   .paymentCard > .checkbox {
     display: flex;
@@ -110,17 +110,17 @@
   }
   .paymentCard > .content > .paymentType {
     font-family: 'RobotoMedium';
-    margin-bottom: 10px;
+    margin-bottom: 16pt;
   }
   .paymentCard > .content > .brand > :global(img) {
-    height: 14px;
+    height: 16px;
     width: auto;
   }
   .paymentCard > .content > .brand {
     font-weight: lighter;
     font-size: 1em;
     width: 100%;
-    margin-top: 5px;
+    margin-top: 8pt;
   }
   h3,
   small {

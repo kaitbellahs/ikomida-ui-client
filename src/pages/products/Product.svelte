@@ -17,6 +17,7 @@
   let cartProduct: Types.CCart
   let quantity = 1
   let working: Types.Interfaces.IRecord<string, boolean> = {}
+  let Layout = Stores.Layout.instance?.store
 
   $: optionsTotal = () => {
     let calcTotal = 0
@@ -247,7 +248,10 @@
 </script>
 
 {#if cartProduct}
-  <div class="product">
+  <div class="productImage">
+    <Views.Image source={cartProduct.image} name={cartProduct.title} />
+  </div>
+  <div class="product" style="background: {$Layout.background};">
     {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
       <span class="discount"
         >-{Types.Types.TDiscount.VALUE === cartProduct.discountType
@@ -255,7 +259,6 @@
           : Utils.Strings.percent(cartProduct.discount)}</span
       >
     {/if}
-    <Views.Image source={cartProduct.image} name={cartProduct.title} />
     <h2>{cartProduct.title}</h2>
     <p>{cartProduct.description}</p>
     <span class="serves"
@@ -299,14 +302,14 @@
         on:click={() => plus()}><Fa icon={faPlusSquare} /></Views.Button
       >
     </div>
-    <Views.Divider />
     {#if (cartProduct.optionsCategories?.length ?? 0) > 0}
       {#if hasOptions()}
+        <Views.Divider height={8} />
         <h2>Personalize seu pedido</h2>
         {#each cartProduct.optionsCategories ?? [] as optionsCategory}
           {#if (optionsCategory.options?.length ?? 0) > 0}
             <Views.Divider height={10} />
-            <div class="optionsCategory">
+            <div class="optionsCategory shadow">
               <header>
                 <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45px" width="45px" />
                 <div>
@@ -324,7 +327,7 @@
               </header>
               {#each optionsCategory.options ?? [] as option}
                 <Views.Divider height={15} />
-                <div class="option">
+                <div class="option shadow">
                   <Views.Image source={option.image} name={option.name} height="45px" width="45px" />
                   <div>
                     <h3>{option.name}</h3>
@@ -408,9 +411,23 @@
 {/if}
 
 <style>
+  .productImage {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 64px;
+  }
   .product {
-    position: relative;
-    padding-bottom: 50px;
+    position: absolute;
+    padding: 16pt;
+    padding-bottom: 128pt;
+    left: 0;
+    right: 0;
+    top: 100vw;
+    border-radius: 16pt 16pt 0 0;
+    background: #fff;
+    box-shadow: 0 -4pt 8pt #0000009e;
+    height: fit-content;
   }
   .product > .discount {
     position: absolute;
@@ -418,16 +435,16 @@
     right: -5px;
     border-radius: 20.5px;
     min-width: 60px;
-    border: 1px solid #4c0708;
+    border: 1pt solid #4c0708;
     background: #4c0708;
     color: white;
     line-height: 21px;
-    padding: 0px 8px;
-    text-shadow: 0.5px 1px #00000055;
-    box-shadow: 2px 3px #00000099;
+    padding: 0pt 8pt;
+    text-shadow: 0pt 4pt 8pt #000000;
+    box-shadow: 0 4pt 8pt #0000009e;
   }
   .quantity {
-    margin-top: 10px;
+    margin-top: 16pt;
     align-items: center;
     font-size: 1.8em;
     text-align: center;
@@ -436,8 +453,8 @@
     padding: 0;
     border: 0;
     background: transparent;
-    margin-right: 10px;
-    margin-left: 10px;
+    margin-right: 8pt;
+    margin-left: 8pt;
   }
   .product > .price {
     display: flex;
@@ -467,16 +484,15 @@
   p {
     font-size: 1.1rem;
     font-weight: lighter;
-    margin: 10px 0;
+    margin: 16pt 0;
   }
   .serves {
     font-size: 1rem;
   }
   .product > .optionsCategory {
-    background-color: #ccccccfa;
-    border: #ccd;
-    border-radius: 5px;
-    padding: 10px;
+    background-color: #fffffffa;
+    border-radius: 8pt;
+    padding: 16pt;
     position: relative;
   }
   .product > .optionsCategory > header {
@@ -486,23 +502,23 @@
   }
   .product > .optionsCategory > header > div {
     width: calc(100% - 42px);
-    margin-left: 10px;
+    margin-left: 16pt;
   }
   .product > .optionsCategory > header > div > .mandatory {
     position: absolute;
-    right: -15px;
-    top: -15px;
+    right: -24pt;
+    top: -24pt;
     width: auto;
     display: flex;
     align-items: center;
-    padding: 3px 13px 3px 13px;
-    border-radius: 23px 0 23px 0;
+    padding: 8pt 16pt 4pt 16pt;
+    border-radius: 24pt 0 24pt 0;
     background: #ffeabe;
     font-family: RobotoBold, sans-serif;
     line-height: 1;
     color: #4c0708;
-    text-shadow: 0.5px 1px #00000055;
-    box-shadow: 2px 3px #00000099;
+    text-shadow: 0pt 4pt 8pt #000000;
+    box-shadow: 0 4pt 8pt #0000009e;
   }
   .product > .optionsCategory > header > div > div {
     display: flex;
@@ -522,9 +538,8 @@
   }
   .product > .optionsCategory > .option {
     background-color: #ffffff26;
-    border: #ccd;
-    border-radius: 5px;
-    padding: 10px;
+    border-radius: 8pt;
+    padding: 16pt;
     position: relative;
   }
   .product > .optionsCategory > .option {
@@ -533,7 +548,7 @@
   }
   .product > .optionsCategory > .option > div {
     width: calc(100% - 42px);
-    margin-left: 10px;
+    margin-left: 16pt;
   }
   .product > .optionsCategory > .option > div > div {
     display: flex;
@@ -549,7 +564,6 @@
     width: 100%;
   }
   .product > .optionsCategory > .option > div > div > .units {
-    margin-top: 5px;
     align-items: center;
     font-size: 0.9em;
     text-align: center;
@@ -560,8 +574,8 @@
     padding: 0;
     border: 0;
     background: transparent;
-    margin-right: 6px;
-    margin-left: 6px;
+    margin-right: 8pt;
+    margin-left: 8pt;
   }
   .product > .optionsCategory > .option > div > div > .price {
     display: flex;

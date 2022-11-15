@@ -61,7 +61,7 @@
   let Layout = Stores.Layout.instance?.store
   let style: HTMLElement
 
-  $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 50}px`
+  $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 56}px`
 
   $: if (style)
     if (showCart) {
@@ -78,7 +78,7 @@
       body {
         --backgroundColor: ${$Layout.background};
         --paddingTop: ${styleHeight};
-        --paddingBottom: 55px;
+        --paddingBottom: 56pt;
       }
     `
     }
@@ -396,9 +396,12 @@
   <NoService />
 {:else}
   <main
-    style="margin-top:{styleHeight};padding: 20px; padding-bottom: {showCart
-      ? '140px'
-      : '70px'}; overflow: scroll;max-width: 100%;background: {$Layout.background};height: 100%;"
+    style="margin-top:{styleHeight};padding: 16pt; padding-bottom: {showCart ||
+    route === Routes.checkout ||
+    route === Routes.cart ||
+    route === Routes.product
+      ? '128pt'
+      : '64pt'}; overflow: scroll;max-width: 100%;background: {$Layout.background};height: 100%;"
   >
     {#if route == Routes.home}
       <Home />
@@ -465,11 +468,11 @@
     right: 0;
     padding-top: 1px;
     padding-bottom: 1px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 12pt;
+    padding-right: 12pt;
     z-index: 9999999999;
     text-align: center;
-    border-bottom: 1px solid white;
+    border-bottom: 1pt solid white;
   }
   :global(.grecaptcha-badge) {
     visibility: hidden;

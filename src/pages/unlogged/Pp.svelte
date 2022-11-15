@@ -47,7 +47,7 @@
     min-height: 20vh;
     background: #cccccc25;
     border-radius: 10px;
-    box-shadow: 1px 2px #cccccc33;
+    box-shadow: 0 4pt 8pt #0000009e;
     width: 100%;
     padding: 20px;
   }

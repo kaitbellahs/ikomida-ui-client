@@ -315,69 +315,69 @@
     flex-direction: column;
   }
   .order.screenShot {
-    padding: 20px;
+    padding: 16pt;
   }
   .product {
     font-family: RobotoLight;
     font-size: 0.9em;
-    margin-top: 10px;
+    margin-top: 16pt;
     margin-bottom: 0;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #ccc;
-    border-left: 1px solid #ccc;
+    border-bottom: 1pt solid #ccc;
+    border-left: 1pt solid #ccc;
     display: flex;
     flex-direction: column;
   }
   .product > small {
-    margin-left: 5px;
+    margin-left: 8pt;
   }
   .product > header > .quantity {
-    margin-right: 5px;
+    margin-right: 8pt;
     font-family: RobotoMedium;
     font-size: 1em;
     background: #ccc;
-    width: 20px;
-    height: 20px;
-    padding: 2px;
+    width: 24pt;
+    height: 24pt;
+    padding: 4pt;
     text-align: center;
     vertical-align: middle;
   }
   .product > header > .price {
-    margin-left: 5px;
+    margin-left: 8pt;
     font-family: RobotoMedium;
     font-size: 0.9em;
   }
   .product > div {
-    margin-left: 15px;
-    margin-bottom: 5px;
-    margin-top: 5px;
+    margin-left: 16pt;
+    margin-bottom: 8pt;
+    margin-top: 8pt;
     font-size: 0.9em;
   }
   .product > div > .option > .units {
-    margin-right: 5px;
+    margin-right: 8pt;
     font-family: RobotoMedium;
     font-size: 1em;
     background: rgba(204, 204, 204, 0.356);
-    width: 20px;
-    height: 20px;
-    padding: 0 2px;
+    width: 24pt;
+    height: 24pt;
+    padding: 0 4pt;
     text-align: center;
     vertical-align: middle;
   }
   .product > div > .option > .price {
-    margin-left: 5px;
+    margin-left: 8pt;
     font-family: RobotoMedium;
     font-size: 0.9em;
   }
   .address {
     font-size: 0.9em;
-    margin-top: 20px;
-    margin-bottom: 10px;
+    margin-top: 16pt;
+    margin-bottom: 16pt;
   }
   .address > .street {
     font-family: 'RobotoMedium';
-    margin-bottom: 10px;
+    margin-bottom: 16pt;
   }
   .address > .neighborhood {
     font-family: 'RobotoMedium';
@@ -386,27 +386,27 @@
   }
   .paymentMethod {
     font-size: 0.9em;
-    margin-bottom: 5px;
+    margin-bottom: 8pt;
     display: flex;
     flex-direction: column;
   }
   .paymentMethod > .brand > :global(img) {
-    height: 14px;
+    height: 16pt;
     width: auto;
   }
   .paymentMethod > .brand {
     font-weight: lighter;
     font-size: 1em;
     width: 100%;
-    margin-top: 5px;
+    margin-top: 8pt;
   }
   .time {
     font-size: 0.8em;
-    margin-top: 5px;
+    margin-top: 8pt;
   }
   table {
     width: 100%;
-    padding-bottom: 10px;
+    padding-bottom: 16pt;
   }
   .resumeHead {
     font-size: 1.1em;
@@ -431,21 +431,21 @@
   .order > .buttonGroup {
     display: flex;
     flex-direction: row;
-    margin-top: 20px;
+    margin-top: 16pt;
   }
   .order > .buttonGroup > :global(*) {
     flex: 1;
   }
   .order > .buttonGroup > :global(*):first-child {
-    margin-right: 5px;
+    margin-right: 8pt;
   }
   .order > .buttonGroup > :global(*):last-child {
-    margin-left: 5px;
+    margin-left: 8pt;
   }
   .order > h3 {
-    border-left: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    padding: 0 20px;
+    border-left: 1pt solid #ccc;
+    border-bottom: 1pt solid #ccc;
+    padding: 0 16pt;
     margin: 0;
     font-size: 1.1em;
   }
@@ -465,8 +465,8 @@
     font-size: 3em;
     width: 100%;
     max-width: 100%;
-    border-radius: 45px;
-    line-height: 90px;
+    border-radius: 48pt;
+    line-height: 88pt;
     vertical-align: middle;
     display: table-cell;
     overflow: hidden;
@@ -481,7 +481,7 @@
     display: flex;
   }
   .signature > :global(img) {
-    height: 45px;
+    height: 48pt;
     width: auto;
   }
 </style>

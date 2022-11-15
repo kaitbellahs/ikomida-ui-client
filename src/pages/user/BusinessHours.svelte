@@ -78,13 +78,13 @@
   .date {
     display: flex;
     width: 100%;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1pt solid #ccc;
     padding: 20px;
     font-size: 1.1em;
     flex-direction: column;
     place-content: center;
     align-items: center;
-    border: 1px solid var(--buttonBackground);
+    border: 1pt solid var(--buttonBackground);
     border-radius: 6px;
   }
   .date > div,
@@ -97,14 +97,14 @@
     flex-wrap: wrap;
   }
   .date > h2.title {
-    border-bottom: 1px solid var(--buttonBackground);
+    border-bottom: 1pt solid var(--buttonBackground);
   }
   .date > div.data > span {
     display: flex;
     flex-direction: row;
-    padding: 10px 20px;
-    margin: 10px 5px;
-    border: 1px solid #fff;
+    padding: 12pt 24pt;
+    margin: 16pt 8pt;
+    border: 1pt solid #fff;
     color: var(--buttonColor);
     background: var(--buttonBackground);
     border-radius: 6px;

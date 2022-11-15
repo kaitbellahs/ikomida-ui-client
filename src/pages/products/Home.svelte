@@ -7,11 +7,29 @@
   import { onMount } from 'svelte'
   import OrderType from '../../stores/OrderType'
   import { Cart } from '../../stores/Cart'
+  import type { IStore } from '../../stores/Cart'
+  import { Cart as CartStore } from '../../stores/Cart'
 
   let userInfo: Types.Classes.CUser | undefined = undefined
   let categoriesAndProducts: Types.Classes.CCategoryProducts[] | undefined = undefined
   let orderType: Types.Types.TOrderType | undefined | null = null
   let working = false
+  let Layout = Stores.Layout.instance?.store
+  let router = Stores.Navigation.instance.router
+  let Store: IStore
+
+  $: route = $router.route
+  $: showCart =
+    ($Store?.length ?? 0) > 0 &&
+    route !== Routes.cart &&
+    route !== Routes.product &&
+    route !== Routes.checkout &&
+    route !== Routes.orders &&
+    route !== Routes.order &&
+    route !== Routes.newAddress &&
+    route !== Routes.newMethod &&
+    route !== Routes.profile
+
   $: if (orderType !== null) {
     OrderType.set(orderType)
     if (orderType) {
@@ -31,6 +49,7 @@
     }
   }
   onMount(async () => {
+    Store = await CartStore.instance.store()
     const auth = await Stores.Auth.Auth.instance.data()
     if (auth) {
       userInfo = await Utils.Jws.extractToken(auth)
@@ -54,47 +73,68 @@
   $: Stores.Title.instance.set($Settings?.profile?.contractName ?? 'iKomida')
 </script>
 
-<h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
-<div class="preparationTime">
-  entre {Utils.Strings.timeToString(($Settings?.preparation?.min ?? 0) * 60)} até {Utils.Strings.timeToString(
-    ($Settings?.preparation?.max ?? 0) * 60
-  )}
-</div>
-<Views.Divider height={10} />
-<div class="filters">
-  {#if orderType !== null}
-    <Views.Selector bind:selected={orderType} options={$Settings.orderTypes ?? []} name="Tipo do seu pedido" />
-  {/if}
-</div>
-<Views.Divider height={30} />
+<header class="mainPicture">
+  <Views.Image source={$Settings.profile?.mainPicture} name={$Settings.profile?.contractName} />
+</header>
+<content style="padding-bottom: {showCart ? '120pt' : '56pt'};background: {$Layout.background};">
+  <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
+  <div class="preparationTime">
+    entre {Utils.Strings.timeToString(($Settings?.preparation?.min ?? 0) * 60)} até {Utils.Strings.timeToString(
+      ($Settings?.preparation?.max ?? 0) * 60
+    )}
+  </div>
+  <Views.Divider height={10} />
+  <div class="filters">
+    {#if orderType !== null}
+      <Views.Selector bind:selected={orderType} options={$Settings.orderTypes ?? []} name="Tipo do seu pedido" />
+    {/if}
+  </div>
+  <Views.Divider height={30} />
 
-{#if orderType}
-  {#if (categoriesAndProducts?.length ?? 0) > 0}
-    <Views.ItemsList bind:categoriesAndProducts productPage={Routes.product} />
+  {#if orderType}
+    {#if (categoriesAndProducts?.length ?? 0) > 0}
+      <Views.ItemsList bind:categoriesAndProducts productPage={Routes.product} />
+    {:else}
+      <Views.CentredMessage
+        text="Por enquanto estamos ainda organizando o nosso cardápio para este tipo de pedidos, volte a verificar de novo mais tarde!"
+      />
+    {/if}
   {:else}
+    <Views.Divider />
+    <h2>{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
+    <Views.Divider />
     <Views.CentredMessage
-      text="Por enquanto estamos ainda organizando o nosso cardápio para este tipo de pedidos, volte a verificar de novo mais tarde!"
+      text="Pra começarmos precisa escolher o tipo do seu pedido para podermos lhe exibir os produtos certos!"
     />
   {/if}
-{:else}
-  <div class="mainPicture">
-    <Views.Image source={$Settings.profile?.mainPicture} name={$Settings.profile?.contractName} />
-  </div>
-  <Views.Divider />
-  <h2>{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
-  <Views.CentredMessage
-    text="Pra começarmos precisa escolher o tipo do seu pedido para podermos lhe exibir os produtos certos!"
-  />
-{/if}
+</content>
 
 <style>
-  h2 {
-    text-align: center;
+  header {
+    max-height: 260pt;
+    max-width: 480pt;
+    object-fit: contain;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 48pt;
+  }
+  content {
+    position: absolute;
+    padding: 16pt;
+    left: 0;
+    right: 0;
+    top: 200pt;
+    border-radius: 16pt 16pt 0 0;
+    background: #fff;
+    box-shadow: 0 -4pt 8pt #0000009e;
+    height: fit-content;
   }
   .mainPicture > :global(img) {
-    border-radius: 40px;
-    height: 210px;
-    max-width: 500px;
+    /* border-radius: 8pt;
+    max-height: 260pt;
+    max-width: 480pt; */
     object-fit: contain;
     width: 100%;
   }
@@ -107,7 +147,7 @@
   }
   .filters {
     width: 100%;
-    height: 73px;
+    height: 72px;
     display: flex;
     flex-direction: row;
   }

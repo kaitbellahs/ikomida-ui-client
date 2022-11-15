@@ -86,10 +86,10 @@ mesmo!"
     width: 100%;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #ccc;
-    box-shadow: 1px 2px #cccccc66;
-    margin-top: 30px;
-    padding: 10px;
+    box-shadow: 0 4pt 8pt #0000009e;
+    margin-top: 24pt;
+    padding: 16pt;
+    border-radius: 8pt;
   }
   .address > .checkbox {
     display: flex;
@@ -102,7 +102,7 @@ mesmo!"
   }
   .address > .content > .street {
     font-family: 'RobotoMedium';
-    margin-bottom: 10px;
+    margin-bottom: 16pt;
   }
   .address > .content > .neighborhood {
     font-weight: lighter;

@@ -458,7 +458,6 @@
   <h2 class="businessHoursError">Estámos fora do horario do funcionamento, confire os nossos horários</h2>
 {/if}
 <Views.GTerms />
-<Views.Divider height={60} />
 {#if showLocationAlertAlert}
   <Views.Alert
     title="Alerta"
@@ -482,53 +481,53 @@
   .product {
     font-family: RobotoLight;
     font-size: 0.9em;
-    margin-top: 10px;
+    margin-top: 16pt;
     margin-bottom: 0;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #ccc;
-    border-left: 1px solid #ccc;
+    border-bottom: 1pt solid #ccc;
+    border-left: 1pt solid #ccc;
     display: flex;
     flex-direction: column;
   }
   .product > small {
-    margin-left: 5px;
+    margin-left: 8pt;
   }
   .product > header > .quantity {
-    margin-right: 5px;
+    margin-right: 8pt;
     font-family: RobotoMedium;
     font-size: 1em;
     background: #ccc;
-    width: 20px;
-    height: 20px;
-    padding: 2px;
+    width: 24pt;
+    height: 24pt;
+    padding: 4pt;
     text-align: center;
     vertical-align: middle;
   }
   .product > header > .price {
-    margin-left: 5px;
+    margin-left: 8pt;
     font-family: RobotoMedium;
     font-size: 0.9em;
   }
   .product > div {
-    margin-left: 15px;
-    margin-bottom: 5px;
-    margin-top: 5px;
+    margin-left: 16pt;
+    margin-bottom: 8pt;
+    margin-top: 8pt;
     font-size: 0.9em;
   }
   .product > div > .option > .units {
-    margin-right: 5px;
+    margin-right: 8pt;
     font-family: RobotoMedium;
     font-size: 1em;
     background: rgba(204, 204, 204, 0.356);
-    width: 20px;
-    height: 20px;
-    padding: 0 2px;
+    width: 24pt;
+    height: 24pt;
+    padding: 0 4pt;
     text-align: center;
     vertical-align: middle;
   }
   .product > div > .option > .price {
-    margin-left: 5px;
+    margin-left: 8pt;
     font-family: RobotoMedium;
     font-size: 0.9em;
   }
@@ -536,7 +535,7 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
+    margin-top: 16pt;
   }
   .paymentCard > .content {
     display: flex;
@@ -549,21 +548,21 @@
     width: 100%;
   }
   .paymentCard > .content > .brand > :global(img) {
-    height: 14px;
+    height: 16pt;
     width: auto;
   }
   .paymentCard > .content > .brand {
     font-weight: lighter;
     font-size: 1em;
     width: 100%;
-    margin-top: 5px;
+    margin-top: 8pt;
   }
   .address {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #ccc;
-    padding: 10px 0;
+    border-bottom: 1pt solid #ccc;
+    padding: 16pt 0;
   }
   .address > .content {
     display: flex;
@@ -605,7 +604,7 @@
     font-size: 0.9em;
   }
   tr.total {
-    padding-top: 10px;
+    padding-top: 16pt;
   }
   .resumeValue.total {
     font-size: 1.1em;
@@ -616,6 +615,6 @@
   .businessHoursError {
     text-align: center;
     color: #4c0708;
-    margin-top: 20px;
+    margin-top: 24pt;
   }
 </style>

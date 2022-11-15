@@ -354,7 +354,7 @@
 <style>
   table {
     width: 100%;
-    padding-bottom: 55px;
+    padding-bottom: 56pt;
   }
   .resumeHead {
     font-size: 1.1em;
