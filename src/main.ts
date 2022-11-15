@@ -24,7 +24,7 @@ Stores.Layout.createInstance()
 Cart.createInstance()
 Network.createInstance(
   url[window.environment],
-  'com.ikomida.br.tialtonivel',
+  '${{iKomidaId}}$',
   agent,
   '6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS',
   appVersion
