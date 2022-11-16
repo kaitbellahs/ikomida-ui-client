@@ -74,7 +74,10 @@
 </script>
 
 <header class="mainPicture">
-  <Views.Image source={$Settings.profile?.mainPicture} name={$Settings.profile?.contractName} />
+  <Views.Image
+    source={$Settings.profile?.mainPicture ?? '/assets/icons/transparent-logo-1.svg'}
+    name={$Settings.profile?.contractName}
+  />
 </header>
 <content style="padding-bottom: {showCart ? '120pt' : '56pt'};background: {$Layout.background};">
   <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>

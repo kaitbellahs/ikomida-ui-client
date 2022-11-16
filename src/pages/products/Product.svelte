@@ -249,7 +249,7 @@
 
 {#if cartProduct}
   <div class="productImage">
-    <Views.Image source={cartProduct.image} name={cartProduct.title} />
+    <Views.Image source={cartProduct.image ?? '/assets/images/food-plate.svg'} name={cartProduct.title} />
   </div>
   <div class="product" style="background: {$Layout.background};">
     {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
