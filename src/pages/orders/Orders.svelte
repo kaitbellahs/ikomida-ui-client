@@ -47,7 +47,7 @@
   let:item
   let:index
 >
-  <div class="leftShadow orderContainer" style="--itemBackground: {$Layout?.itemBackground || '#ffffffab'};">
+  <div class="orderContainer" style="--itemBackground: {$Layout?.itemBackground || '#ffffffab'};">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div on:click={() => goToOrder(items[index])}>
       <h3 class="title">Pedido N˚: {items[index].customID}</h3>
@@ -133,6 +133,7 @@
 <style>
   .orderContainer {
     padding: 16pt;
+    border-radius: 8pt;
     background: var(--itemBackground);
     display: flex;
     flex-direction: column;

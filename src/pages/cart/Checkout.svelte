@@ -362,6 +362,7 @@
   <Views.Button type={Types.TButton.TRANSPARENT} on:click={removeCoupon}>Remover o cupom</Views.Button>
 {:else}
   <Views.TextEdit
+    marginTop={16}
     bind:value={coupon}
     placeHolder="Adicionar cupom"
     buttonName="Adicionar"
@@ -372,7 +373,7 @@
 {/if}
 <Views.Button type={Types.TButton.TRANSPARENT} on:click={addMoreItems}>Adicionar mais itens</Views.Button>
 {#if orderType === Types.Types.TOrderType.DELIVERY}
-  <Views.Divider />
+  <Views.Divider height={16} />
   <Views.Button on:click={manageAddress}>trocar endereço</Views.Button>
   {#if address === undefined}
     <Views.LocalLoading size={2} />
@@ -390,6 +391,7 @@
   {/if}
 {:else if orderType === Types.Types.TOrderType.LOCAL}
   <Views.TextEdit
+    marginTop={16}
     placeHolder="Símbolo da mesa"
     bind:value={table}
     initialValue={table}
@@ -398,11 +400,11 @@
     max={50}
   />
   {#if !table}
-    <Views.Divider height={10} />
+    <Views.Divider height={8} />
     <Views.Status type={Types.Status.WARNING}>Para continuar precisa digitar o símbolo da mesa.</Views.Status>
   {/if}
 {/if}
-<Views.Divider />
+<Views.Divider height={16} />
 <Views.Button on:click={manageCard}>Trocar meio de pagamento</Views.Button>
 {#if payment === undefined}
   <Views.LocalLoading size={2} />
@@ -425,7 +427,7 @@
           />
           <!-- //TODO: -- 'undefined' bug fix -->
           {#if isNaN(Number(change)) || Number(change) <= 0}
-            <Views.Divider height={10} />
+            <Views.Divider height={8} />
             <Views.Status type={Types.Status.WARNING}
               >Para continuar precisa digitar o valor total das notas ou cédulas que vai usar para o pagamento, para que
               o garçom ou entregador já leva o seu troco.</Views.Status

@@ -326,7 +326,7 @@
                 </div>
               </header>
               {#each optionsCategory.options ?? [] as option}
-                <Views.Divider height={15} />
+                <Views.Divider height={16} />
                 <div class="option shadow">
                   <Views.Image source={option.image} name={option.name} height="45px" width="45px" />
                   <div>
@@ -336,17 +336,19 @@
                         <Views.Button
                           type={Types.TButton.TRANSPARENT}
                           size="none"
-                          height="16px"
+                          height="16pt"
                           sizeMultiplier={1.3}
                           margin="0"
+                          padding={4}
                           on:click={() => minos(option)}
                         >
                           <Fa icon={faMinusSquare} /></Views.Button
                         ><span>{getCartOptionUnitsById(option.id)}/{option.units}</span><Views.Button
                           type={Types.TButton.TRANSPARENT}
                           size="none"
-                          height="16px"
+                          height="16pt"
                           margin="0"
+                          padding={4}
                           sizeMultiplier={1.3}
                           on:click={() => plus(optionsCategory, option)}><Fa icon={faPlusSquare} /></Views.Button
                         >
@@ -444,7 +446,7 @@
     box-shadow: 0 4pt 8pt #0000009e;
   }
   .quantity {
-    margin-top: 16pt;
+    margin-top: 8pt;
     align-items: center;
     font-size: 1.8em;
     text-align: center;
@@ -569,20 +571,20 @@
     text-align: center;
     display: flex;
     flex-direction: row;
+    margin-top: 4pt;
   }
   .product > .optionsCategory > .option > div > div > .units > span {
     padding: 0;
     border: 0;
     background: transparent;
-    margin-right: 8pt;
-    margin-left: 8pt;
   }
   .product > .optionsCategory > .option > div > div > .price {
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-size: 0.9em;
   }
   .product > .optionsCategory > .option > div > div > div > .oldPrice {
-    font-size: 0.8em;
+    font-size: 0.7em;
   }
 </style>

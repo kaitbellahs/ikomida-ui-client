@@ -336,6 +336,7 @@
   menuHamburgerItems.forEach(page => Stores.MenuHamburger.instance.addItem(page))
 
   onMount(async () => {
+    await CartStore.createInstance()
     style = document.createElement('style')
     document.head.appendChild(style)
     Store = await CartStore.instance.store()

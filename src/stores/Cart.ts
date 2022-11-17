@@ -19,7 +19,7 @@ export class Cart {
   //MARK: -- static region
   static instance: Cart
   unsubscribe: any
-  static createInstance() {
+  static async createInstance() {
     if (!Cart.instance) {
       Object.defineProperty(Cart, 'instance', {
         value: new Cart(),
@@ -28,15 +28,14 @@ export class Cart {
         configurable: false
       })
     }
+    await Cart.instance.updateType()
+    await Cart.instance.store()
     return Cart.instance
   }
 
   //MARK: -- instance region
   private name = 'Cart'
   private storeValue?: IStore
-  constructor() {
-    this.updateType()
-  }
 
   async updateType() {
     const token = await Stores.Auth.Auth.instance.data()
@@ -52,25 +51,28 @@ export class Cart {
     }
   }
 
-  setter(setter: Subscriber<Types.CCart[]>): void | Unsubscriber {
-    let products: Types.CCart[] | null = null
-    Preferences.get({
-      key: this.name
-    })
-      .then(result => {
-        products = Types.CCart.fromObject(JSON.parse(result.value ?? '[]'))
-        if (products === null) products = []
-        setter(products)
-      })
-      .catch((error: any) => {
-        products = []
-        setter(products)
-        //TODO: -- report errors
-      })
+  async setter() {
+    let products: Types.CCart[] = []
+    try {
+      products = Types.CCart.fromObject(
+        JSON.parse(
+          (
+            await Preferences.get({
+              key: this.name
+            })
+          ).value ?? '[]'
+        )
+      )
+    } catch (_) {
+      //TODO: -- report errors
+    }
+    return (setter: Subscriber<Types.CCart[]>): void | Unsubscriber => {
+      setter(products)
+    }
   }
 
   async createStore() {
-    const { subscribe, set, update } = writable([], this.setter.bind(this))
+    const { subscribe, set, update } = writable([], (await this.setter()).bind(this))
 
     return {
       subscribe,
@@ -107,7 +109,7 @@ export class Cart {
   }
 
   async update(products: Types.CCart[]) {
-    this.save(products)
+    await this.save(products)
 
     const store = await this.store()
     return store?.updateProducts(products)
