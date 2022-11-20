@@ -20,9 +20,9 @@
 
 <style>
   .mainPicture > :global(img) {
-    border-radius: 40px;
-    height: 210px;
-    max-width: 500px;
+    border-radius: 8pt;
+    height: 260pt;
+    max-width: 480pt;
     object-fit: contain;
     width: 100%;
   }

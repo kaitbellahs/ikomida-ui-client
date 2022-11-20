@@ -49,7 +49,6 @@
   Stores.Title.instance.set('Endereços')
 </script>
 
-<Views.Divider />
 <Views.Button on:click={toggleNewAddress}>Novo endereço</Views.Button>
 {#if !addresses}
   <Views.LocalLoading size={2} />

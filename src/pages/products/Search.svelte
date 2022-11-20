@@ -55,6 +55,6 @@
   }
   .preparationTime {
     font-size: 1.1em;
-    margin-bottom: 20px;
+    margin-bottom: 16pt;
   }
 </style>

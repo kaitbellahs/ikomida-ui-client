@@ -79,13 +79,13 @@
     display: flex;
     width: 100%;
     border-bottom: 1pt solid #ccc;
-    padding: 20px;
+    padding: 16pt;
     font-size: 1.1em;
     flex-direction: column;
     place-content: center;
     align-items: center;
     border: 1pt solid var(--buttonBackground);
-    border-radius: 6px;
+    border-radius: 8pt;
   }
   .date > div,
   .date > h2 {
@@ -107,7 +107,7 @@
     border: 1pt solid #fff;
     color: var(--buttonColor);
     background: var(--buttonBackground);
-    border-radius: 6px;
+    border-radius: 8pt;
   }
   .date div.data > span:first-child {
     margin-left: 0;

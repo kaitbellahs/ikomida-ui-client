@@ -61,7 +61,7 @@
   let Layout = Stores.Layout.instance?.store
   let style: HTMLElement
 
-  $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 56}px`
+  $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 48}pt`
 
   $: if (style)
     if (showCart) {
@@ -69,7 +69,7 @@
       body {
         --backgroundColor: ${$Layout.background};
         --paddingTop: ${styleHeight};
-        --paddingBottom: 115px;
+        --paddingBottom: 112pt;
       }
     `
       document.head.appendChild(style)
@@ -389,6 +389,10 @@
   //     ...data,
   //   });
   // });
+  $: isPageList = [Routes.orders, Routes.pushNotifications].includes(route)
+  $: styleParams = `padding: ${isPageList ? 0 : 16}pt;margin-top:${styleHeight};padding-bottom: ${
+    showCart || route === Routes.checkout || route === Routes.cart || route === Routes.product ? '128pt' : '64pt'
+  }; overflow: scroll;max-width: 100%;background: ${$Layout.background};height: 100%;`
 </script>
 
 {#if initialazation}
@@ -396,14 +400,7 @@
 {:else if !isActive}
   <NoService />
 {:else}
-  <main
-    style="margin-top:{styleHeight};padding: 16pt; padding-bottom: {showCart ||
-    route === Routes.checkout ||
-    route === Routes.cart ||
-    route === Routes.product
-      ? '128pt'
-      : '64pt'}; overflow: scroll;max-width: 100%;background: {$Layout.background};height: 100%;"
-  >
+  <main style={styleParams}>
     {#if route == Routes.home}
       <Home />
     {:else if route == Routes.cart}
@@ -467,10 +464,10 @@
     top: 0;
     left: 0;
     right: 0;
-    padding-top: 1px;
-    padding-bottom: 1px;
-    padding-left: 12pt;
-    padding-right: 12pt;
+    padding-top: 1pt;
+    padding-bottom: 1pt;
+    padding-left: 16pt;
+    padding-right: 16pt;
     z-index: 9999999999;
     text-align: center;
     border-bottom: 1pt solid white;

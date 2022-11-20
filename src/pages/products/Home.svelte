@@ -150,7 +150,7 @@
   }
   .filters {
     width: 100%;
-    height: 72px;
+    height: 72pt;
     display: flex;
     flex-direction: row;
   }

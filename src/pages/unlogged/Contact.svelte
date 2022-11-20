@@ -58,8 +58,8 @@
     font-size: 3em;
     width: 100%;
     max-width: 100%;
-    border-radius: 45px;
-    line-height: 90px;
+    border-radius: 8pt;
+    line-height: 88pt;
     vertical-align: middle;
     display: table-cell;
     overflow: hidden;

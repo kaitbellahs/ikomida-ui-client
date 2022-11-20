@@ -32,9 +32,7 @@
 <style>
   article {
     position: relative;
-    border: 1pt solid #ccc;
-    border-radius: 4px;
-    margin-top: 10px;
-    padding: 10px;
+    border-radius: 8pt;
+    padding: 16pt;
   }
 </style>

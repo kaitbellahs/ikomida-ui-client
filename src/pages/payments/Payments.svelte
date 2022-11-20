@@ -55,7 +55,6 @@
   Stores.Title.instance.set('Meios de pagamento')
 </script>
 
-<Views.Divider />
 <Views.Button on:click={toggleNewCreditCard}>novo cartão</Views.Button>
 {#if !payments}
   <Views.LocalLoading size={2} />
@@ -113,7 +112,7 @@
     margin-bottom: 16pt;
   }
   .paymentCard > .content > .brand > :global(img) {
-    height: 16px;
+    height: 16pt;
     width: auto;
   }
   .paymentCard > .content > .brand {

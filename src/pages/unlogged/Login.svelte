@@ -133,26 +133,26 @@
   header.mainPicture > :global(img) {
     font-size: 3em;
     width: 100%;
-    max-width: 500px;
+    max-width: 500pt;
     /* border-radius: 40px; */
     /* height: 210px; */
-    line-height: 90px;
+    line-height: 88pt;
     overflow: hidden;
     object-fit: contain;
   }
   header.mainPicture > .avatarCircle {
     font-size: 3em;
-    height: 90px;
-    width: 90px;
+    height: 88pt;
+    width: 88pt;
     background: #ccc;
-    border-radius: 45px;
+    border-radius: 44pt;
     float: left;
-    line-height: 90px;
+    line-height: 88pt;
     text-align: center;
     vertical-align: middle;
     display: table-cell;
     overflow: hidden;
-    margin-right: 10px;
+    margin-right: 8pt;
   }
   section {
     position: absolute;

@@ -34,7 +34,7 @@
   Stores.Title.instance.set('Pedidos')
 </script>
 
-<div class="filters">
+<div style="padding: 0 16pt;" class="filters">
   <Views.Selector bind:selected={orderType} options={Types.Types.TOrderType.values()} name="Tipo dos pedidos" />
 </div>
 <Views.LoadMoreReusableList

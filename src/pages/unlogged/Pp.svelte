@@ -4,7 +4,7 @@
   import { onMount } from 'svelte'
   import { getPrivacyPolicy } from '../../network/Terms'
 
-  $: styleHeight = `${Number($StatusBar.height) + 50}px`
+  $: styleHeight = `${Number($StatusBar.height) + 56}pt`
   let term: Types.Classes.CTerm
 
   onMount(async () => {
@@ -43,13 +43,13 @@
     flex-direction: column;
     /* align-items: center; */
     place-content: center;
-    margin-bottom: 30px;
-    min-height: 20vh;
+    margin-bottom: 32pt;
+    min-height: 24vh;
     background: #cccccc25;
-    border-radius: 10px;
+    border-radius: 8pt;
     box-shadow: 0 4pt 8pt #0000009e;
     width: 100%;
-    padding: 20px;
+    padding: 16pt;
   }
   .jambtron > h1 {
     align-self: center;

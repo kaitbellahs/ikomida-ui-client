@@ -19,6 +19,16 @@
   let working: Types.Interfaces.IRecord<string, boolean> = {}
   let Layout = Stores.Layout.instance?.store
 
+  $: style = `--top:${Number($StatusBar.height + ($StatusBar.topMargin ?? 0)) + 48}pt`
+  $: total = Utils.Strings.currency(
+    cartProduct
+      ? quantity *
+          (optionsTotal() +
+            cartProduct.price -
+            Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType))
+      : 0
+  )
+
   $: optionsTotal = () => {
     let calcTotal = 0
     for (const option of cartProduct?.options ?? []) {
@@ -29,14 +39,9 @@
     return calcTotal
   }
 
-  $: total = Utils.Strings.currency(
-    cartProduct
-      ? quantity *
-          (optionsTotal() +
-            cartProduct.price -
-            Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType))
-      : 0
-  )
+  $: hasOptions = () => {
+    return (cartProduct.optionsCategories?.filter(category => (category.options?.length ?? 0) > 0) ?? []).length > 0
+  }
 
   $: getCartOptionUnitsById = (id?: string) => {
     if (id) {
@@ -45,6 +50,7 @@
     }
     return 0
   }
+
   $: getCartOptionsCount = (optionsCategory: Types.Classes.CProductOptionsCategory) => {
     const optionsCategoryIds = optionsCategory?.options.flatMap(option => option.id) ?? []
     const categoryOptions = cartProduct.options
@@ -217,10 +223,6 @@
     }
   }
 
-  $: hasOptions = () => {
-    return (cartProduct.optionsCategories?.filter(category => (category.options?.length ?? 0) > 0) ?? []).length > 0
-  }
-
   onMount(async () => {
     Stores.Loading.instance.reset()
     Stores.Loading.instance.start()
@@ -248,7 +250,7 @@
 </script>
 
 {#if cartProduct}
-  <div class="productImage">
+  <div {style} class="productImage">
     <Views.Image source={cartProduct.image ?? '/assets/images/food-plate.svg'} name={cartProduct.title} />
   </div>
   <div class="product" style="background: {$Layout.background};">
@@ -308,10 +310,10 @@
         <h2>Personalize seu pedido</h2>
         {#each cartProduct.optionsCategories ?? [] as optionsCategory}
           {#if (optionsCategory.options?.length ?? 0) > 0}
-            <Views.Divider height={10} />
+            <Views.Divider height={24} />
             <div class="optionsCategory shadow">
               <header>
-                <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45px" width="45px" />
+                <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45pt" width="45pt" />
                 <div>
                   <h3>{optionsCategory.name}</h3>
                   <div>
@@ -328,7 +330,7 @@
               {#each optionsCategory.options ?? [] as option}
                 <Views.Divider height={16} />
                 <div class="option shadow">
-                  <Views.Image source={option.image} name={option.name} height="45px" width="45px" />
+                  <Views.Image source={option.image} name={option.name} height="45pt" width="45pt" />
                   <div>
                     <h3>{option.name}</h3>
                     <div>
@@ -417,7 +419,7 @@
     position: fixed;
     left: 0;
     right: 0;
-    top: 64px;
+    top: var(--top);
   }
   .product {
     position: absolute;
@@ -433,14 +435,14 @@
   }
   .product > .discount {
     position: absolute;
-    top: -5px;
-    right: -5px;
-    border-radius: 20.5px;
-    min-width: 60px;
+    top: -4pt;
+    right: -4pt;
+    border-radius: 22wpt;
+    min-width: 60pt;
     border: 1pt solid #4c0708;
     background: #4c0708;
     color: white;
-    line-height: 21px;
+    line-height: 24pt;
     padding: 0pt 8pt;
     text-shadow: 0pt 4pt 8pt #000000;
     box-shadow: 0 4pt 8pt #0000009e;
@@ -503,7 +505,7 @@
     position: relative;
   }
   .product > .optionsCategory > header > div {
-    width: calc(100% - 42px);
+    width: calc(100% - 42pt);
     margin-left: 16pt;
   }
   .product > .optionsCategory > header > div > .mandatory {
@@ -549,7 +551,7 @@
     flex-direction: row;
   }
   .product > .optionsCategory > .option > div {
-    width: calc(100% - 42px);
+    width: calc(100% - 42pt);
     margin-left: 16pt;
   }
   .product > .optionsCategory > .option > div > div {
