@@ -75,7 +75,7 @@
 
 <header class="mainPicture">
   <Views.Image
-    source={$Settings.profile?.mainPicture ?? '/assets/icons/transparent-logo-1.svg'}
+    source={$Settings.profile?.mainPicture ? $Settings.profile?.mainPicture : '/assets/icons/transparent-logo-1.svg'}
     name={$Settings.profile?.contractName}
   />
 </header>

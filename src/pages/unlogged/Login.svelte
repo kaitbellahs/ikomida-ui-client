@@ -110,8 +110,8 @@
   <Views.Button type={Types.TButton.SECONDARY} on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
   <Views.Button type={Types.TButton.PRIMARY} on:click={doSubscribe}>Criar conta</Views.Button>
   <Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
+  <Views.GTerms />
 </section>
-<Views.GTerms />
 
 <style>
   header {
