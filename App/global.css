@@ -152,10 +152,11 @@ img {
 main {
     display: flex;
     flex-direction: column;
-    flex: 1;
+    flex: 1 0 100%;
     padding: 16pt;
     width: 100%;
     overflow: scroll;
+    background-color: rgb(223, 223, 223);
 }
 
 *,
@@ -191,7 +192,8 @@ jumbotron, productImage {
     border-radius: 16pt 16pt 0 0;
     background: var(--backgroundColor);
     box-shadow: 0 -4pt 8pt #0000009e;
-    padding-bottom: var(--paddingBottom);
+    padding-bottom: calc(var(--paddingBottom) + 8pt);
+    min-height: calc(100% - calc(160pt + var(--paddingTop) - 16pt));
   }
 
   productImage {

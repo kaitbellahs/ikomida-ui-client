@@ -89,9 +89,6 @@
   {/if}
 </jumbotron>
 <content
-  style="padding-bottom: {showCart || route === Routes.checkout || route === Routes.cart || route === Routes.product
-    ? '128pt'
-    : '64pt'};background: {$Layout.background};"
 >
   <Views.Divider />
   <h3>
