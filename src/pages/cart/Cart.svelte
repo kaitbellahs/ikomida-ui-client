@@ -188,7 +188,8 @@
           if (
             cartProduct &&
             cartProduct.quantity < cartProduct.leftQuantity &&
-            cartProduct.quantity < (cartProduct.maxQuantityPerOrder ?? 10)
+            ((cartProduct.maxQuantityPerOrder ?? 10) <= 0 ||
+              cartProduct.quantity < (cartProduct.maxQuantityPerOrder ?? 10))
           ) {
             cartProduct.quantity++
             update = true
@@ -311,6 +312,7 @@
   />
 {/if}
 
+<Views.Divider height={32} />
 {#each $Products ?? [] as product}
   <Views.CartItem {addOptions} {onRemoveClick} {onPlusClick} {onMinosClick} {product} />
 {/each}

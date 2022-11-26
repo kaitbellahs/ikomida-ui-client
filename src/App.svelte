@@ -395,66 +395,68 @@
   }; overflow: scroll;max-width: 100%;background: ${$Layout.background};height: 100%;`
 </script>
 
-{#if initialazation}
-  <LaunchScreen />
-{:else if !isActive}
-  <NoService />
-{:else}
-  <main style={styleParams}>
-    {#if route == Routes.home}
-      <Home />
-    {:else if route == Routes.cart}
-      <Cart />
-    {:else if route == Routes.search}
-      <Search />
-    {:else if route == Routes.product}
-      <Product />
-    {:else if route == Routes.businessHours}
-      <BusinessHours />
-    {:else if route == Routes.subscribe}
-      <Subscribe />
-    {:else if route == Routes.forgotPassword}
-      <ForgotPassword />
-    {:else if route == Routes.confirmSubscribe}
-      <ConfirmSubscribe />
-    {:else if route == Routes.tac}
-      <Tac />
-    {:else if route == Routes.pp}
-      <Pp />
-    {:else if route == Routes.contact}
-      <Contact />
-    {:else}
-      <Main />
-    {/if}
-    {#if showCart}
-      <Views.Button bottomPadding={$_StatusBar.bottomPadding} on:click={goToCart} isFloat={true}
-        >Ver sacola {Utils.Strings.currency(total)}</Views.Button
-      >
-    {/if}
-  </main>
-  <Views.NavigationBar
-    logo={$Settings?.profile?.mainPicture || 'assets/icons/transparent-logo-1.svg'}
-    paddingTop={$_StatusBar.height}
-    topMargin={$_StatusBar.topMargin}
-  />
-  <Views.Tabs {tabs} bottomPadding={$_StatusBar.bottomPadding} />
-{/if}
+<mainContainer>
+  {#if initialazation}
+    <LaunchScreen />
+  {:else if !isActive}
+    <NoService />
+  {:else}
+    <main style={styleParams}>
+      {#if route == Routes.home}
+        <Home />
+      {:else if route == Routes.cart}
+        <Cart />
+      {:else if route == Routes.search}
+        <Search />
+      {:else if route == Routes.product}
+        <Product />
+      {:else if route == Routes.businessHours}
+        <BusinessHours />
+      {:else if route == Routes.subscribe}
+        <Subscribe />
+      {:else if route == Routes.forgotPassword}
+        <ForgotPassword />
+      {:else if route == Routes.confirmSubscribe}
+        <ConfirmSubscribe />
+      {:else if route == Routes.tac}
+        <Tac />
+      {:else if route == Routes.pp}
+        <Pp />
+      {:else if route == Routes.contact}
+        <Contact />
+      {:else}
+        <Main />
+      {/if}
+      {#if showCart}
+        <Views.Button bottomPadding={$_StatusBar.bottomPadding} on:click={goToCart} isFloat={true}
+          >Ver sacola {Utils.Strings.currency(total)}</Views.Button
+        >
+      {/if}
+    </main>
+    <Views.NavigationBar
+      logo={$Settings?.profile?.mainPicture || 'assets/icons/transparent-logo-1.svg'}
+      paddingTop={$_StatusBar.height}
+      topMargin={$_StatusBar.topMargin}
+    />
+    <Views.Tabs {tabs} bottomPadding={$_StatusBar.bottomPadding} />
+  {/if}
 
-<Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
-<Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
-{#if networkStatus == null || !networkStatus.connected}
-  <div id="internetError">Esperando por conexão a internet...</div>
-{/if}
-{#if showNotificationPopup}
-  <Views.Alert
-    title={notificationPopup?.title}
-    message={notificationPopup?.body}
-    closeCallBack={togglePushNotificationPopup}
-    buttons={notificationPopup?.buttons}
-  />
-{/if}
-<Views.Loading topPadding={$_StatusBar.height} bottomPadding={$_StatusBar.bottomPadding} />
-<Views.MessageAlert />
+  <Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
+  <Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
+  {#if networkStatus == null || !networkStatus.connected}
+    <div id="internetError">Esperando por conexão a internet...</div>
+  {/if}
+  {#if showNotificationPopup}
+    <Views.Alert
+      title={notificationPopup?.title}
+      message={notificationPopup?.body}
+      closeCallBack={togglePushNotificationPopup}
+      buttons={notificationPopup?.buttons}
+    />
+  {/if}
+  <Views.Loading topPadding={$_StatusBar.height} bottomPadding={$_StatusBar.bottomPadding} />
+  <Views.MessageAlert />
+</mainContainer>
 
 <style>
   #internetError {

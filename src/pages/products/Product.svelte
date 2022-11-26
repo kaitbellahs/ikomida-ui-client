@@ -182,6 +182,7 @@
         initalProduct.observation = newCartProduct.observation
         if (newCartProduct.equal(initalProduct)) {
           isEditing = true
+          working.addProduct = false
           return true
         }
         const clonedCartProductJSON = newCartProduct.toJSON()
@@ -203,13 +204,21 @@
       if (index >= 0) {
         if (!Types.CCart.isInstance(initalProduct)) {
           cartProduct.quantity = isEditing ? quantity : cartProducts[index].quantity + quantity
-          cartProduct.leftQuantity = cartProduct.quantity
+        }
+        if (
+          cartProduct.quantity > cartProduct.leftQuantity ||
+          ((cartProduct.maxQuantityPerOrder ?? 10) > 0 &&
+            cartProduct.quantity > (cartProduct.maxQuantityPerOrder ?? 10))
+        ) {
+          Stores.MessageAlert.instance.show(`A quantidade do produto é superior à quantidade permitida.`)
+          working.addProduct = false
+          return
         }
         if (!isEditing) {
           for (const option of cartProduct.options) {
             const cartOption = cartProducts[index].options.filter(cartOption => cartOption.id === option.id)?.[0]
             if (cartOption) {
-              option.units += cartOption.units
+              option.units = cartOption.units
             }
           }
         }
@@ -431,7 +440,6 @@
     border-radius: 16pt 16pt 0 0;
     background: #fff;
     box-shadow: 0 -4pt 8pt #0000009e;
-    height: fit-content;
   }
   .product > .discount {
     position: absolute;
