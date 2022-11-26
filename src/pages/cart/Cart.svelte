@@ -312,7 +312,6 @@
   />
 {/if}
 
-<Views.Divider height={32} />
 {#each $Products ?? [] as product}
   <Views.CartItem {addOptions} {onRemoveClick} {onPlusClick} {onMinosClick} {product} />
 {/each}
