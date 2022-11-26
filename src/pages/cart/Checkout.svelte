@@ -70,7 +70,8 @@
       ? table
       : true) &&
     subtotal >= (couponObject?.minValue ?? 0) &&
-    (payment?.type === Types.Types.TPaymentMethod.CASH_ON_DELIVERY ? Number(change) > 0 : true)
+    (payment?.type === Types.Types.TPaymentMethod.CASH_ON_DELIVERY ? Number(change) > 0 : true) &&
+    total >= ($Settings.delivery?.orderMinValue ?? 0)
   $: businessTime = $Settings.business && Logics.DateTime.isBusinessTime($Settings.business)
 
   function addMoreItems() {
@@ -377,6 +378,14 @@
   />
 {/if}
 <Views.Button type={Types.TButton.TRANSPARENT} on:click={addMoreItems}>Adicionar mais itens</Views.Button>
+
+{#if ($Settings.delivery?.orderMinValue ?? 0) > total}
+  <Views.Divider height={8} />
+  <Views.Status type={Types.Status.WARNING}
+    >Para continuar adicione mais itens para atingir o valor mínimo do pedido.</Views.Status
+  >
+{/if}
+
 {#if orderType === Types.Types.TOrderType.DELIVERY}
   <Views.Divider height={16} />
   <Views.Button on:click={manageAddress}>trocar endereço</Views.Button>

@@ -106,6 +106,14 @@
           }
         }
       }
+      if (($Settings.delivery?.orderMinValue ?? 0) > total) {
+        Stores.MessageAlert.instance.show(
+          `Por enquanto só aceitamos pedidos a partir de ${Utils.Strings.currency(
+            $Settings.delivery?.orderMinValue ?? 0
+          )}, adicione mais itens.`
+        )
+        return
+      }
       working.forward = false
     }
     Stores.Navigation.instance.goTo(Routes.checkout)
@@ -311,7 +319,11 @@
     ]}
   />
 {/if}
-
+{#if $Settings.delivery?.orderMinValue}
+  <info class="shadow">
+    Pedido mínimo: <b>{Utils.Strings.currency($Settings.delivery?.orderMinValue ?? 0)}</b>
+  </info>
+{/if}
 {#each $Products ?? [] as product}
   <Views.CartItem {addOptions} {onRemoveClick} {onPlusClick} {onMinosClick} {product} />
 {/each}
@@ -372,5 +384,9 @@
   }
   .deliveryFree {
     color: green;
+  }
+  info {
+    padding: 16pt;
+    border-radius: 8pt;
   }
 </style>
