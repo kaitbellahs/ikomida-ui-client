@@ -9,7 +9,7 @@
   import { onMount } from 'svelte'
 
   const router = Stores.Navigation.instance.router
-  const initalProduct = $router.options.product
+  const initalProduct = $router.optionsproduct
   const genericError =
     'Ocorreu um erro interno, por favor entre em contato conosco pelo e-mail contact@tialtonivel.com.br. Eesvazia o seu carrinho de compras e repita a compra novamente! ou reinicie o app se o erro persiste.'
 
@@ -19,7 +19,6 @@
   let working: Types.Interfaces.IRecord<string, boolean> = {}
   let Layout = Stores.Layout.instance?.store
 
-  $: style = `--top:${Number($StatusBar.height + ($StatusBar.topMargin ?? 0)) + 48}pt`
   $: total = Utils.Strings.currency(
     cartProduct
       ? quantity *
@@ -259,10 +258,10 @@
 </script>
 
 {#if cartProduct}
-  <div {style} class="productImage">
+  <productImage>
     <Views.Image source={cartProduct.image ?? '/assets/images/food-plate.svg'} name={cartProduct.title} />
-  </div>
-  <div class="product" style="background: {$Layout.background};">
+  </productImage>
+  <product>
     {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
       <span class="discount"
         >-{Types.Types.TDiscount.VALUE === cartProduct.discountType
@@ -420,28 +419,11 @@
       <Views.Divider />
       <Views.Status>Por enquanto este produto está disponível apenas para consulta.</Views.Status>
     {/if}
-  </div>
+  </product>
 {/if}
 
 <style>
-  .productImage {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: var(--top);
-  }
-  .product {
-    position: absolute;
-    padding: 16pt;
-    padding-bottom: 128pt;
-    left: 0;
-    right: 0;
-    top: 100vw;
-    border-radius: 16pt 16pt 0 0;
-    background: #fff;
-    box-shadow: 0 -4pt 8pt #0000009e;
-  }
-  .product > .discount {
+  product > .discount {
     position: absolute;
     top: -4pt;
     right: -4pt;
@@ -468,18 +450,18 @@
     margin-right: 8pt;
     margin-left: 8pt;
   }
-  .product > .price {
+  product > .price {
     display: flex;
     flex-direction: row;
     width: 100%;
     justify-content: space-between;
     text-align: center;
   }
-  .product > .price > div {
+  product > .price > div {
     display: flex;
     flex-direction: column;
   }
-  .product > .price > div > div {
+  product > .price > div > div {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -501,22 +483,22 @@
   .serves {
     font-size: 1rem;
   }
-  .product > .optionsCategory {
+  product > .optionsCategory {
     background-color: #fffffffa;
     border-radius: 8pt;
     padding: 16pt;
     position: relative;
   }
-  .product > .optionsCategory > header {
+  product > .optionsCategory > header {
     display: flex;
     flex-direction: row;
     position: relative;
   }
-  .product > .optionsCategory > header > div {
+  product > .optionsCategory > header > div {
     width: calc(100% - 42pt);
     margin-left: 16pt;
   }
-  .product > .optionsCategory > header > div > .mandatory {
+  product > .optionsCategory > header > div > .mandatory {
     position: absolute;
     right: -24pt;
     top: -24pt;
@@ -532,50 +514,50 @@
     text-shadow: 0pt 4pt 8pt #000000;
     box-shadow: 0 4pt 8pt #0000009e;
   }
-  .product > .optionsCategory > header > div > div {
+  product > .optionsCategory > header > div > div {
     display: flex;
     flex-direction: row;
     width: 100%;
     justify-content: space-between;
     font-size: 0.8em;
   }
-  .product > .optionsCategory > header > div > div > div {
+  product > .optionsCategory > header > div > div > div {
     display: flex;
     flex-direction: column;
   }
-  .product > .optionsCategory > header > div > div > div > .selected {
+  product > .optionsCategory > header > div > div > div > .selected {
     font-size: 1.1em;
     font-family: RobotoBold;
     text-align: center;
   }
-  .product > .optionsCategory > .option {
+  product > .optionsCategory > .option {
     background-color: #ffffff26;
     border-radius: 8pt;
     padding: 16pt;
     position: relative;
   }
-  .product > .optionsCategory > .option {
+  product > .optionsCategory > .option {
     display: flex;
     flex-direction: row;
   }
-  .product > .optionsCategory > .option > div {
+  product > .optionsCategory > .option > div {
     width: calc(100% - 42pt);
     margin-left: 16pt;
   }
-  .product > .optionsCategory > .option > div > div {
+  product > .optionsCategory > .option > div > div {
     display: flex;
     flex-direction: row;
   }
-  .product > .optionsCategory > .option > div > div > * {
+  product > .optionsCategory > .option > div > div > * {
     font-size: 0.9em;
   }
-  .product > .optionsCategory > .option > div > div {
+  product > .optionsCategory > .option > div > div {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
   }
-  .product > .optionsCategory > .option > div > div > .units {
+  product > .optionsCategory > .option > div > div > .units {
     align-items: center;
     font-size: 0.9em;
     text-align: center;
@@ -583,18 +565,18 @@
     flex-direction: row;
     margin-top: 4pt;
   }
-  .product > .optionsCategory > .option > div > div > .units > span {
+  product > .optionsCategory > .option > div > div > .units > span {
     padding: 0;
     border: 0;
     background: transparent;
   }
-  .product > .optionsCategory > .option > div > div > .price {
+  product > .optionsCategory > .option > div > div > .price {
     display: flex;
     flex-direction: column;
     align-items: center;
     font-size: 0.9em;
   }
-  .product > .optionsCategory > .option > div > div > div > .oldPrice {
+  product > .optionsCategory > .option > div > div > div > .oldPrice {
     font-size: 0.7em;
   }
 </style>

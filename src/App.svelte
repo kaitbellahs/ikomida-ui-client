@@ -66,7 +66,7 @@
   $: if (style)
     if (showCart) {
       style.innerHTML = `
-      body {
+      main {
         --backgroundColor: ${$Layout.background};
         --paddingTop: ${styleHeight};
         --paddingBottom: 112pt;
@@ -75,7 +75,7 @@
       document.head.appendChild(style)
     } else {
       style.innerHTML = `
-      body {
+      main {
         --backgroundColor: ${$Layout.background};
         --paddingTop: ${styleHeight};
         --paddingBottom: 56pt;

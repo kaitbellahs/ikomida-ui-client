@@ -103,9 +103,9 @@
     "@capacitor/share": "^4.1.0",
     "@fortawesome/free-solid-svg-icons": "^6.2.1",
     "@ikomida/capacitor-plugin-status-bar": "github:TIAltoNivel/capacitor-plugin-statusbar",
-    "@ikomida/shared-frontend": "^1.6.6",
+    "@ikomida/shared-frontend": "^1.6.8",
     "@ikomida/shared-logics": "^1.2.1",
-    "@ikomida/shared-types": "^1.5.16",
+    "@ikomida/shared-types": "^1.6.0",
     "credit-card-type": "^9.1.0",
     "html2canvas": "^1.4.1",
     "uuid": "^9.0.0"
