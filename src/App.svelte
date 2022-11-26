@@ -69,7 +69,7 @@
       main {
         --backgroundColor: ${$Layout.background};
         --paddingTop: ${styleHeight};
-        --paddingBottom: 112pt;
+        --paddingBottom: 128pt;
       }
     `
       document.head.appendChild(style)
@@ -78,7 +78,7 @@
       main {
         --backgroundColor: ${$Layout.background};
         --paddingTop: ${styleHeight};
-        --paddingBottom: 56pt;
+        --paddingBottom: 64pt;
       }
     `
     }

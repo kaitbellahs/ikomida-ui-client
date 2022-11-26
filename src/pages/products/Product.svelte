@@ -9,7 +9,7 @@
   import { onMount } from 'svelte'
 
   const router = Stores.Navigation.instance.router
-  const initalProduct = $router.optionsproduct
+  const initalProduct: Types.CCart|undefined = $router.options.product
   const genericError =
     'Ocorreu um erro interno, por favor entre em contato conosco pelo e-mail contact@tialtonivel.com.br. Eesvazia o seu carrinho de compras e repita a compra novamente! ou reinicie o app se o erro persiste.'
 
@@ -149,7 +149,7 @@
   }
 
   const addProduct = async () => {
-    if (!('addProduct' in working) || !working.addProduct) {
+    if ((!('addProduct' in working) || !working.addProduct) && initalProduct) {
       working.addProduct = true
       const productOptionsCategoriesMandatories =
         cartProduct.optionsCategories?.filter(optionsCategory => optionsCategory.min > 0) ?? []
@@ -234,7 +234,7 @@
   onMount(async () => {
     Stores.Loading.instance.reset()
     Stores.Loading.instance.start()
-    if (!initalProduct.id) {
+    if (!initalProduct || !initalProduct.id) {
       Stores.Loading.instance.stop()
       return
     }

@@ -74,10 +74,20 @@
 </script>
 
 <jumbotron class="mainPicture">
-  <Views.Image
-    source={$Settings.profile?.mainPicture ? $Settings.profile?.mainPicture : '/assets/icons/transparent-logo-1.svg'}
-    name={$Settings.profile?.contractName}
-  />
+  {#if $Settings?.profile?.mainPicture}
+    <Views.Image
+      source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+      name={$Settings?.profile?.contractName ?? 'iKomida'}
+    />
+  {:else if $Settings?.profile?.contractName}
+    <div class="avatarCircle">
+      {$Settings?.profile?.contractName?.[0]}{$Settings?.profile?.contractName?.[1]}
+    </div>
+    <h2>{$Settings?.profile?.contractName}</h2>
+  {:else}
+    <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
+    <h2>{$Settings?.profile?.contractName}</h2>
+  {/if}
 </jumbotron>
 <content>
   <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>

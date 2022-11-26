@@ -114,34 +114,4 @@
 </content>
 
 <style>
-  jumbotron.mainPicture {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-  }
-  jumbotron.mainPicture > :global(img) {
-    font-size: 3em;
-    width: 100%;
-    max-width: 500pt;
-    /* border-radius: 40px; */
-    /* height: 210px; */
-    line-height: 88pt;
-    overflow: hidden;
-    object-fit: contain;
-  }
-  jumbotron.mainPicture > .avatarCircle {
-    font-size: 3em;
-    height: 88pt;
-    width: 88pt;
-    background: #ccc;
-    border-radius: 44pt;
-    float: left;
-    line-height: 88pt;
-    text-align: center;
-    vertical-align: middle;
-    display: table-cell;
-    overflow: hidden;
-  }
 </style>
