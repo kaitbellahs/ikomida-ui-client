@@ -73,13 +73,13 @@
   $: Stores.Title.instance.set($Settings?.profile?.contractName ?? 'iKomida')
 </script>
 
-<header class="mainPicture">
+<jumbotron class="mainPicture">
   <Views.Image
     source={$Settings.profile?.mainPicture ? $Settings.profile?.mainPicture : '/assets/icons/transparent-logo-1.svg'}
     name={$Settings.profile?.contractName}
   />
-</header>
-<content style="padding-bottom: {showCart ? '120pt' : '56pt'};background: {$Layout.background};">
+</jumbotron>
+<content>
   <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
   <div class="preparationTime">
     entre {Utils.Strings.timeToString(($Settings?.preparation?.min ?? 0) * 60)} até {Utils.Strings.timeToString(
@@ -113,26 +113,6 @@
 </content>
 
 <style>
-  header {
-    max-height: 260pt;
-    max-width: 480pt;
-    object-fit: contain;
-    width: 100%;
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 48pt;
-  }
-  content {
-    position: absolute;
-    padding: 16pt;
-    left: 0;
-    right: 0;
-    top: 200pt;
-    border-radius: 16pt 16pt 0 0;
-    background: #fff;
-    box-shadow: 0 -4pt 8pt #0000009e;
-  }
   .mainPicture > :global(img) {
     /* border-radius: 8pt;
     max-height: 260pt;

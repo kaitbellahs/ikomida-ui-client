@@ -72,7 +72,7 @@
   })
 </script>
 
-<header class="mainPicture">
+<jumbotron class="mainPicture">
   {#if $Settings?.profile?.mainPicture}
     <Views.Image
       source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
@@ -87,8 +87,8 @@
     <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
     <h2>{$Settings?.profile?.contractName}</h2>
   {/if}
-</header>
-<section
+</jumbotron>
+<content
   style="padding-bottom: {showCart || route === Routes.checkout || route === Routes.cart || route === Routes.product
     ? '128pt'
     : '64pt'};background: {$Layout.background};"
@@ -111,26 +111,17 @@
   <Views.Button type={Types.TButton.PRIMARY} on:click={doSubscribe}>Criar conta</Views.Button>
   <Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
   <Views.GTerms />
-</section>
+</content>
 
 <style>
-  header {
-    max-height: 260pt;
-    max-width: 480pt;
-    object-fit: contain;
-    width: 100%;
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 48pt;
-  }
-  header.mainPicture {
+  jumbotron.mainPicture {
     display: flex;
     align-items: center;
     flex-direction: column;
     width: 100%;
+    height: 100%;
   }
-  header.mainPicture > :global(img) {
+  jumbotron.mainPicture > :global(img) {
     font-size: 3em;
     width: 100%;
     max-width: 500pt;
@@ -140,7 +131,7 @@
     overflow: hidden;
     object-fit: contain;
   }
-  header.mainPicture > .avatarCircle {
+  jumbotron.mainPicture > .avatarCircle {
     font-size: 3em;
     height: 88pt;
     width: 88pt;
@@ -152,24 +143,5 @@
     vertical-align: middle;
     display: table-cell;
     overflow: hidden;
-    margin-right: 8pt;
-  }
-  section {
-    position: absolute;
-    padding: 16pt;
-    padding-bottom: 64pt;
-    left: 0;
-    right: 0;
-    top: 200pt;
-    border-radius: 16pt 16pt 0 0;
-    background: #fff;
-    box-shadow: 0 -4pt 8pt #0000009e;
-    text-align: center;
-    min-width: 100%;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    place-content: center;
   }
 </style>
