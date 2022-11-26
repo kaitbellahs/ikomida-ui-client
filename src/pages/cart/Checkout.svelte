@@ -243,6 +243,11 @@
     }
   }
 
+  function validateChange() {
+    return (value: number) => {
+      return value >= total
+    }
+  }
   onMount(async () => {
     try {
       orderType = await OrderType.get()
@@ -424,6 +429,8 @@
             bind:value={change}
             initialValue={change}
             type={Types.TTextEdit.CURRENCY}
+            validation={validateChange()}
+            error="O valor total das do pagamento deve ser maior ou igual ao valor do pedido."
           />
           <!-- //TODO: -- 'undefined' bug fix -->
           {#if isNaN(Number(change)) || Number(change) <= 0}

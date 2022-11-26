@@ -164,7 +164,6 @@
     border-radius: 16pt 16pt 0 0;
     background: #fff;
     box-shadow: 0 -4pt 8pt #0000009e;
-    height: fit-content;
     text-align: center;
     min-width: 100%;
     margin: 0 auto;
