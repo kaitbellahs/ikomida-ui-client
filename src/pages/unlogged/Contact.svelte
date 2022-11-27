@@ -12,9 +12,23 @@
   Stores.Title.instance.set('Contato')
 </script>
 
-<div class="settings">
-  <Views.Image source={$Settings.profile?.mainPicture} name={settings?.contractName} />
-  <Views.Divider />
+<jumbotron class="mainPicture">
+  {#if $Settings?.profile?.mainPicture}
+    <Views.Image
+      source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+      name={$Settings?.profile?.contractName ?? 'iKomida'}
+    />
+  {:else if $Settings?.profile?.contractName}
+    <div class="avatarCircle">
+      {$Settings?.profile?.contractName?.[0]}{$Settings?.profile?.contractName?.[1]}
+    </div>
+    <h2>{$Settings?.profile?.contractName}</h2>
+  {:else}
+    <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
+    <h2>{$Settings?.profile?.contractName}</h2>
+  {/if}
+</jumbotron>
+<content>
   <h2>{settings?.contractName}</h2>
   <Views.Divider />
   <Views.TextValue
@@ -39,29 +53,4 @@
     ? ` - ${settings?.address?.complement}`
     : ''}<br />{settings?.address?.neighborhood}<br />
   {settings?.address?.city}/{settings?.address?.stat} CEP: {settings?.address?.postalCode}
-</div>
-
-<style>
-  .settings {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    place-content: center;
-    align-items: center;
-  }
-  .settings > :global(*) {
-    display: flex;
-    width: 100%;
-    place-content: center;
-  }
-  .settings > :global(img) {
-    font-size: 3em;
-    width: 100%;
-    max-width: 100%;
-    border-radius: 8pt;
-    line-height: 88pt;
-    vertical-align: middle;
-    display: table-cell;
-    overflow: hidden;
-  }
-</style>
+</content>
