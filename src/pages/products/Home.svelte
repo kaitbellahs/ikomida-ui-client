@@ -65,7 +65,9 @@
     } else {
       Stores.MessageAlert.instance.show(response?.data)
     }
-    if (!orderType || !$Settings.orderTypes?.includes(orderType)) {
+    if ($Settings.orderTypes?.length === 1) {
+      orderType = $Settings.orderTypes[0]
+    } else if (!orderType || !$Settings.orderTypes?.includes(orderType)) {
       orderType = undefined
     }
     Stores.Loading.instance.stop()
@@ -96,12 +98,12 @@
       ($Settings?.preparation?.max ?? 0) * 60
     )}
   </div>
-  <Views.Divider height={10} />
-  <div class="filters">
-    {#if orderType !== null}
+  {#if orderType !== null && ($Settings.orderTypes?.length ?? 0) > 1}
+    <Views.Divider height={10} />
+    <div class="filters">
       <Views.Selector bind:selected={orderType} options={$Settings.orderTypes ?? []} name="Tipo do seu pedido" />
-    {/if}
-  </div>
+    </div>
+  {/if}
   <Views.Divider height={30} />
 
   {#if orderType}
@@ -109,9 +111,16 @@
       <Views.ItemsList bind:categoriesAndProducts productPage={Routes.product} />
     {:else}
       <Views.CentredMessage
-        text="Por enquanto estamos ainda organizando o nosso cardápio para este tipo de pedidos, volte a verificar de novo mais tarde!"
+        text="Por enquanto estamos ainda organizando o nosso cardápio para este tipo de pedidos, volte mais tarde e confira!"
       />
     {/if}
+  {:else if ($Settings.orderTypes?.length ?? 0) === 0}
+    <Views.Divider />
+    <h2>{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
+    <Views.Divider />
+    <Views.CentredMessage
+      text="Por enquanto estamos cadastrando os produtos e preparando nosso estabelecimento dital, volte mais tarde e confira!"
+    />
   {:else}
     <Views.Divider />
     <h2>{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
