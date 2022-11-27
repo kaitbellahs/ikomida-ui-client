@@ -91,10 +91,10 @@
         </div>
       {:else if items[index].orderType === Types.Types.TOrderType.PICKUP}
         <Views.Divider height={5} />
-        <h3>Seu cliente vai retirar o pedido no seu estabelecimento.</h3>
+        <h3>Você vai realizar a retirada do pedido.</h3>
       {:else if items[index].orderType === Types.Types.TOrderType.LOCAL}
         <Views.Divider height={5} />
-        <h3>Leva o pedido até a mesa: <b>{items[index].table}</b></h3>
+        <h3>O pedido vai até sua mesa: <b>{items[index].table}</b></h3>
       {:else}
         <Views.Status type={Types.Status.ERROR}
           >Não foi possível definir o tipo do pedido, entre em contato com o suporte.</Views.Status

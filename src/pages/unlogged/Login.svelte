@@ -12,10 +12,11 @@
   import type { IStore } from '../../stores/Cart'
   import type { Readable } from 'svelte/store'
   import type { INavigation } from '@ikomida/shared-frontend/lib/Stores/Navigation'
+  import { Capacitor } from '@capacitor/core'
 
   const router: Readable<INavigation | undefined> = Stores.Navigation.instance.router
 
-  let pushNotificationToken = Stores.PushNotificationToken.instance?.store
+  let pushNotificationToken: Stores.PushNotificationToken = Stores.PushNotificationToken.instance
   let Layout = Stores.Layout.instance?.store
   let phone: string
   let password: string
@@ -54,8 +55,11 @@
       const token = await Utils.Jws.extractToken(response?.data)
       if (token !== null) {
         await Stores.Auth.Auth.instance.setToken(response?.data)
-        if ($pushNotificationToken) {
-          await registerPushNotificationToken($pushNotificationToken)
+        await Stores.Auth.Auth.instance.setToken(response?.data)
+        const pNTData = pushNotificationToken.data
+        if (pNTData) {
+          const pNTObject = Types.Classes.CRegisterPushNotification.init(Capacitor.getPlatform(), pNTData)
+          await registerPushNotificationToken(pNTObject)
         }
       } else {
         Stores.MessageAlert.instance.show('O token de acesso não é válido')
@@ -88,8 +92,7 @@
     <h2>{$Settings?.profile?.contractName}</h2>
   {/if}
 </jumbotron>
-<content
->
+<content>
   <Views.Divider />
   <h3>
     Se você ainda não tem uma conta, <span on:click={doSubscribe} style="color: #4c0708;">clique aqui</span> é rápido e fácil.

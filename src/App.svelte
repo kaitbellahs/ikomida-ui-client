@@ -60,26 +60,26 @@
 
   let Layout = Stores.Layout.instance?.store
   let style: HTMLElement
-  
-    $: if (style)
-      if (showCart) {
-        style.innerHTML = `
+
+  $: if (style)
+    if (showCart) {
+      style.innerHTML = `
         main {
-          --backgroundColor: ${$Layout.background};
+          --backgroundColor: ${$Layout.background ?? 'rgb(223, 223, 223)'};
           --paddingTop: ${styleHeight};
           --paddingBottom: 128pt;
         }
       `
-        document.head.appendChild(style)
-      } else {
-        style.innerHTML = `
+      document.head.appendChild(style)
+    } else {
+      style.innerHTML = `
         main {
-          --backgroundColor: ${$Layout.background};
+          --backgroundColor: ${$Layout.background ?? 'rgb(223, 223, 223)'};
           --paddingTop: ${styleHeight};
           --paddingBottom: 64pt;
         }
       `
-      }
+    }
 
   $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 48}pt`
   $: route = $router.route

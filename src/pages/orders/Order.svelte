@@ -221,10 +221,10 @@
     </div>
   {:else if order.orderType === Types.Types.TOrderType.PICKUP}
     <Views.Divider />
-    <h3>Seu cliente vai retirar o pedido no seu estabelecimento.</h3>
+    <h3>Você vai realizar a retirada do pedido.</h3>
   {:else if order.orderType === Types.Types.TOrderType.LOCAL}
     <Views.Divider />
-    <h3>Leva o pedido até a mesa: <b>{order.table}</b></h3>
+    <h3>O pedido vai até sua mesa: <b>{order.table}</b></h3>
   {:else}
     <Views.Status type={Types.Status.ERROR}
       >Não foi possível definir o tipo do pedido, entre em contato com o suporte.</Views.Status
@@ -253,7 +253,7 @@
     {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN].includes(order.status)}
       <Views.Button sizeMultiplier={0.8} type={Types.TButton.SECONDARY} on:click={cancel}>Cancelar</Views.Button>
     {/if}
-    {#if order.status && [Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status)}
+    {#if order.status && [Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY, Types.Types.TOrderStatus.WAITING_LOCAL, Types.Types.TOrderStatus.WAITING_PICKUP, Types.Types.TOrderStatus.IN_TABLE_DELIVERY].includes(order.status)}
       <Views.Button on:click={delivered}>Confirmar<br />a entrega</Views.Button>
     {/if}
   </div>
