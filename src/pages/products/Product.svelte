@@ -9,7 +9,7 @@
   import { onMount } from 'svelte'
 
   const router = Stores.Navigation.instance.router
-  const initalProduct: Types.CCart|undefined = $router.options.product
+  const initalProduct: Types.CCart | undefined = $router.options.product
   const genericError =
     'Ocorreu um erro interno, por favor entre em contato conosco pelo e-mail contact@tialtonivel.com.br. Eesvazia o seu carrinho de compras e repita a compra novamente! ou reinicie o app se o erro persiste.'
 
@@ -427,7 +427,7 @@
     position: absolute;
     top: -4pt;
     right: -4pt;
-    border-radius: 22wpt;
+    border-radius: 22pt;
     min-width: 60pt;
     border: 1pt solid #4c0708;
     background: #4c0708;

@@ -17,17 +17,17 @@ export async function all(): Promise<Types.Classes.CCategoryProducts[]> {
         .map(item => item.toJSON())
       cache.setObject('Products', data)
       timeout = new Date().getTime()
-      return Types.Classes.CCategoryProducts.fromObject(data)
+      return sortItems(Types.Classes.CCategoryProducts.fromObject(data))
     } else {
       return []
     }
   } else {
-    return Types.Classes.CCategoryProducts.fromObject(cache.getObject('Products'))
+    return sortItems(Types.Classes.CCategoryProducts.fromObject(cache.getObject('Products')))
   }
 }
 
 export async function search(query: string): Promise<Types.Classes.CCategoryProducts[]> {
-  return (await all())
+  return sortItems((await all())
     .map(section => {
       return {
         title: section.title,
@@ -43,18 +43,19 @@ export async function search(query: string): Promise<Types.Classes.CCategoryProd
         })
       } as Types.Classes.CCategoryProducts
     })
-    .filter(item => (item.products?.length ?? 0) > 0)
+    .filter(item => (item.products?.length ?? 0) > 0))
 }
 
 export async function getProduct(id?: string) {
   return Network.instance?.get(`/product/${id}`, true)
 }
 
+
 function sortItems(items: Types.Classes.CCategoryProducts[]) {
   return items
     .map(category => {
-      category.products = category.products?.sort((i1, i2) => (i1?.order ?? 0) - (i2?.order ?? 0))
+      category.products = category?.products?.sort((i1, i2) => (i1?.order ?? 0) - (i2?.order ?? 0))
       return category
     })
-    .sort((i1, i2) => (i1?.order ?? 0) - (i2?.order ?? 0))
+    .sort((i1, i2) => (i1.order ?? 0) - (i2.order ?? 0))
 }
