@@ -62,7 +62,7 @@
   bind:value={subscribeObject.lastName}
   initialValue={subscribeObject.lastName}
   type={Types.TTextEdit.NAME}
-  placeHolder="Sobre nome"
+  placeHolder="Sobrenome"
 />
 <Views.TextEdit
   bind:value={subscribeObject.identity}

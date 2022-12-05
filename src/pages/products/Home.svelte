@@ -123,7 +123,7 @@
     <h2>{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
     <Views.Divider />
     <Views.CentredMessage
-      text="Por enquanto estamos cadastrando os produtos e preparando nosso estabelecimento dital, volte mais tarde e confira!"
+      text="Por enquanto estamos cadastrando os produtos e preparando nosso estabelecimento digital, volte mais tarde e confira!"
     />
   {:else}
     <Views.Divider />
