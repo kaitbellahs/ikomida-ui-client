@@ -35,34 +35,36 @@
     Estamos atendendo 24h/7
   {:else} -->
   <div
-    class="date"
+    class="shadow date"
     style="--buttonBackground: {$Layout?.button?.background ?? '#4c0708'};--buttonColor: {$Layout?.button?.color ??
       '#ffffff'};"
   >
     <h2 class="title">Dias de funcionamento</h2>
     <div class="data">
       {#if $Settings?.business?.days?.length === 7}
-        <span>Todos os dias da semana</span>
+        <span class="shadow">Todos os dias da semana</span>
       {:else}
-        {#each $Settings?.business?.days as day}
-          <span>{days?.[day]?.name || '-'}</span>
+        {#each $Settings?.business?.days.sort((i1, i2) => i1 - i2) as day}
+          <span class="shadow">{days?.[day]?.name || '-'}</span>
         {/each}
       {/if}
     </div>
   </div>
   <Views.Divider />
   <div
-    class="date"
+    class="shadow date"
     style="--buttonBackground: {$Layout?.button?.background ?? '#4c0708'};--buttonColor: {$Layout?.button?.color ??
       '#ffffff'};"
   >
     <h2 class="title">Horários de funcionamento</h2>
     <div class="data">
       {#if twintyFourHours}
-        <span>24h por dia</span>
+        <span class="shadow">24h por dia</span>
       {:else}
         {#each $Settings?.business?.hours as businessHour}
-          <span>das {numerToTime(businessHour?.start ?? '')} até {numerToTime(businessHour?.end ?? '')} </span>
+          <span class="shadow"
+            >das {numerToTime(businessHour?.start ?? '')} até {numerToTime(businessHour?.end ?? '')}
+          </span>
         {/each}
       {/if}
     </div>
@@ -102,8 +104,8 @@
   .date > div.data > span {
     display: flex;
     flex-direction: row;
-    padding: 12pt 24pt;
-    margin: 16pt 8pt;
+    margin: 4pt;
+    padding: 8pt;
     border: 1pt solid #fff;
     color: var(--buttonColor);
     background: var(--buttonBackground);
