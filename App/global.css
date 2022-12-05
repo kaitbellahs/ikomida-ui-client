@@ -168,9 +168,10 @@ main {
     box-sizing: border-box;
 }
 
-jumbotron, productImage {
+jumbotron,
+productImage {
     max-height: 160pt;
-    max-width: 480pt;
+    /* max-width: 480pt; */
     object-fit: contain;
     width: 100%;
     position: fixed;
@@ -182,8 +183,10 @@ jumbotron, productImage {
     justify-items: center;
     align-items: center;
     height: 100%;
-  }
-  content, product {
+}
+
+content,
+product {
     position: absolute;
     padding: 16pt;
     left: 0;
@@ -194,32 +197,35 @@ jumbotron, productImage {
     box-shadow: 0 -4pt 8pt #0000009e;
     padding-bottom: calc(var(--paddingBottom) + 8pt);
     min-height: calc(100% - calc(160pt + var(--paddingTop) - 16pt));
-  }
+}
 
-  productImage {
+productImage {
     max-height: 100vw;
-    max-width: 480pt;
-  }
-  product {
+}
+
+product {
     top: calc(100vw + var(--paddingTop) - 16pt);
     padding-bottom: 128pt;
-  }
-  jumbotron.mainPicture {
+}
+
+jumbotron.mainPicture {
     display: flex;
     align-items: center;
     flex-direction: column;
     width: 100%;
     height: 100%;
-  }
-  jumbotron.mainPicture > :global(img) {
+}
+
+jumbotron.mainPicture> :global(img) {
     font-size: 3em;
     width: 100%;
     max-width: 500pt;
     line-height: 88pt;
     overflow: hidden;
     object-fit: cover;
-  }
-  jumbotron.mainPicture > .avatarCircle {
+}
+
+jumbotron.mainPicture>.avatarCircle {
     font-size: 3em;
     height: 88pt;
     width: 88pt;
@@ -231,4 +237,4 @@ jumbotron, productImage {
     vertical-align: middle;
     display: table-cell;
     overflow: hidden;
-  }
+}

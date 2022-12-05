@@ -318,7 +318,7 @@
       icon: faMoneyBill1Wave
     },
     {
-      name: 'Mensagens',
+      name: 'Notificações',
       callback: () => Stores.Navigation.instance.goTo(Routes.pushNotifications),
       icon: faRocket
     },

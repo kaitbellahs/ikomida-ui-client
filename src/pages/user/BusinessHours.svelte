@@ -28,53 +28,70 @@
   Stores.Title.instance.set('Horario de funcionamento')
 </script>
 
-{#if !$Settings?.business}
-  <Views.LocalLoading size={2} />
-{:else if $Settings?.business?.days && $Settings?.business?.hours}
-  <!-- {#if $Settings?.business?.days?.length === 7 && twintyFourHours}
+<jumbotron class="mainPicture">
+  {#if $Settings?.profile?.mainPicture}
+    <Views.Image
+      source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+      name={$Settings?.profile?.contractName ?? 'iKomida'}
+    />
+  {:else if $Settings?.profile?.contractName}
+    <div class="avatarCircle">
+      {$Settings?.profile?.contractName?.[0]}{$Settings?.profile?.contractName?.[1]}
+    </div>
+    <h2>{$Settings?.profile?.contractName}</h2>
+  {:else}
+    <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
+    <h2>{$Settings?.profile?.contractName}</h2>
+  {/if}
+</jumbotron>
+<content>
+  {#if !$Settings?.business}
+    <Views.LocalLoading size={2} />
+  {:else if $Settings?.business?.days && $Settings?.business?.hours}
+    <!-- {#if $Settings?.business?.days?.length === 7 && twintyFourHours}
     Estamos atendendo 24h/7
   {:else} -->
-  <div
-    class="shadow date"
-    style="--buttonBackground: {$Layout?.button?.background ?? '#4c0708'};--buttonColor: {$Layout?.button?.color ??
-      '#ffffff'};"
-  >
-    <h2 class="title">Dias de funcionamento</h2>
-    <div class="data">
-      {#if $Settings?.business?.days?.length === 7}
-        <span class="shadow">Todos os dias da semana</span>
-      {:else}
-        {#each $Settings?.business?.days.sort((i1, i2) => i1 - i2) as day}
-          <span class="shadow">{days?.[day]?.name || '-'}</span>
-        {/each}
-      {/if}
+    <div
+      class="shadow date"
+      style="--buttonBackground: {$Layout?.button?.background ?? '#4c0708'};--buttonColor: {$Layout?.button?.color ??
+        '#ffffff'};"
+    >
+      <h2 class="title">Dias de funcionamento</h2>
+      <div class="data">
+        {#if $Settings?.business?.days?.length === 7}
+          <span class="shadow">Todos os dias da semana</span>
+        {:else}
+          {#each $Settings?.business?.days.sort((i1, i2) => i1 - i2) as day}
+            <span class="shadow">{days?.[day]?.name || '-'}</span>
+          {/each}
+        {/if}
+      </div>
     </div>
-  </div>
-  <Views.Divider />
-  <div
-    class="shadow date"
-    style="--buttonBackground: {$Layout?.button?.background ?? '#4c0708'};--buttonColor: {$Layout?.button?.color ??
-      '#ffffff'};"
-  >
-    <h2 class="title">Horários de funcionamento</h2>
-    <div class="data">
-      {#if twintyFourHours}
-        <span class="shadow">24h por dia</span>
-      {:else}
-        {#each $Settings?.business?.hours as businessHour}
-          <span class="shadow"
-            >das {numerToTime(businessHour?.start ?? '')} até {numerToTime(businessHour?.end ?? '')}
-          </span>
-        {/each}
-      {/if}
+    <Views.Divider />
+    <div
+      class="shadow date"
+      style="--buttonBackground: {$Layout?.button?.background ?? '#4c0708'};--buttonColor: {$Layout?.button?.color ??
+        '#ffffff'};"
+    >
+      <h2 class="title">Horários de funcionamento</h2>
+      <div class="data">
+        {#if twintyFourHours}
+          <span class="shadow">24h por dia</span>
+        {:else}
+          {#each $Settings?.business?.hours as businessHour}
+            <span class="shadow"
+              >das {numerToTime(businessHour?.start ?? '')} até {numerToTime(businessHour?.end ?? '')}
+            </span>
+          {/each}
+        {/if}
+      </div>
     </div>
-  </div>
-  <!-- {/if} -->
-{:else}
-  <Views.CentredMessage
-    text="Estamos preparando tudo para tornarmos nosso atendimento online realidade, mas ainda não definimos os dias de funcionamento do estabelecimento, atualizamos aqui em breve, volte mais tarde para verificar ou entre em contato conosco!"
-  />
-{/if}
+  {:else}
+    <Views.CentredMessage
+      text="Estamos preparando tudo para tornarmos nosso atendimento online realidade, mas ainda não definimos os dias de funcionamento do estabelecimento, atualizamos aqui em breve, volte mais tarde para verificar ou entre em contato conosco!"
+    />
+  {/if}
+</content>
 
 <style>
   .date {
