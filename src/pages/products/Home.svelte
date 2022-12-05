@@ -93,11 +93,15 @@
 </jumbotron>
 <content>
   <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
-  <div class="preparationTime">
-    entre {Utils.Strings.timeToString(($Settings?.preparation?.min ?? 0) * 60)} até {Utils.Strings.timeToString(
-      ($Settings?.preparation?.max ?? 0) * 60
-    )}
-  </div>
+  {#if ($Settings?.preparation?.min ?? 0) > 0}
+    <div class="preparationTime">
+      {($Settings?.preparation?.max ?? 0) > ($Settings?.preparation?.min ?? 0) ? `entre` : ''}
+      {Utils.Strings.timeToString(($Settings?.preparation?.min ?? 0) * 60)}
+      {($Settings?.preparation?.max ?? 0) > ($Settings?.preparation?.min ?? 0)
+        ? `até ${Utils.Strings.timeToString(($Settings?.preparation?.max ?? 0) * 60)}`
+        : ''}
+    </div>
+  {/if}
   {#if orderType !== null && ($Settings.orderTypes?.length ?? 0) > 1}
     <Views.Divider height={10} />
     <div class="filters">
