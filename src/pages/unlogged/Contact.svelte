@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { Views, Utils, Stores } from '@ikomida/shared-frontend'
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import { Settings } from '../../stores/Setup'
   import { onMount } from 'svelte'
-  import { Capacitor } from '@capacitor/core'
   import { AppLauncher } from '@capacitor/app-launcher'
   import { Clipboard } from '@capacitor/clipboard'
 

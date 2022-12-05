@@ -27,29 +27,30 @@ export async function all(): Promise<Types.Classes.CCategoryProducts[]> {
 }
 
 export async function search(query: string): Promise<Types.Classes.CCategoryProducts[]> {
-  return sortItems((await all())
-    .map(section => {
-      return {
-        title: section.title,
-        products: section.products?.filter(item => {
-          if (typeof item == 'object') {
-            return (
-              item.title?.toLowerCase().includes(query.toLowerCase()) ||
-              item.description?.toLowerCase().includes(query.toLowerCase())
-            )
-          } else {
-            return true
-          }
-        })
-      } as Types.Classes.CCategoryProducts
-    })
-    .filter(item => (item.products?.length ?? 0) > 0))
+  return sortItems(
+    (await all())
+      .map(section => {
+        return {
+          title: section.title,
+          products: section.products?.filter(item => {
+            if (typeof item == 'object') {
+              return (
+                item.title?.toLowerCase().includes(query.toLowerCase()) ||
+                item.description?.toLowerCase().includes(query.toLowerCase())
+              )
+            } else {
+              return true
+            }
+          })
+        } as Types.Classes.CCategoryProducts
+      })
+      .filter(item => (item.products?.length ?? 0) > 0)
+  )
 }
 
 export async function getProduct(id?: string) {
   return Network.instance?.get(`/product/${id}`, true)
 }
-
 
 function sortItems(items: Types.Classes.CCategoryProducts[]) {
   return items
