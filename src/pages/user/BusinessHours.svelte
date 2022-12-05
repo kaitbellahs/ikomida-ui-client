@@ -105,7 +105,7 @@
     display: flex;
     flex-direction: row;
     margin: 4pt;
-    padding: 8pt;
+    padding: 4pt 8pt;
     border: 1pt solid #fff;
     color: var(--buttonColor);
     background: var(--buttonBackground);

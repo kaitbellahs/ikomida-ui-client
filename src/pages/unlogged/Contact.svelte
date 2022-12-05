@@ -78,15 +78,6 @@
 <content>
   <h2>{settings?.contractName}</h2>
   <Views.Divider />
-  <div class="data shadow">
-    <Views.TextValue
-      text="CNPJ:"
-      value={Utils?.Strings?.formatString(/\d/gi, '__.___.___/____-__', '_', settings?.contractIdentity)}
-      fontSize="1.3em"
-      leftMargin={30}
-    />
-  </div>
-  <Views.Divider />
   <div class="data shadow" on:click={openWhatsapp}>
     <Views.TextValue
       text="Celular:"
@@ -107,8 +98,17 @@
       ? ` - ${settings?.address?.complement}`
       : ''}<br />{settings?.address?.neighborhood}<br />
     {settings?.address?.city}/{settings?.address?.stat} CEP: {settings?.address?.postalCode}
-  </div></content
->
+  </div>
+  <Views.Divider />
+  <div class="data shadow">
+    <Views.TextValue
+      text="CNPJ:"
+      value={Utils?.Strings?.formatString(/\d/gi, '__.___.___/____-__', '_', settings?.contractIdentity)}
+      fontSize="1.3em"
+      leftMargin={30}
+    />
+  </div>
+</content>
 
 <style>
   h2 {
