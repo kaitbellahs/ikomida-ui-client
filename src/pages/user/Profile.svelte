@@ -20,7 +20,7 @@
   }
 
   function toggleDeleteAccountAlert(){
-    showDeleteAccountAlert != showDeleteAccountAlert
+    showDeleteAccountAlert = !showDeleteAccountAlert
   }
 
   async function updateAvatar() {
