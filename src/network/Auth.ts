@@ -38,7 +38,7 @@ export async function logout() {
 }
 
 export async function deleteProfile() {
-  return (Network.instance as Network|undefined)?.remove('/deleteAccount', undefined, undefined, 'deleteAccount')
+  return (Network.instance as Network | undefined)?.remove('/deleteAccount', true, undefined, 'deleteAccount')
 }
 
 export async function requestPhoneValidation(object: Types.Classes.CUser) {
