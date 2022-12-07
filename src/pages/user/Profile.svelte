@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import { onMount } from 'svelte'
-  import { updatePassword, logout } from '../../network/Auth'
+  import { updatePassword, logout, deleteProfile } from '../../network/Auth'
   import { UpdateAvatar, profile } from '../../network/User'
   const Layout = Stores.Layout.instance.store
 
@@ -13,9 +13,14 @@
     newPass: false,
     reNewPass: false
   }
+  let showDeleteAccountAlert = false
 
   $: if (userInfo?.avatar && userInfo?.avatar !== avatar) {
     updateAvatar()
+  }
+
+  function toggleDeleteAccountAlert(){
+    showDeleteAccountAlert != showDeleteAccountAlert
   }
 
   async function updateAvatar() {
@@ -34,6 +39,12 @@
   async function out() {
     Stores.Loading.instance.start()
     await logout()
+    Stores.Loading.instance.stop()
+  }
+
+  async function deleteAccount() {
+    Stores.Loading.instance.start()
+    await deleteProfile()
     Stores.Loading.instance.stop()
   }
 
@@ -121,9 +132,28 @@
   </div>
   <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
   <Views.Button type={Types.TButton.TRANSPARENT} on:click={out}>Logout</Views.Button>
+  <Views.Button type={Types.TButton.TRANSPARENT} on:click={toggleDeleteAccountAlert}>Excluir minha conta</Views.Button>
   <Views.GTerms />
 {/if}
 
+{#if showDeleteAccountAlert}
+  <Views.Alert
+    title="Alerta"
+    message={`Você realmente quer deletar a sua conta? Esta operação é permanente e será efetivada após 45 dias da após a solicitação, o tempo necessário para verificarmos a existência de pendências!`}
+    closeCallBack={toggleDeleteAccountAlert}
+    buttons={[
+      {
+        name: 'Sim',
+        callback: deleteAccount
+      },
+      {
+        name: 'Não quero',
+        callback: toggleDeleteAccountAlert,
+        principal: true
+      }
+    ]}
+  />
+{/if}
 <style>
   h2 {
     text-align: center;

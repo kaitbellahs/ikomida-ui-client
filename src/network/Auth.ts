@@ -36,6 +36,11 @@ export async function requestPassword(object: Types.Classes.CUser) {
 export async function logout() {
   return Network.instance?.logout()
 }
+
+export async function deleteProfile() {
+  return (Network.instance as Network|undefined)?.remove('/deleteAccount', undefined, undefined, 'deleteAccount')
+}
+
 export async function requestPhoneValidation(object: Types.Classes.CUser) {
   return Network.instance?.post('/requestPhoneValidation', undefined, object, 'requestPhoneValidation')
 }
