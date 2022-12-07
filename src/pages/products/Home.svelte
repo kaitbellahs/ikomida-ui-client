@@ -92,41 +92,41 @@
   {/if}
 </jumbotron>
 <content>
-  <h3 class="preparationTitle">Tempo de preparação dos pedidos</h3>
-  {#if ($Settings?.preparation?.min ?? 0) > 0}
-    <div class="preparationTime">
-      {($Settings?.preparation?.max ?? 0) > ($Settings?.preparation?.min ?? 0) ? `entre` : ''}
-      {Utils.Strings.timeToString(($Settings?.preparation?.min ?? 0) * 60)}
-      {($Settings?.preparation?.max ?? 0) > ($Settings?.preparation?.min ?? 0)
-        ? `até ${Utils.Strings.timeToString(($Settings?.preparation?.max ?? 0) * 60)}`
-        : ''}
-    </div>
-  {/if}
-  {#if orderType !== null && ($Settings.orderTypes?.length ?? 0) > 1}
-    <Views.Divider height={10} />
-    <div class="filters">
-      <Views.Selector bind:selected={orderType} options={$Settings.orderTypes ?? []} name="Tipo do seu pedido" />
-    </div>
-  {/if}
-  <Views.Divider height={30} />
+  <div class="shadow filters">
+    <h3 class="preparationTitle">Tempo de preparação do pedido</h3>
+    {#if ($Settings?.preparation?.min ?? 0) > 0}
+      <div class="preparationTime">
+        {($Settings?.preparation?.max ?? 0) > ($Settings?.preparation?.min ?? 0) ? `entre` : ''}
+        {Utils.Strings.timeToString(($Settings?.preparation?.min ?? 0) * 60)}
+        {($Settings?.preparation?.max ?? 0) > ($Settings?.preparation?.min ?? 0)
+          ? `até ${Utils.Strings.timeToString(($Settings?.preparation?.max ?? 0) * 60)}`
+          : ''}
+      </div>
+    {/if}
+    {#if orderType !== null && ($Settings.orderTypes?.length ?? 0) > 1}
+      <div class="divider" />
+      <div class="filter">
+        <Views.Selector bind:selected={orderType} options={$Settings.orderTypes ?? []} name="Tipo do seu pedido" />
+      </div>
+    {/if}
+  </div>
+  <Views.Divider height={24} />
 
   {#if orderType}
     {#if (categoriesAndProducts?.length ?? 0) > 0}
       <Views.ItemsList bind:categoriesAndProducts productPage={Routes.product} />
     {:else}
       <Views.CentredMessage
-        text="Por enquanto estamos ainda organizando o nosso cardápio para este tipo de pedidos, volte mais tarde e confira!"
+        text="Estamos organizando o nosso cardápio para este tipo de pedido, volte mais tarde e confira as novidades que estamos preparando para você!"
       />
     {/if}
   {:else if ($Settings.orderTypes?.length ?? 0) === 0}
-    <Views.Divider />
     <h2>{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
     <Views.Divider />
     <Views.CentredMessage
-      text="Por enquanto estamos cadastrando os produtos e preparando nosso estabelecimento digital, volte mais tarde e confira!"
+      text="Por enquanto estamos cadastrando os produtos e preparando nosso estabelecimento digital, volte mais tarde e confira as novidades que estamos preparando para você!"
     />
   {:else}
-    <Views.Divider />
     <h2>{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
     <Views.Divider />
     <Views.CentredMessage
@@ -151,8 +151,19 @@
     font-size: 1.1em;
   }
   .filters {
+    padding: 12pt;
+    border-radius: 8pt;
+  }
+  .filters > .divider {
     width: 100%;
-    height: 72pt;
+    height: 1pt;
+    margin: 12pt 0 0;
+    background-color: #ccc;
+  }
+  .filters > .filter {
+    width: 100%;
+    height: 64pt;
+    align-items: flex-end;
     display: flex;
     flex-direction: row;
   }

@@ -260,6 +260,9 @@
 {#if cartProduct}
   <productImage>
     <Views.Image source={cartProduct.image ?? '/assets/images/food-plate.svg'} name={cartProduct.title} />
+    {#if !isActive}
+      <span class="unavailable">Indisponível</span>
+    {/if}
   </productImage>
   <product>
     {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
@@ -303,9 +306,16 @@
       </div>
     </div>
     <div class="quantity">
-      <Views.Button margin="0" type={Types.TButton.TRANSPARENT} size="none" on:click={() => minos()}>
+      <Views.Button
+        disabled={quantity <= 1 || !isActive}
+        margin="0"
+        type={Types.TButton.TRANSPARENT}
+        size="none"
+        on:click={() => minos()}
+      >
         <Fa icon={faMinusSquare} /></Views.Button
       ><span>{quantity}</span><Views.Button
+        disabled={!(quantity < cartProduct.quantity && quantity < (cartProduct.maxQuantityPerOrder ?? 10)) || !isActive}
         margin="0"
         type={Types.TButton.TRANSPARENT}
         size="none"
@@ -319,7 +329,7 @@
         {#each cartProduct.optionsCategories ?? [] as optionsCategory}
           {#if (optionsCategory.options?.length ?? 0) > 0}
             <Views.Divider height={24} />
-            <div class="optionsCategory shadow">
+            <div class="optionsCategory shadow {!isActive ? 'disabled' : ''}">
               <header>
                 <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45pt" width="45pt" />
                 <div>
@@ -337,7 +347,12 @@
               </header>
               {#each optionsCategory.options ?? [] as option}
                 <Views.Divider height={16} />
-                <div class="option shadow">
+                <div
+                  class="option shadow {getCartOptionUnitsById(option.id) === 0 &&
+                  getCartOptionsCount(optionsCategory) >= optionsCategory.max
+                    ? 'disabled'
+                    : ''}"
+                >
                   <Views.Image source={option.image} name={option.name} height="45pt" width="45pt" />
                   <div>
                     <h3>{option.name}</h3>
@@ -350,6 +365,7 @@
                           sizeMultiplier={1.3}
                           margin="0"
                           padding={4}
+                          disabled={getCartOptionUnitsById(option.id) <= 0}
                           on:click={() => minos(option)}
                         >
                           <Fa icon={faMinusSquare} /></Views.Button
@@ -360,6 +376,8 @@
                           margin="0"
                           padding={4}
                           sizeMultiplier={1.3}
+                          disabled={getCartOptionUnitsById(option.id) > option.units ||
+                            getCartOptionsCount(optionsCategory) >= optionsCategory.max}
                           on:click={() => plus(optionsCategory, option)}><Fa icon={faPlusSquare} /></Views.Button
                         >
                       </div>
@@ -578,5 +596,8 @@
   }
   product > .optionsCategory > .option > div > div > div > .oldPrice {
     font-size: 0.7em;
+  }
+  .disabled {
+    background-color: #ccccccc4 !important;
   }
 </style>

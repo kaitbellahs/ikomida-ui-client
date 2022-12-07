@@ -43,7 +43,7 @@
   </div>
   <Views.ItemsList {categoriesAndProducts} productPage={Routes.product} />
 {:else}
-  <Views.CentredMessage text="Nenhum produto foi encontrad">
+  <Views.CentredMessage text="Nenhum produto foi encontrado">
     <h3>Tente usar outro termo para pequisar</h3>
   </Views.CentredMessage>
 {/if}
