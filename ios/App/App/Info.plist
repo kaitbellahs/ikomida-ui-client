@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
+	<string>pt-BR</string>
 	<key>CFBundleDisplayName</key>
 	<string>${{appName}}$</string>
 	<key>CFBundleExecutable</key>
@@ -35,6 +35,10 @@
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Usamos a camera para que voce pode tirar fotos dos seus produtos</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Usamos sua localizacao para entregar seus pedidos</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>this app need localizaion</string>
 	<key>UILaunchStoryboardName</key>
