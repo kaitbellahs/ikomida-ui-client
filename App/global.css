@@ -73,7 +73,7 @@ body {
     flex-direction: column;
     position: fixed;
     overflow: hidden;
-    font-size: 4.5vw;
+    font-size: 14pt;
 }
 
 @media screen and (min-width: 816px) {
