@@ -73,7 +73,7 @@ body {
     flex-direction: column;
     position: fixed;
     overflow: hidden;
-    font-size: 14pt;
+    font-size: 12pt;
 }
 
 @media screen and (min-width: 816px) {
@@ -185,7 +185,7 @@ productImage {
     position: fixed;
     left: 0;
     right: 0;
-    top: var(--paddingTop);
+    top: 0;
     display: flex;
     justify-content: flex-start;
     justify-items: center;
@@ -197,7 +197,7 @@ productImage {
 productImage>.unavailable {
     position: absolute;
     box-shadow: 4pt 4pt 8pt 4pt #0000009e;
-    top: var(--paddingTop);
+    top: 0;
     right: 0;
     padding: 4pt 16pt;
     transform: rotate(27deg);
@@ -213,12 +213,12 @@ product {
     padding: 16pt;
     left: 0;
     right: 0;
-    top: calc(50vw + var(--paddingTop) - 16pt);
+    top: calc(50vw - 16pt);
     border-radius: 16pt 16pt 0 0;
     background: var(--backgroundColor);
     box-shadow: 0 -4pt 8pt #0000009e;
     padding-bottom: calc(var(--paddingBottom) + 8pt);
-    min-height: calc(100% - calc(160pt + var(--paddingTop) - 16pt));
+    min-height: calc(100% - calc(160pt - 16pt));
 }
 
 productImage {
@@ -226,7 +226,7 @@ productImage {
 }
 
 product {
-    top: calc(100vw + var(--paddingTop) - 16pt);
+    top: calc(100vw - 16pt);
     padding-bottom: 128pt;
 }
 
