@@ -44,7 +44,13 @@
 
   async function deleteAccount() {
     Stores.Loading.instance.start()
-    await deleteProfile()
+    toggleDeleteAccountAlert()
+    let response = await deleteProfile()
+    if (response?.success) {
+      (Stores.MessageAlert.instance as Stores.MessageAlert|undefined)?.show('A sua conta foi marcada para ser excluída após 45 dias, para cancelar a deleção da sua conta, e só logar novamente no seu perfil!', out)
+    } else {
+      Stores.MessageAlert.instance.show(response.data ?? 'Não foi possível excluir a sua conta.!')
+    }
     Stores.Loading.instance.stop()
   }
 
@@ -139,7 +145,7 @@
 {#if showDeleteAccountAlert}
   <Views.Alert
     title="Alerta"
-    message={`Você realmente quer deletar a sua conta? Esta operação é permanente e será efetivada após 45 dias da após a solicitação, o tempo necessário para verificarmos a existência de pendências!`}
+    message={`Você realmente quer deletar a sua conta? Esta operação é permanente e será efetivada após 45 dias após a solicitação, o tempo necessário para verificarmos a existência de pendências!`}
     closeCallBack={toggleDeleteAccountAlert}
     buttons={[
       {
