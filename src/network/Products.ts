@@ -1,4 +1,4 @@
-import { Network, Types, Stores } from '@ikomida/shared-frontend'
+import { Network, Types, Stores, Logics } from '@ikomida/shared-frontend'
 import OrderType from '../stores/OrderType'
 const cache = Stores.Cache.createInstance('Products')
 let timeout = 0
@@ -52,6 +52,11 @@ export async function getProduct(id?: string) {
   return Network.instance?.get(`/product/${id}`, true)
 }
 
+
+function isBusinessTime(business?: Types.Classes.CBusinessTime) {
+  return !business || (!business.days && !business.hours) || Logics.DateTime.isBusinessTime(business!)
+}
+
 function sortItems(items: Types.Classes.CCategoryProducts[]) {
   return items
     .map(category => {
@@ -59,4 +64,5 @@ function sortItems(items: Types.Classes.CCategoryProducts[]) {
       return category
     })
     .sort((i1, i2) => (i1.order ?? 0) - (i2.order ?? 0))
+    .sort((i1, i2) => (isBusinessTime(i2.business) ? 1 : 0) - (isBusinessTime(i1.business) ? 1 : 0))
 }
