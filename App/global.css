@@ -194,16 +194,20 @@ productImage {
     max-height: 100vw;
 }
 
+productImage {
+    top: var(--paddingTop);
+}
+
 productImage>.unavailable {
     position: absolute;
     box-shadow: 4pt 4pt 8pt 4pt #0000009e;
-    top: 0;
-    right: 0;
-    padding: 4pt 16pt;
-    transform: rotate(27deg);
+    top: calc(var(--paddingTop) - 0pt);
+    right: -96pt;
+    padding: 4pt 96pt;
+    transform: rotate(45deg);
     background: yellow;
     color: blue;
-    border-radius: 4px 10vw;
+    /* border-radius: 4px 10vw; */
     font-size: 10vw;
 }
 
