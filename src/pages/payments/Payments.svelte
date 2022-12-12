@@ -48,6 +48,8 @@
     if (response?.success) {
       const data: Types.Classes.CPaymentMethod[] = Types.Classes.CPaymentMethod.fromObject(response.data)
       payments = data.sort((i1, i2) => (i2.createdAt?.getTime() ?? 0) - (i1.createdAt?.getTime() ?? 0)) || []
+    } else {
+      payments = []
     }
     Stores.Loading.instance.stop()
   })

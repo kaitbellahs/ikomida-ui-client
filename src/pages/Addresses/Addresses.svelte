@@ -42,6 +42,8 @@
     let response = await GetAddresses()
     if (response?.success) {
       addresses = Types.Classes.CAddress.fromObject(response?.data)
+    }else{
+      addresses = []
     }
     Stores.Loading.instance.stop()
   })
