@@ -3,6 +3,7 @@
   import { onMount } from 'svelte'
   import { Settings } from '../../stores/Setup'
   const Layout = Stores.Layout.instance.store
+  const today = new Date().getDay()
 
   $: twintyFourHours =
     ((Array.isArray($Settings?.business)
@@ -59,7 +60,7 @@
         {#if Utils.Objects.isTrue(businessDay.day)}
           <Views.ExpandableBox
             title={Utils.Strings.days[businessDay.day ?? -1]}
-            expand={businessDay.day === new Date().getDay()}
+            expand={businessDay.day === (today === 0 ? 7 : today - 1)}
           >
             {#if businessDay.hours && businessDay.hours.length > 0}
               {#if isTwintyFourHours(businessDay)}
