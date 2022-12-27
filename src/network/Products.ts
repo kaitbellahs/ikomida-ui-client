@@ -52,9 +52,12 @@ export async function getProduct(id?: string) {
   return Network.instance?.get(`/product/${id}`, true)
 }
 
-
-function isBusinessTime(business?: Types.Classes.CBusinessTime) {
-  return !business || (!business.days && !business.hours) || Logics.DateTime.isBusinessTime(business!)
+function isBusinessTime(business?: Types.Classes.CBusinessTime[]) {
+  return (
+    !business ||
+    (Array.isArray(business) ? business : [business]).filter(businessDay => (businessDay.hours?.length ?? 0) > 0)
+      .length === 0
+  )
 }
 
 function sortItems(items: Types.Classes.CCategoryProducts[]) {

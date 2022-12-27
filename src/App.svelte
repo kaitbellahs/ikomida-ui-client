@@ -401,7 +401,7 @@
   {:else if !isActive}
     <NoService />
   {:else}
-    <main style={styleParams}>
+    <Views.MainContainer style={styleParams}>
       {#if route == Routes.home}
         <Home />
       {:else if route == Routes.cart}
@@ -432,7 +432,7 @@
           >Ver sacola {Utils.Strings.currency(total)}</Views.Button
         >
       {/if}
-    </main>
+    </Views.MainContainer>
     <Views.NavigationBar
       logo={$Settings?.profile?.mainPicture || 'assets/icons/transparent-logo-1.svg'}
       paddingTop={$_StatusBar.height}

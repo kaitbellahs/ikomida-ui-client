@@ -37,10 +37,7 @@ function createSettings() {
         phone: '',
         email: ''
       },
-      business: {
-        hours: [],
-        days: []
-      },
+      business: [],
       isActive: ''
     }) as Types.Classes.CVendorSettings
   )
@@ -48,7 +45,13 @@ function createSettings() {
   return {
     subscribe: store.subscribe,
     set: (info: Types.Classes.CVendorSettings) => store.set(info),
-    get: () => Types.Classes.CVendorSettings.fromObject(get(store))
+    get: () => {
+      try {
+        return Types.Classes.CVendorSettings.fromObject(get(store))
+      } catch (_: any) {
+        return Types.Classes.CVendorSettings.fromObject({})
+      }
+    }
   }
 }
 
