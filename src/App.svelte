@@ -40,6 +40,8 @@
   import Contact from './pages/unlogged/Contact.svelte'
   import type { IStore } from './stores/Cart'
   import Cart from './pages/cart/Cart.svelte'
+  import { Classes } from '@ikomida/shared-types'
+  import { Writable } from 'svelte/store'
 
   let initialazation = true
   let logedIn = false
@@ -58,14 +60,14 @@
   let showNotificationPopup = false
   let isActive = true
 
-  let Layout = Stores.Layout.instance?.store
+  const Layout: Writable<Classes.CLayout | undefined> = Stores.Layout.instance?.store
   let style: HTMLElement
 
   $: if (style)
     if (showCart) {
       style.innerHTML = `
         main {
-          --backgroundColor: ${$Layout.background ?? 'rgb(223, 223, 223)'};
+          --backgroundColor: ${$Layout?.background ?? 'rgb(223, 223, 223)'};
           --paddingTop: ${styleHeight};
           --paddingBottom: 128pt;
         }
@@ -74,7 +76,7 @@
     } else {
       style.innerHTML = `
         main {
-          --backgroundColor: ${$Layout.background ?? 'rgb(223, 223, 223)'};
+          --backgroundColor: ${$Layout?.background ?? 'rgb(223, 223, 223)'};
           --paddingTop: ${styleHeight};
           --paddingBottom: 64pt;
         }
@@ -392,7 +394,7 @@
   $: isPageList = [Routes.orders, Routes.pushNotifications].includes(route)
   $: styleParams = `padding: ${isPageList ? 0 : 16}pt;margin-top:${styleHeight};padding-bottom: ${
     showCart || route === Routes.checkout || route === Routes.cart || route === Routes.product ? '128pt' : '64pt'
-  }; overflow: scroll;max-width: 100%;background: ${$Layout.background};height: 100%;`
+  }; overflow: scroll;max-width: 100%;background: ${$Layout?.background};height: 100%;`
 </script>
 
 <mainContainer>

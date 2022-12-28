@@ -166,7 +166,7 @@ main {
     padding: 16pt;
     width: 100%;
     overflow: scroll;
-    background-color: rgb(223, 223, 223);
+    background: var(--backgroundColor);
 }
 
 *,
@@ -263,4 +263,26 @@ jumbotron.mainPicture>.avatarCircle {
     vertical-align: middle;
     display: table-cell;
     overflow: hidden;
+}
+
+.backgroundCustomColor {
+    position: relative;
+    background: var(--backgroundColor);
+}
+
+.mandatory {
+    position: absolute;
+    right: -24pt;
+    top: -24pt;
+    width: auto;
+    display: flex;
+    align-items: center;
+    padding: 8pt 16pt 4pt 16pt;
+    border-radius: 24pt 0 24pt 0;
+    background: #ffeabe;
+    font-family: RobotoBold, sans-serif;
+    line-height: 1;
+    color: #4c0708;
+    text-shadow: 0pt 4pt 8pt #000000;
+    box-shadow: 0 4pt 8pt #0000009e;
 }

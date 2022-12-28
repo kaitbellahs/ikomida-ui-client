@@ -1,34 +1,25 @@
 <script lang="ts">
+  import type { IStore } from '../../stores/Cart'
   import Routes from '../../stores/Routes'
+  import OrderType from '../../stores/OrderType'
   import { all, resetTimeout } from '../../network/Products'
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import { GetSettings } from '../../network/User'
   import { Settings } from '../../stores/Setup'
   import { onMount } from 'svelte'
-  import OrderType from '../../stores/OrderType'
   import { Cart } from '../../stores/Cart'
-  import type { IStore } from '../../stores/Cart'
-  import { Cart as CartStore } from '../../stores/Cart'
+  import { Writable } from 'svelte/store'
+  import { Classes } from '@ikomida/shared-types'
 
+  const cart: Cart = Cart.instance
+  const Layout: Writable<Classes.CLayout | undefined> = Stores.Layout.instance?.store
+
+  let itemsList: HTMLDivElement[] = []
   let userInfo: Types.Classes.CUser | undefined = undefined
   let categoriesAndProducts: Types.Classes.CCategoryProducts[] | undefined = undefined
   let orderType: Types.Types.TOrderType | undefined | null = null
   let working = false
-  let Layout = Stores.Layout.instance?.store
-  let router = Stores.Navigation.instance.router
   let Store: IStore
-
-  $: route = $router.route
-  $: showCart =
-    ($Store?.length ?? 0) > 0 &&
-    route !== Routes.cart &&
-    route !== Routes.product &&
-    route !== Routes.checkout &&
-    route !== Routes.orders &&
-    route !== Routes.order &&
-    route !== Routes.newAddress &&
-    route !== Routes.newMethod &&
-    route !== Routes.profile
 
   $: if (orderType !== null) {
     OrderType.set(orderType)
@@ -36,20 +27,24 @@
       updateAll()
     }
   }
+
+  $: Stores.Title.instance.set($Settings?.profile?.contractName ?? 'iKomida')
+
   async function updateAll() {
     if (!working) {
       working = true
       Stores.Loading.instance.start()
       resetTimeout()
-      await Cart.instance.updateType()
-      await Cart.instance.products()
+      await cart.updateType()
+      await cart.products()
       categoriesAndProducts = await all()
       Stores.Loading.instance.stop()
       working = false
     }
   }
+
   onMount(async () => {
-    Store = await CartStore.instance.store()
+    Store = await cart.store()
     const auth = await Stores.Auth.Auth.instance.data()
     if (auth) {
       userInfo = await Utils.Jws.extractToken(auth)
@@ -72,7 +67,6 @@
     }
     Stores.Loading.instance.stop()
   })
-  $: Stores.Title.instance.set($Settings?.profile?.contractName ?? 'iKomida')
 </script>
 
 <jumbotron class="mainPicture">
@@ -91,8 +85,14 @@
     <h2>{$Settings?.profile?.contractName}</h2>
   {/if}
 </jumbotron>
-<content>
-  <div class="shadow filters">
+<Views.Scroll
+  tag="content"
+  {itemsList}
+  animationIn={$Layout?.product.animation.in}
+  animationOut={$Layout?.product.animation.out}
+  backgroundImage={$Layout?.backgroundImage}
+>
+  <div class="shadow filters backgroundCustomColor">
     <h3 class="preparationTitle">Tempo de preparação do pedido</h3>
     {#if ($Settings?.preparation?.min ?? 0) > 0}
       <div class="preparationTime">
@@ -114,32 +114,29 @@
 
   {#if orderType}
     {#if (categoriesAndProducts?.length ?? 0) > 0}
-      <Views.ItemsList bind:categoriesAndProducts productPage={Routes.product} />
+      <Views.ItemsList bind:itemsList bind:categoriesAndProducts productPage={Routes.product} />
     {:else}
       <Views.CentredMessage
         text="Estamos organizando o nosso cardápio para este tipo de pedido, volte mais tarde e confira as novidades que estamos preparando para você!"
       />
     {/if}
   {:else if ($Settings.orderTypes?.length ?? 0) === 0}
-    <h2>{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
+    <h2 class="background">{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
     <Views.Divider />
     <Views.CentredMessage
       text="Por enquanto estamos cadastrando os produtos e preparando nosso estabelecimento digital, volte mais tarde e confira as novidades que estamos preparando para você!"
     />
   {:else}
-    <h2>{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
+    <h2 class="background">{userInfo?.name ? `Olá ${userInfo?.name}, tudo bem?` : 'Bem vindo visitante'}</h2>
     <Views.Divider />
     <Views.CentredMessage
       text="Pra começarmos precisa escolher o tipo do seu pedido para podermos lhe exibir os produtos certos!"
     />
   {/if}
-</content>
+</Views.Scroll>
 
 <style>
   .mainPicture > :global(img) {
-    /* border-radius: 8pt;
-    max-height: 260pt;
-    max-width: 480pt; */
     object-fit: contain;
     width: 100%;
   }

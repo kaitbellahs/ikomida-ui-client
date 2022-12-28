@@ -7,6 +7,8 @@
   import { Views, Utils, Logics, Types, Stores } from '@ikomida/shared-frontend'
   import { getProduct } from '../../network/Products'
   import { onMount } from 'svelte'
+  import { Classes } from '@ikomida/shared-types'
+  import { Writable } from 'svelte/store'
 
   const router = Stores.Navigation.instance.router
   const initalProduct: Types.CCart | undefined = $router.options.product
@@ -17,7 +19,7 @@
   let cartProduct: Types.CCart
   let quantity = 1
   let working: Types.Interfaces.IRecord<string, boolean> = {}
-  let Layout = Stores.Layout.instance?.store
+  const Layout: Writable<Classes.CLayout | undefined> = Stores.Layout.instance?.store
 
   $: total = Utils.Strings.currency(
     cartProduct
@@ -264,196 +266,198 @@
       <span class="unavailable">Indisponível</span>
     {/if}
   </productImage>
-  <product>
+  <product style="--backgroundImage: {$Layout?.backgroundImage ? ` url('${$Layout?.backgroundImage}')` : 'none'};">
     {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
-      <span class="discount"
-        >-{Types.Types.TDiscount.VALUE === cartProduct.discountType
-          ? Utils.Strings.currency(cartProduct.discount)
-          : Utils.Strings.percent(cartProduct.discount)}</span
-      >
+      <Views.Discount value={cartProduct.discount} type={cartProduct.discountType} top={8} right={8} />
     {/if}
-    <h2>{cartProduct.title}</h2>
-    <p>{cartProduct.description}</p>
-    <span class="serves"
-      >Aproximadamente {cartProduct.measureUnit && cartProduct.measure
-        ? Logics.Finances.formatMeasure(cartProduct.measure, cartProduct.measureUnit)
-        : '-'}</span
-    >
-    <Views.Divider />
-    <div class="price">
-      <div>
-        <h4>Valor</h4>
-        <div>
-          {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
-            <span class="oldPrice">{Utils.Strings.currency(cartProduct.price)}</span>
-          {/if}
-          <span class="current"
-            >{Utils.Strings.currency(
-              cartProduct.price -
-                Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType)
-            )}</span
-          >
-        </div>
-      </div>
-      <div>
-        <h4>Total</h4>
-        <div>
-          {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
-            <span class="oldPrice">{Utils.Strings.currency(total)}</span>
-          {/if}
-          <span class="current">{Utils.Strings.currency(total)}</span>
-        </div>
-      </div>
-    </div>
-    <div class="quantity">
-      <Views.Button
-        disabled={quantity <= 1 || !isActive}
-        margin="0"
-        type={Types.TButton.TRANSPARENT}
-        size="none"
-        on:click={() => minos()}
+    <div class="backgroundCustomColor">
+      <h2>{cartProduct.title}</h2>
+      <p>{cartProduct.description}</p>
+      <span class="serves"
+        >Aproximadamente {cartProduct.measureUnit && cartProduct.measure
+          ? Logics.Finances.formatMeasure(cartProduct.measure, cartProduct.measureUnit)
+          : '-'}</span
       >
-        <Fa icon={faMinusSquare} /></Views.Button
-      ><span>{quantity}</span><Views.Button
-        disabled={!(quantity < cartProduct.quantity && quantity < (cartProduct.maxQuantityPerOrder ?? 10)) || !isActive}
-        margin="0"
-        type={Types.TButton.TRANSPARENT}
-        size="none"
-        on:click={() => plus()}><Fa icon={faPlusSquare} /></Views.Button
-      >
-    </div>
-    {#if (cartProduct.optionsCategories?.length ?? 0) > 0}
-      {#if hasOptions()}
-        <Views.Divider height={8} />
-        <h2>Personalize seu pedido</h2>
-        {#each cartProduct.optionsCategories ?? [] as optionsCategory}
-          {#if (optionsCategory.options?.length ?? 0) > 0}
-            <Views.Divider height={24} />
-            <div class="optionsCategory shadow {!isActive ? 'disabled' : ''}">
-              <header>
-                <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45pt" width="45pt" />
-                <div>
-                  <h3>{optionsCategory.name}</h3>
-                  <div>
-                    <div>
-                      <span>Mínimo: {optionsCategory.min}</span><span>Máximo: {optionsCategory.max}</span>
-                    </div>
-                    <div><span>Escolheu</span><span class="selected">{getCartOptionsCount(optionsCategory)}</span></div>
-                  </div>
-                  {#if optionsCategory.min > 0}
-                    <span class="mandatory">Mandatório</span>
-                  {/if}
-                </div>
-              </header>
-              {#each optionsCategory.options ?? [] as option}
-                <Views.Divider height={16} />
-                <div
-                  class="option shadow {getCartOptionUnitsById(option.id) === 0 &&
-                  getCartOptionsCount(optionsCategory) >= optionsCategory.max
-                    ? 'disabled'
-                    : ''}"
-                >
-                  <Views.Image source={option.image} name={option.name} height="45pt" width="45pt" />
-                  <div>
-                    <h3>{option.name}</h3>
-                    <div>
-                      <div class="units">
-                        <Views.Button
-                          type={Types.TButton.TRANSPARENT}
-                          size="none"
-                          height="16pt"
-                          sizeMultiplier={1.3}
-                          margin="0"
-                          padding={4}
-                          disabled={getCartOptionUnitsById(option.id) <= 0}
-                          on:click={() => minos(option)}
-                        >
-                          <Fa icon={faMinusSquare} /></Views.Button
-                        ><span>{getCartOptionUnitsById(option.id)}/{option.units}</span><Views.Button
-                          type={Types.TButton.TRANSPARENT}
-                          size="none"
-                          height="16pt"
-                          margin="0"
-                          padding={4}
-                          sizeMultiplier={1.3}
-                          disabled={getCartOptionUnitsById(option.id) > option.units ||
-                            getCartOptionsCount(optionsCategory) >= optionsCategory.max}
-                          on:click={() => plus(optionsCategory, option)}><Fa icon={faPlusSquare} /></Views.Button
-                        >
-                      </div>
-                      {#if option.price > 0}
-                        <div class="price">
-                          <h5>Valor</h5>
-                          {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType) && option.price > 0}
-                            <span class="oldPrice">{Utils.Strings.currency(option.price * quantity)}</span>
-                          {/if}
-                          {Utils.Strings.currency(
-                            quantity *
-                              (option.price -
-                                Logics.Finances.calcDiscount(
-                                  option.price,
-                                  cartProduct.discount,
-                                  cartProduct.discountType
-                                ))
-                          )}
-                        </div>
-                        <div class="price">
-                          <h5>Total</h5>
-                          {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType) && option.price > 0}
-                            <span class="oldPrice"
-                              >{Utils.Strings.currency(
-                                getCartOptionUnitsById(option.id) * option.price * quantity
-                              )}</span
-                            >
-                          {/if}
-                          {Utils.Strings.currency(
-                            quantity *
-                              getCartOptionUnitsById(option.id) *
-                              (option.price -
-                                Logics.Finances.calcDiscount(
-                                  option.price,
-                                  cartProduct.discount,
-                                  cartProduct.discountType
-                                ))
-                          )}
-                        </div>
-                      {:else}
-                        <span class="current">Gratuito</span>
-                      {/if}
-                    </div>
-                  </div>
-                </div>
-              {/each}
-            </div>
-          {/if}
-        {/each}
-      {/if}
-    {/if}
-    <Views.Button disabled={!isActive} isFloat={true} on:click={addProduct} bottomPadding={$StatusBar.bottomPadding}
-      ><Fa icon={faCartPlus} /> <span>{Types.CCart.isInstance(initalProduct) ? 'Atualizar' : 'Adicionar'}</span>
-      <span>({total})</span></Views.Button
-    >
-    {#if !isActive}
       <Views.Divider />
-      <Views.Status>Por enquanto este produto está disponível apenas para consulta.</Views.Status>
-    {/if}
+      <div class="price">
+        <div>
+          <h4>Valor</h4>
+          <div>
+            {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
+              <span class="oldPrice">{Utils.Strings.currency(cartProduct.price)}</span>
+            {/if}
+            <span class="current"
+              >{Utils.Strings.currency(
+                cartProduct.price -
+                  Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType)
+              )}</span
+            >
+          </div>
+        </div>
+        <div>
+          <h4>Total</h4>
+          <div>
+            {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
+              <span class="oldPrice">{Utils.Strings.currency(total)}</span>
+            {/if}
+            <span class="current">{Utils.Strings.currency(total)}</span>
+          </div>
+        </div>
+      </div>
+      <div class="quantity">
+        <Views.Button
+          disabled={quantity <= 1 || !isActive}
+          margin="0"
+          type={Types.TButton.TRANSPARENT}
+          size="none"
+          on:click={() => minos()}
+        >
+          <Fa icon={faMinusSquare} /></Views.Button
+        ><span>{quantity}</span><Views.Button
+          disabled={!(quantity < cartProduct.quantity && quantity < (cartProduct.maxQuantityPerOrder ?? 10)) ||
+            !isActive}
+          margin="0"
+          type={Types.TButton.TRANSPARENT}
+          size="none"
+          on:click={() => plus()}><Fa icon={faPlusSquare} /></Views.Button
+        >
+      </div>
+      {#if (cartProduct.optionsCategories?.length ?? 0) > 0}
+        {#if hasOptions()}
+          <Views.Divider height={8} />
+          <h2>Personalize seu pedido</h2>
+          {#each cartProduct.optionsCategories ?? [] as optionsCategory}
+            {#if (optionsCategory.options?.length ?? 0) > 0}
+              <Views.Divider height={24} />
+              <div class="optionsCategory shadow {!isActive ? 'disabled' : ''}">
+                <header>
+                  <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45pt" width="45pt" />
+                  <div>
+                    <h3>{optionsCategory.name}</h3>
+                    <div>
+                      <div>
+                        <span>Mínimo: {optionsCategory.min}</span><span>Máximo: {optionsCategory.max}</span>
+                      </div>
+                      <div>
+                        <span>Escolheu</span><span class="selected">{getCartOptionsCount(optionsCategory)}</span>
+                      </div>
+                    </div>
+                    {#if optionsCategory.min > 0}
+                      <span class="mandatory">Mandatório</span>
+                    {/if}
+                  </div>
+                </header>
+                {#each optionsCategory.options ?? [] as option}
+                  <Views.Divider height={16} />
+                  <div
+                    class="option shadow {getCartOptionUnitsById(option.id) === 0 &&
+                    getCartOptionsCount(optionsCategory) >= optionsCategory.max
+                      ? 'disabled'
+                      : ''}"
+                  >
+                    <Views.Image source={option.image} name={option.name} height="45pt" width="45pt" />
+                    <div>
+                      <h3>{option.name}</h3>
+                      <div>
+                        <div class="units">
+                          <Views.Button
+                            type={Types.TButton.TRANSPARENT}
+                            size="none"
+                            height="16pt"
+                            sizeMultiplier={1.3}
+                            margin="0"
+                            padding={4}
+                            disabled={getCartOptionUnitsById(option.id) <= 0}
+                            on:click={() => minos(option)}
+                          >
+                            <Fa icon={faMinusSquare} /></Views.Button
+                          ><span>{getCartOptionUnitsById(option.id)}/{option.units}</span><Views.Button
+                            type={Types.TButton.TRANSPARENT}
+                            size="none"
+                            height="16pt"
+                            margin="0"
+                            padding={4}
+                            sizeMultiplier={1.3}
+                            disabled={getCartOptionUnitsById(option.id) > option.units ||
+                              getCartOptionsCount(optionsCategory) >= optionsCategory.max}
+                            on:click={() => plus(optionsCategory, option)}><Fa icon={faPlusSquare} /></Views.Button
+                          >
+                        </div>
+                        {#if option.price > 0}
+                          <div class="price">
+                            <h5>Valor</h5>
+                            {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType) && option.price > 0}
+                              <span class="oldPrice">{Utils.Strings.currency(option.price * quantity)}</span>
+                            {/if}
+                            {Utils.Strings.currency(
+                              quantity *
+                                (option.price -
+                                  Logics.Finances.calcDiscount(
+                                    option.price,
+                                    cartProduct.discount,
+                                    cartProduct.discountType
+                                  ))
+                            )}
+                          </div>
+                          <div class="price">
+                            <h5>Total</h5>
+                            {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType) && option.price > 0}
+                              <span class="oldPrice"
+                                >{Utils.Strings.currency(
+                                  getCartOptionUnitsById(option.id) * option.price * quantity
+                                )}</span
+                              >
+                            {/if}
+                            {Utils.Strings.currency(
+                              quantity *
+                                getCartOptionUnitsById(option.id) *
+                                (option.price -
+                                  Logics.Finances.calcDiscount(
+                                    option.price,
+                                    cartProduct.discount,
+                                    cartProduct.discountType
+                                  ))
+                            )}
+                          </div>
+                        {:else}
+                          <span class="current">Gratuito</span>
+                        {/if}
+                      </div>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          {/each}
+        {/if}
+      {/if}
+      <Views.Button disabled={!isActive} isFloat={true} on:click={addProduct} bottomPadding={$StatusBar.bottomPadding}
+        ><Fa icon={faCartPlus} /> <span>{Types.CCart.isInstance(initalProduct) ? 'Atualizar' : 'Adicionar'}</span>
+        <span>({total})</span></Views.Button
+      >
+      {#if !isActive}
+        <Views.Divider />
+        <Views.Status>Por enquanto este produto está disponível apenas para consulta.</Views.Status>
+      {/if}
+    </div>
   </product>
 {/if}
 
 <style>
-  product > .discount {
+  product::before {
+    content: '';
+    background-image: var(--backgroundImage);
     position: absolute;
-    top: -4pt;
-    right: -4pt;
-    border-radius: 22pt;
-    min-width: 60pt;
-    border: 1pt solid #4c0708;
-    background: #4c0708;
-    color: white;
-    line-height: 24pt;
-    padding: 0pt 8pt;
-    text-shadow: 0pt 4pt 8pt #000000;
-    box-shadow: 0 4pt 8pt #0000009e;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.3;
+  }
+  product > div {
+    padding: 16pt;
+    margin-bottom: 16pt;
+    border-radius: 8pt;
   }
   .quantity {
     margin-top: 8pt;
@@ -468,18 +472,18 @@
     margin-right: 8pt;
     margin-left: 8pt;
   }
-  product > .price {
+  .price {
     display: flex;
     flex-direction: row;
     width: 100%;
     justify-content: space-between;
     text-align: center;
   }
-  product > .price > div {
+  .price > div {
     display: flex;
     flex-direction: column;
   }
-  product > .price > div > div {
+  .price > div > div {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -501,81 +505,65 @@
   .serves {
     font-size: 1rem;
   }
-  product > .optionsCategory {
+  .optionsCategory {
     background-color: #fffffffa;
     border-radius: 8pt;
     padding: 16pt;
     position: relative;
   }
-  product > .optionsCategory > header {
+  .optionsCategory > header {
     display: flex;
     flex-direction: row;
     position: relative;
   }
-  product > .optionsCategory > header > div {
+  .optionsCategory > header > div {
     width: calc(100% - 42pt);
     margin-left: 16pt;
   }
-  product > .optionsCategory > header > div > .mandatory {
-    position: absolute;
-    right: -24pt;
-    top: -24pt;
-    width: auto;
-    display: flex;
-    align-items: center;
-    padding: 8pt 16pt 4pt 16pt;
-    border-radius: 24pt 0 24pt 0;
-    background: #ffeabe;
-    font-family: RobotoBold, sans-serif;
-    line-height: 1;
-    color: #4c0708;
-    text-shadow: 0pt 4pt 8pt #000000;
-    box-shadow: 0 4pt 8pt #0000009e;
-  }
-  product > .optionsCategory > header > div > div {
+  .optionsCategory > header > div > div {
     display: flex;
     flex-direction: row;
     width: 100%;
     justify-content: space-between;
     font-size: 0.8em;
   }
-  product > .optionsCategory > header > div > div > div {
+  .optionsCategory > header > div > div > div {
     display: flex;
     flex-direction: column;
   }
-  product > .optionsCategory > header > div > div > div > .selected {
+  .optionsCategory > header > div > div > div > .selected {
     font-size: 1.1em;
     font-family: RobotoBold;
     text-align: center;
   }
-  product > .optionsCategory > .option {
+  .optionsCategory > .option {
     background-color: #ffffff26;
     border-radius: 8pt;
     padding: 16pt;
     position: relative;
   }
-  product > .optionsCategory > .option {
+  .optionsCategory > .option {
     display: flex;
     flex-direction: row;
   }
-  product > .optionsCategory > .option > div {
+  .optionsCategory > .option > div {
     width: calc(100% - 42pt);
     margin-left: 16pt;
   }
-  product > .optionsCategory > .option > div > div {
+  .optionsCategory > .option > div > div {
     display: flex;
     flex-direction: row;
   }
-  product > .optionsCategory > .option > div > div > * {
+  .optionsCategory > .option > div > div > * {
     font-size: 0.9em;
   }
-  product > .optionsCategory > .option > div > div {
+  .optionsCategory > .option > div > div {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     width: 100%;
   }
-  product > .optionsCategory > .option > div > div > .units {
+  .optionsCategory > .option > div > div > .units {
     align-items: center;
     font-size: 0.9em;
     text-align: center;
@@ -583,18 +571,18 @@
     flex-direction: row;
     margin-top: 4pt;
   }
-  product > .optionsCategory > .option > div > div > .units > span {
+  .optionsCategory > .option > div > div > .units > span {
     padding: 0;
     border: 0;
     background: transparent;
   }
-  product > .optionsCategory > .option > div > div > .price {
+  .optionsCategory > .option > div > div > .price {
     display: flex;
     flex-direction: column;
     align-items: center;
     font-size: 0.9em;
   }
-  product > .optionsCategory > .option > div > div > div > .oldPrice {
+  .optionsCategory > .option > div > div > div > .oldPrice {
     font-size: 0.7em;
   }
   .disabled {

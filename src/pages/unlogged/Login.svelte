@@ -8,32 +8,20 @@
   import { onMount } from 'svelte'
   import LastRoute from '../../stores/LastRoute'
   import { Cart } from '../../stores/Cart'
-  import { Cart as CartStore } from '../../stores/Cart'
   import type { IStore } from '../../stores/Cart'
-  import type { Readable } from 'svelte/store'
+  import type { Readable, Writable } from 'svelte/store'
   import type { INavigation } from '@ikomida/shared-frontend/lib/Stores/Navigation'
   import { Capacitor } from '@capacitor/core'
+  import { Classes } from '@ikomida/shared-types'
 
   const router: Readable<INavigation | undefined> = Stores.Navigation.instance.router
 
   let pushNotificationToken: Stores.PushNotificationToken = Stores.PushNotificationToken.instance
-  let Layout = Stores.Layout.instance?.store
+  const Layout: Writable<Classes.CLayout | undefined> = Stores.Layout.instance?.store
   let phone: string
   let password: string
   let isValidPhone = false
   let Store: IStore
-
-  $: route = $router?.route
-  $: showCart =
-    ($Store?.length ?? 0) > 0 &&
-    route !== Routes.cart &&
-    route !== Routes.product &&
-    route !== Routes.checkout &&
-    route !== Routes.orders &&
-    route !== Routes.order &&
-    route !== Routes.newAddress &&
-    route !== Routes.newMethod &&
-    route !== Routes.profile
 
   $: canLogin = isValidPhone
 
@@ -71,7 +59,7 @@
   }
 
   onMount(async () => {
-    Store = await CartStore.instance.store()
+    Store = await Cart.instance.store()
     Stores.Loading.instance.stop()
   })
 </script>
