@@ -123,7 +123,7 @@
         {($Settings?.preparation?.max ?? 0) > ($Settings?.preparation?.min ?? 0) ? `entre` : ''}
         {Utils.Strings.timeToString(($Settings?.preparation?.min ?? 0) * 60)}
         {($Settings?.preparation?.max ?? 0) > ($Settings?.preparation?.min ?? 0)
-          ? `até ${Utils.Strings.timeToString(($Settings?.preparation?.max ?? 0) * 60)}`
+          ? `e ${Utils.Strings.timeToString(($Settings?.preparation?.max ?? 0) * 60)}`
           : ''}
       </div>
     {/if}

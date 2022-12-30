@@ -328,7 +328,7 @@
           <h2>Personalize seu pedido</h2>
           {#each cartProduct.optionsCategories ?? [] as optionsCategory}
             {#if (optionsCategory.options?.length ?? 0) > 0}
-              <Views.Divider height={24} />
+              <Views.Divider height={8} />
               <div class="optionsCategory shadow {!isActive ? 'disabled' : ''}">
                 <header>
                   <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45pt" width="45pt" />
@@ -508,8 +508,9 @@
   .optionsCategory {
     background-color: #fffffffa;
     border-radius: 8pt;
-    padding: 16pt;
+    padding: 8pt;
     position: relative;
+    margin: 0 -8pt;
   }
   .optionsCategory > header {
     display: flex;
@@ -539,7 +540,7 @@
   .optionsCategory > .option {
     background-color: #ffffff26;
     border-radius: 8pt;
-    padding: 16pt;
+    padding: 8pt;
     position: relative;
   }
   .optionsCategory > .option {
@@ -548,7 +549,7 @@
   }
   .optionsCategory > .option > div {
     width: calc(100% - 42pt);
-    margin-left: 16pt;
+    margin-left: 8pt;
   }
   .optionsCategory > .option > div > div {
     display: flex;
