@@ -394,7 +394,7 @@
   $: isPageList = [Routes.orders, Routes.pushNotifications].includes(route)
   $: styleParams = `padding: ${isPageList ? 0 : 16}pt;margin-top:${styleHeight};padding-bottom: ${
     showCart || route === Routes.checkout || route === Routes.cart || route === Routes.product ? '128pt' : '64pt'
-  }; overflow: scroll;max-width: 100%;background: ${$Layout?.background};height: 100%;`
+  };background: ${$Layout?.background};`
 </script>
 
 <mainContainer>
