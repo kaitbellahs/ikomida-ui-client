@@ -38,7 +38,7 @@
 <style>
   article {
     position: relative;
-    border-radius: 8pt;
-    padding: 16pt;
+    border-radius: 8px;
+    padding: 16px;
   }
 </style>

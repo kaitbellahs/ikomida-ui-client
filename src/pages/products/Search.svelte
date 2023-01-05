@@ -56,7 +56,7 @@
 {#if (categoriesAndProducts?.length ?? 0) > 0 && !error}
   <Views.Scroll
     tag="content"
-    style="top: calc(50vw - 0pt);"
+    style="top: calc(50vw - 0px);"
     {itemsList}
     animationIn={$Layout?.product.animation.in}
     animationOut={$Layout?.product.animation.out}
@@ -80,13 +80,13 @@
     font-size: 1.1em;
   }
   .filters {
-    padding: 12pt;
-    border-radius: 8pt;
+    padding: 12px;
+    border-radius: 8px;
   }
   .filters > .divider {
     width: 100%;
-    height: 1pt;
-    margin: 12pt 0 0;
+    height: 1px;
+    margin: 12px 0 0;
     background-color: #ccc;
   }
 </style>

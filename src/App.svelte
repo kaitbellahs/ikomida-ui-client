@@ -69,7 +69,7 @@
         main {
           --backgroundColor: ${$Layout?.background ?? 'rgb(223, 223, 223)'};
           --paddingTop: ${styleHeight};
-          --paddingBottom: 128pt;
+          --paddingBottom: 168px;
         }
       `
       document.head.appendChild(style)
@@ -78,12 +78,12 @@
         main {
           --backgroundColor: ${$Layout?.background ?? 'rgb(223, 223, 223)'};
           --paddingTop: ${styleHeight};
-          --paddingBottom: 64pt;
+          --paddingBottom: 64px;
         }
       `
     }
 
-  $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 48}pt`
+  $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 48}px`
   $: route = $router.route
   $: if ($auth) {
     Utils.Jws.extractToken($auth).then(async token => {
@@ -102,33 +102,13 @@
     statusBar.topMargin = 0
     _StatusBar.setStatusBar(statusBar)
   }
-  $: optionsTotal = () => {
-    const totalOptionsArray =
-      $Store?.map(product => {
-        let calcTotal = 0
-        for (const option of product?.options ?? []) {
-          calcTotal +=
-            product.quantity *
-            option.units *
-            (option.price - Logics.Finances.calcDiscount(option.price, product.discount, product.discountType))
-        }
-        return calcTotal
-      }) ?? []
+  $: subtotal = () => {
+    const totalOptionsArray = $Store?.map(product => Utils.Numbers.calcProductPrice(product)) ?? []
     return (totalOptionsArray?.length ?? 0) > 0 ? totalOptionsArray.reduce((a, b) => a + b) : 0
   }
 
-  $: subtotalArray = [
-    ...($Store?.map(
-      product =>
-        product.quantity *
-        (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType))
-    ) ?? []),
-    optionsTotal()
-  ]
-
-  $: subtotal = subtotalArray.length > 0 ? subtotalArray.reduce((a, b) => a + b) : 0
   $: delivery = 0
-  $: total = subtotal + delivery
+  $: total = subtotal() + delivery
   $: showCart =
     ($Store?.length ?? 0) > 0 &&
     route !== Routes.cart &&
@@ -199,8 +179,8 @@
       }
       if (notification?.data?.uri && ['/vendorNotification/'].includes(notification?.data?.uri)) {
         await iKomidaNetwork.instance?.clearCache(Stores.Cache.Types.PUSH_NOTIFICATIONS)
-        if (route == Routes.pushNotifications || go) {
-          if (route == Routes.pushNotifications) {
+        if (route === Routes.pushNotifications || go) {
+          if (route === Routes.pushNotifications) {
             network.reset(Routes.home)
             Stores.Loading.instance.reset()
           }
@@ -227,8 +207,8 @@
             cachedOrders = cachedOrders.sort((i1, i2) => (i2.timestamp ?? 0) - (i1.timestamp ?? 0))
           }
           cache.setObject(Stores.Cache.Types.ORDERS, cachedOrders)
-          if (route == Routes.order || go) {
-            if (route == Routes.order) {
+          if (route === Routes.order || go) {
+            if (route === Routes.order) {
               network.reset(Routes.orders)
               Stores.Loading.instance.reset()
             }
@@ -237,7 +217,7 @@
               newOrder: false,
               order
             })
-          } else if (route == Routes.orders) {
+          } else if (route === Routes.orders) {
             network.reset(Routes.home)
             await tick()
             Stores.Loading.instance.reset()
@@ -336,7 +316,7 @@
     }
   ]
   menuHamburgerItems.forEach(page => Stores.MenuHamburger.instance.addItem(page))
-
+  $: console.log($Settings)
   onMount(async () => {
     await CartStore.createInstance()
     style = document.createElement('style')
@@ -392,8 +372,8 @@
   //   });
   // });
   $: isPageList = [Routes.orders, Routes.pushNotifications].includes(route)
-  $: styleParams = `padding: ${isPageList ? 0 : 16}pt;margin-top:${styleHeight};padding-bottom: ${
-    showCart || route === Routes.checkout || route === Routes.cart || route === Routes.product ? '128pt' : '64pt'
+  $: styleParams = `padding: ${isPageList ? 0 : 16}px;margin-top:${styleHeight};padding-bottom: ${
+    showCart || route === Routes.checkout || route === Routes.cart || route === Routes.product ? '168px' : '64px'
   };background: ${$Layout?.background};`
 </script>
 
@@ -404,27 +384,27 @@
     <NoService />
   {:else}
     <Views.MainContainer style={styleParams}>
-      {#if route == Routes.home}
+      {#if route === Routes.home}
         <Home />
-      {:else if route == Routes.cart}
+      {:else if route === Routes.cart}
         <Cart />
-      {:else if route == Routes.search}
+      {:else if route === Routes.search}
         <Search />
-      {:else if route == Routes.product}
-        <Product />
-      {:else if route == Routes.businessHours}
+      {:else if route === Routes.businessHours}
         <BusinessHours />
-      {:else if route == Routes.subscribe}
+      {:else if route === Routes.product}
+        <Product />
+      {:else if route === Routes.subscribe}
         <Subscribe />
-      {:else if route == Routes.forgotPassword}
+      {:else if route === Routes.forgotPassword}
         <ForgotPassword />
-      {:else if route == Routes.confirmSubscribe}
+      {:else if route === Routes.confirmSubscribe}
         <ConfirmSubscribe />
-      {:else if route == Routes.tac}
+      {:else if route === Routes.tac}
         <Tac />
-      {:else if route == Routes.pp}
+      {:else if route === Routes.pp}
         <Pp />
-      {:else if route == Routes.contact}
+      {:else if route === Routes.contact}
         <Contact />
       {:else}
         <Main />
@@ -445,7 +425,7 @@
 
   <Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
   <Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
-  {#if networkStatus == null || !networkStatus.connected}
+  {#if networkStatus === null || !networkStatus.connected}
     <div id="internetError">Esperando por conexão a internet...</div>
   {/if}
   {#if showNotificationPopup}
@@ -468,13 +448,13 @@
     top: 0;
     left: 0;
     right: 0;
-    padding-top: 1pt;
-    padding-bottom: 1pt;
-    padding-left: 16pt;
-    padding-right: 16pt;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 16px;
+    padding-right: 16px;
     z-index: 9999999999;
     text-align: center;
-    border-bottom: 1pt solid white;
+    border-bottom: 1px solid white;
   }
   :global(.grecaptcha-badge) {
     visibility: hidden;

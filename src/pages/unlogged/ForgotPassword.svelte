@@ -35,7 +35,7 @@
     countdownCanRequestCode = true
     countdown = countdownWaitTime
   }
-  $: styleHeight = `${Number($StatusBar.height) + 56}pt`
+  $: styleHeight = `${Number($StatusBar.height) + 56}px`
 
   function toggleshowRequestValidatingCodeAlert() {
     showRequestValidatingCodeAlert = !showRequestValidatingCodeAlert

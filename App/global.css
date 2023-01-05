@@ -41,15 +41,15 @@
 }
 
 .shadow {
-    box-shadow: 0 4pt 8pt #0000009e;
+    box-shadow: 0 4px 8px #0000009e;
 }
 
 .leftShadow {
-    box-shadow: 0 4pt 8pt #0000009e;
+    box-shadow: 0 4px 8px #0000009e;
 }
 
 .rightShadow {
-    box-shadow: 0 4pt 8pt #0000009e;
+    box-shadow: 0 4px 8px #0000009e;
 }
 
 html,
@@ -67,20 +67,20 @@ body {
     box-sizing: border-box;
     font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
     max-height: 100vh;
-    padding-top: 1pt;
+    padding-top: 1px;
     background: #dfdfdf;
     display: flex;
     flex-direction: column;
     position: fixed;
     overflow: hidden;
-    font-size: 12pt;
+    font-size: 16px;
 }
 
 @media screen and (min-width: 816px) {
 
     html,
     body {
-        font-size: 14pt;
+        font-size: 14px;
     }
 }
 
@@ -89,7 +89,7 @@ mainContainer {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    overflow-y: scroll;
+    /* overflow-y: scroll; */
     -webkit-overflow-scrolling: touch;
 }
 
@@ -116,12 +116,12 @@ select,
 textarea {
     font-family: inherit;
     font-size: inherit;
-    -webkit-padding: 16pt 0;
-    padding: 0 16pt;
+    -webkit-padding: 16px 0;
+    padding: 0 16px;
     margin: 0 0 0.5em 0;
     box-sizing: border-box;
-    border: 1pt solid #ccc;
-    border-radius: 8pt;
+    border: 1px solid #ccc;
+    border-radius: 8px;
 }
 
 input:disabled {
@@ -163,7 +163,7 @@ main {
     display: flex;
     flex-direction: column;
     flex: 1 0 100%;
-    padding: 16pt;
+    padding: 16px;
     width: 100%;
     overflow: scroll;
     background: var(--backgroundColor);
@@ -200,10 +200,10 @@ productImage {
 
 productImage>.unavailable {
     position: absolute;
-    box-shadow: 4pt 4pt 8pt 4pt #0000009e;
-    top: calc(var(--paddingTop) - 0pt);
-    right: -96pt;
-    padding: 4pt 96pt;
+    box-shadow: 4px 4px 8px 4px #0000009e;
+    top: calc(var(--paddingTop) - 0px);
+    right: -96px;
+    padding: 4px 96px;
     transform: rotate(45deg);
     background: yellow;
     color: blue;
@@ -214,15 +214,15 @@ productImage>.unavailable {
 content,
 product {
     position: absolute;
-    padding: 16pt;
+    padding: 16px;
     left: 0;
     right: 0;
-    top: calc(50vw - 16pt);
-    border-radius: 16pt 16pt 0 0;
+    top: calc(50vw - 16px);
+    border-radius: 16px 16px 0 0;
     background: var(--backgroundColor);
-    box-shadow: 0 -4pt 8pt #0000009e;
-    padding-bottom: calc(var(--paddingBottom) + 8pt);
-    min-height: calc(100% - calc(160pt - 16pt));
+    box-shadow: 0 -4px 8px #0000009e;
+    padding-bottom: calc(var(--paddingBottom) + 8px);
+    min-height: calc(100% - calc(160px - 16px));
 }
 
 productImage {
@@ -230,8 +230,8 @@ productImage {
 }
 
 product {
-    top: calc(100vw - 16pt);
-    padding-bottom: 128pt;
+    top: calc(100vw - 16px);
+    padding-bottom: 160px;
 }
 
 jumbotron.mainPicture {
@@ -245,20 +245,20 @@ jumbotron.mainPicture {
 jumbotron.mainPicture> :global(img) {
     font-size: 3em;
     width: 100%;
-    max-width: 500pt;
-    line-height: 88pt;
+    max-width: 500px;
+    line-height: 88px;
     overflow: hidden;
     object-fit: cover;
 }
 
 jumbotron.mainPicture>.avatarCircle {
     font-size: 3em;
-    height: 88pt;
-    width: 88pt;
+    height: 88px;
+    width: 88px;
     background: #ccc;
-    border-radius: 44pt;
+    border-radius: 44px;
     float: left;
-    line-height: 88pt;
+    line-height: 88px;
     text-align: center;
     vertical-align: middle;
     display: table-cell;
@@ -268,24 +268,24 @@ jumbotron.mainPicture>.avatarCircle {
 .backgroundCustomColor {
     position: relative;
     background: var(--backgroundColor);
-    padding: 16pt;
-    border-radius: 8pt;
-    box-shadow: 0 4pt 8pt #0000009e;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px #0000009e;
 }
 
 .mandatory {
     position: absolute;
-    right: -24pt;
-    top: -24pt;
+    right: -24px;
+    top: -24px;
     width: auto;
     display: flex;
     align-items: center;
-    padding: 8pt 16pt 4pt 16pt;
-    border-radius: 24pt 0 24pt 0;
+    padding: 8px 16px 4px 16px;
+    border-radius: 24px 0 24px 0;
     background: #ffeabe;
     font-family: RobotoBold, sans-serif;
     line-height: 1;
     color: #4c0708;
-    text-shadow: 0pt 4pt 8pt #000000;
-    box-shadow: 0 4pt 8pt #0000009e;
+    text-shadow: 0px 4px 8px #000000;
+    box-shadow: 0 4px 8px #0000009e;
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Views, Stores, Types, Utils } from '@ikomida/shared-frontend'
-  import { onMount } from 'svelte'
+  import { onDestroy, onMount } from 'svelte'
   import { Settings } from '../../stores/Setup'
   const Layout = Stores.Layout.instance.store
   const today = new Date().getDay()
@@ -26,7 +26,6 @@
   }
 
   onMount(() => Stores.Loading.instance.stop())
-
   Stores.Title.instance.set('Horario de funcionamento')
 </script>
 
@@ -88,18 +87,18 @@
 
 <style>
   .noExpedient {
-    margin-top: 8pt;
+    margin-top: 8px;
   }
   .busninessHours {
     display: flex;
     flex-direction: row;
     margin: 0;
-    padding: 8pt;
-    border: 1pt solid #fff;
+    padding: 8px;
+    border: 1px solid #fff;
     color: var(--buttonColor);
     background: var(--buttonBackground);
-    border-radius: 8pt;
-    margin-top: 8pt;
+    border-radius: 8px;
+    margin-top: 8px;
     text-align: center;
     place-content: center;
   }

@@ -21,13 +21,9 @@
   let working: Types.Interfaces.IRecord<string, boolean> = {}
   const Layout: Writable<Classes.CLayout | undefined> = Stores.Layout.instance?.store
 
+  $: subTotal = cartProduct ? quantity * (optionsTotal() + cartProduct.price) : 0
   $: total = Utils.Strings.currency(
-    cartProduct
-      ? quantity *
-          (optionsTotal() +
-            cartProduct.price -
-            Logics.Finances.calcDiscount(cartProduct.price, cartProduct.discount, cartProduct.discountType))
-      : 0
+    cartProduct ? subTotal - Logics.Finances.calcDiscount(subTotal, cartProduct.discount, cartProduct.discountType) : 0
   )
 
   $: optionsTotal = () => {
@@ -35,7 +31,10 @@
     for (const option of cartProduct?.options ?? []) {
       calcTotal +=
         option.units *
-        (option.price - Logics.Finances.calcDiscount(option.price, cartProduct.discount, cartProduct.discountType))
+        (option.price -
+          ([Types.Types.TDiscount.PERCENT].includes(cartProduct.discountType)
+            ? Logics.Finances.calcDiscount(option.price, cartProduct.discount, cartProduct.discountType)
+            : 0))
     }
     return calcTotal
   }
@@ -298,7 +297,7 @@
           <h4>Total</h4>
           <div>
             {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType)}
-              <span class="oldPrice">{Utils.Strings.currency(total)}</span>
+              <span class="oldPrice">{Utils.Strings.currency(subTotal)}</span>
             {/if}
             <span class="current">{Utils.Strings.currency(total)}</span>
           </div>
@@ -331,7 +330,7 @@
               <Views.Divider height={8} />
               <div class="optionsCategory shadow {!isActive ? 'disabled' : ''}">
                 <header>
-                  <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45pt" width="45pt" />
+                  <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45px" width="45px" />
                   <div>
                     <h3>{optionsCategory.name}</h3>
                     <div>
@@ -355,7 +354,7 @@
                       ? 'disabled'
                       : ''}"
                   >
-                    <Views.Image source={option.image} name={option.name} height="45pt" width="45pt" />
+                    <Views.Image source={option.image} name={option.name} height="45px" width="45px" />
                     <div>
                       <h3>{option.name}</h3>
                       <div>
@@ -363,7 +362,7 @@
                           <Views.Button
                             type={Types.TButton.TRANSPARENT}
                             size="none"
-                            height="16pt"
+                            height="16px"
                             sizeMultiplier={1.3}
                             margin="0"
                             padding={4}
@@ -374,7 +373,7 @@
                           ><span>{getCartOptionUnitsById(option.id)}/{option.units}</span><Views.Button
                             type={Types.TButton.TRANSPARENT}
                             size="none"
-                            height="16pt"
+                            height="16px"
                             margin="0"
                             padding={4}
                             sizeMultiplier={1.3}
@@ -386,38 +385,11 @@
                         {#if option.price > 0}
                           <div class="price">
                             <h5>Valor</h5>
-                            {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType) && option.price > 0}
-                              <span class="oldPrice">{Utils.Strings.currency(option.price * quantity)}</span>
-                            {/if}
-                            {Utils.Strings.currency(
-                              quantity *
-                                (option.price -
-                                  Logics.Finances.calcDiscount(
-                                    option.price,
-                                    cartProduct.discount,
-                                    cartProduct.discountType
-                                  ))
-                            )}
+                            {Utils.Strings.currency(quantity * option.price)}
                           </div>
                           <div class="price">
                             <h5>Total</h5>
-                            {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(cartProduct.discountType) && option.price > 0}
-                              <span class="oldPrice"
-                                >{Utils.Strings.currency(
-                                  getCartOptionUnitsById(option.id) * option.price * quantity
-                                )}</span
-                              >
-                            {/if}
-                            {Utils.Strings.currency(
-                              quantity *
-                                getCartOptionUnitsById(option.id) *
-                                (option.price -
-                                  Logics.Finances.calcDiscount(
-                                    option.price,
-                                    cartProduct.discount,
-                                    cartProduct.discountType
-                                  ))
-                            )}
+                            {Utils.Strings.currency(quantity * getCartOptionUnitsById(option.id) * option.price)}
                           </div>
                         {:else}
                           <span class="current">Gratuito</span>
@@ -455,12 +427,12 @@
     opacity: 0.3;
   }
   product > div {
-    padding: 16pt;
-    margin-bottom: 16pt;
-    border-radius: 8pt;
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 8px;
   }
   .quantity {
-    margin-top: 8pt;
+    margin-top: 8px;
     align-items: center;
     font-size: 1.8em;
     text-align: center;
@@ -469,8 +441,8 @@
     padding: 0;
     border: 0;
     background: transparent;
-    margin-right: 8pt;
-    margin-left: 8pt;
+    margin-right: 8px;
+    margin-left: 8px;
   }
   .price {
     display: flex;
@@ -500,17 +472,17 @@
   p {
     font-size: 1.1rem;
     font-weight: lighter;
-    margin: 16pt 0;
+    margin: 16px 0;
   }
   .serves {
     font-size: 1rem;
   }
   .optionsCategory {
     background-color: #fffffffa;
-    border-radius: 8pt;
-    padding: 8pt;
+    border-radius: 8px;
+    padding: 8px;
     position: relative;
-    margin: 0 -8pt;
+    margin: 0 -8px;
   }
   .optionsCategory > header {
     display: flex;
@@ -518,8 +490,8 @@
     position: relative;
   }
   .optionsCategory > header > div {
-    width: calc(100% - 42pt);
-    margin-left: 16pt;
+    width: calc(100% - 42px);
+    margin-left: 16px;
   }
   .optionsCategory > header > div > div {
     display: flex;
@@ -539,8 +511,8 @@
   }
   .optionsCategory > .option {
     background-color: #ffffff26;
-    border-radius: 8pt;
-    padding: 8pt;
+    border-radius: 8px;
+    padding: 8px;
     position: relative;
   }
   .optionsCategory > .option {
@@ -548,8 +520,8 @@
     flex-direction: row;
   }
   .optionsCategory > .option > div {
-    width: calc(100% - 42pt);
-    margin-left: 8pt;
+    width: calc(100% - 42px);
+    margin-left: 8px;
   }
   .optionsCategory > .option > div > div {
     display: flex;
@@ -570,7 +542,7 @@
     text-align: center;
     display: flex;
     flex-direction: row;
-    margin-top: 4pt;
+    margin-top: 4px;
   }
   .optionsCategory > .option > div > div > .units > span {
     padding: 0;

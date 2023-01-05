@@ -174,14 +174,14 @@
     z-index: 999;
     place-items: stretch;
     overflow-y: scroll;
-    padding: 8pt;
+    padding: 8px;
     border-radius: 0;
   }
   categories > category {
-    border-radius: 4pt;
-    padding: 4pt 8pt;
+    border-radius: 4px;
+    padding: 4px 8px;
     white-space: nowrap;
-    margin: 0 4pt;
+    margin: 0 4px;
     background-color: var(--buttonBackground);
     color: var(--buttonColor);
   }
@@ -197,18 +197,18 @@
     font-size: 1.1em;
   }
   .filters {
-    padding: 12pt;
-    border-radius: 8pt;
+    padding: 12px;
+    border-radius: 8px;
   }
   .filters > .divider {
     width: 100%;
-    height: 1pt;
-    margin: 12pt 0 0;
+    height: 1px;
+    margin: 12px 0 0;
     background-color: #ccc;
   }
   .filters > .filter {
     width: 100%;
-    height: 64pt;
+    height: 64px;
     align-items: flex-end;
     display: flex;
     flex-direction: row;

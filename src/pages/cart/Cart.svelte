@@ -17,30 +17,11 @@
   let auth: Stores.Auth.IStore
   let logedIn = false
 
-  $: optionsTotal = () => {
-    const totalOptionsArray =
-      $Products?.map(product => {
-        let calcTotal = 0
-        for (const option of product?.options ?? []) {
-          calcTotal +=
-            product.quantity *
-            option.units *
-            (option.price - Logics.Finances.calcDiscount(option.price, product.discount, product.discountType))
-        }
-        return calcTotal
-      }) ?? []
+  $: subtotal = () => {
+    const totalOptionsArray = $Products?.map(product => Utils.Numbers.calcProductPrice(product)) ?? []
     return (totalOptionsArray?.length ?? 0) > 0 ? totalOptionsArray.reduce((a, b) => a + b) : 0
   }
 
-  $: subtotalArray = [
-    ...($Products?.map(
-      product =>
-        product.quantity *
-        (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType))
-    ) ?? []),
-    optionsTotal()
-  ]
-  $: subtotal = (subtotalArray?.length ?? 0) > 0 ? subtotalArray.reduce((a, b) => a + b) : 0
   $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings.delivery?.value ?? 0) : 0
   $: delivery = Math.ceil(
     $Settings?.delivery?.free
@@ -49,9 +30,9 @@
       ? $Settings?.delivery?.min ?? 0
       : calcDelivery
   )
-  $: tip = Logics.Finances.calcDiscount(subtotal, $Settings.tip ?? 0, Types.Types.TDiscount.PERCENT)
+  $: tip = Logics.Finances.calcDiscount(subtotal(), $Settings.tip ?? 0, Types.Types.TDiscount.PERCENT)
   $: total =
-    subtotal +
+    subtotal() +
     (logedIn && orderType === Types.Types.TOrderType.DELIVERY
       ? delivery
       : logedIn && orderType === Types.Types.TOrderType.LOCAL
@@ -337,7 +318,7 @@
   <tbody>
     <tr>
       <td class="resumeText">Subtotal</td>
-      <td class="resumeValue">{Utils.Strings.currency(subtotal)}</td>
+      <td class="resumeValue">{Utils.Strings.currency(subtotal())}</td>
     </tr>
     {#if orderType === Types.Types.TOrderType.DELIVERY}
       {#if address}
@@ -367,7 +348,7 @@
 <style>
   table {
     width: 100%;
-    padding-bottom: 56pt;
+    padding-bottom: 56px;
   }
   .resumeHead {
     font-size: 1.1em;
@@ -386,7 +367,7 @@
     color: green;
   }
   info {
-    padding: 16pt;
-    border-radius: 8pt;
+    padding: 16px;
+    border-radius: 8px;
   }
 </style>

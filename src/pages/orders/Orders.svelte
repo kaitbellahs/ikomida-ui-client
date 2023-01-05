@@ -34,7 +34,7 @@
   Stores.Title.instance.set('Pedidos')
 </script>
 
-<div style="padding: 0 16pt;" class="filters">
+<div style="padding: 0 16px;" class="filters">
   <Views.Selector bind:selected={orderType} options={Types.Types.TOrderType.values()} name="Tipo dos pedidos" />
 </div>
 <Views.LoadMoreReusableList
@@ -132,8 +132,8 @@
 
 <style>
   .orderContainer {
-    padding: 16pt;
-    border-radius: 8pt;
+    padding: 16px;
+    border-radius: 8px;
     background: var(--itemBackground);
     display: flex;
     flex-direction: column;

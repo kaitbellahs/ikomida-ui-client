@@ -18,6 +18,6 @@
   }
   main > :global(img) {
     width: 100%;
-    padding: 16pt;
+    padding: 16px;
   }
 </style>

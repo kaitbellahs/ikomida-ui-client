@@ -42,7 +42,7 @@
     let response = await GetAddresses()
     if (response?.success) {
       addresses = Types.Classes.CAddress.fromObject(response?.data)
-    }else{
+    } else {
       addresses = []
     }
     Stores.Loading.instance.stop()
@@ -87,10 +87,10 @@ mesmo!"
     width: 100%;
     display: flex;
     justify-content: space-between;
-    box-shadow: 0 4pt 8pt #0000009e;
-    margin-top: 24pt;
-    padding: 16pt;
-    border-radius: 8pt;
+    box-shadow: 0 4px 8px #0000009e;
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 8px;
   }
   .address > .checkbox {
     display: flex;
@@ -103,7 +103,7 @@ mesmo!"
   }
   .address > .content > .street {
     font-family: 'RobotoMedium';
-    margin-bottom: 16pt;
+    margin-bottom: 16px;
   }
   .address > .content > .neighborhood {
     font-weight: lighter;

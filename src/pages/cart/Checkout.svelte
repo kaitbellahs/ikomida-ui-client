@@ -23,31 +23,11 @@
   let address: Types.Classes.CAddress | undefined | null = undefined
   let payment: Types.Classes.CPaymentMethod | undefined = undefined
 
-  $: optionsTotal = () => {
-    const totalOptionsArray =
-      $Products?.map(product => {
-        let calcTotal = 0
-        for (const option of product?.options ?? []) {
-          calcTotal +=
-            product.quantity *
-            option.units *
-            (option.price - Logics.Finances.calcDiscount(option.price, product.discount, product.discountType))
-        }
-        return calcTotal
-      }) ?? []
+  $: subtotal = () => {
+    const totalOptionsArray = $Products?.map(product => Utils.Numbers.calcProductPrice(product)) ?? []
     return (totalOptionsArray?.length ?? 0) > 0 ? totalOptionsArray.reduce((a, b) => a + b) : 0
   }
 
-  $: subtotalArray = [
-    ...($Products?.map(
-      product =>
-        product.quantity *
-        (product?.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType))
-    ) ?? []),
-    optionsTotal()
-  ]
-
-  $: subtotal = (subtotalArray?.length ?? 0) > 0 ? subtotalArray.reduce((a, b) => a + b) : 0
   $: calcDelivery = address ? ((address?.distance ?? 0) / 1000) * ($Settings?.delivery?.value ?? 0) : 0
   $: delivery = Math.ceil(
     $Settings?.delivery?.free
@@ -56,11 +36,11 @@
       ? $Settings.delivery?.min ?? 0
       : calcDelivery
   )
-  $: tip = Logics.Finances.calcDiscount(subtotal, $Settings.tip ?? 0, Types.Types.TDiscount.PERCENT)
+  $: tip = Logics.Finances.calcDiscount(subtotal(), $Settings.tip ?? 0, Types.Types.TDiscount.PERCENT)
   $: netTotal =
-    subtotal +
+    subtotal() +
     (orderType === Types.Types.TOrderType.DELIVERY ? delivery : orderType === Types.Types.TOrderType.LOCAL ? tip : 0)
-  $: discount = couponObject ? Logics.Finances.calcDiscount(subtotal, couponObject.value, couponObject.valueType) : 0
+  $: discount = couponObject ? Logics.Finances.calcDiscount(subtotal(), couponObject.value, couponObject.valueType) : 0
   $: total = netTotal - discount
   $: validate =
     payment &&
@@ -69,7 +49,7 @@
       : orderType === Types.Types.TOrderType.LOCAL
       ? table
       : true) &&
-    subtotal >= (couponObject?.minValue ?? 0) &&
+    subtotal() >= (couponObject?.minValue ?? 0) &&
     (payment?.type === Types.Types.TPaymentMethod.CASH_ON_DELIVERY ? Number(change) > 0 : true) &&
     total >= ($Settings.delivery?.orderMinValue ?? 0)
   $: businessTime = $Settings.business && Logics.DateTime.isBusinessTime($Settings.business)
@@ -183,13 +163,19 @@
   async function addCoupon() {
     if (coupon && orderType && coupon.length >= 3) {
       Stores.Loading.instance.start()
-      const payload = Types.Classes.CCoupon.init(coupon, 0, subtotal, Types.Types.TDiscount.NO, undefined, undefined, [
-        orderType
-      ])
+      const payload = Types.Classes.CCoupon.init(
+        coupon,
+        0,
+        subtotal(),
+        Types.Types.TDiscount.NO,
+        undefined,
+        undefined,
+        [orderType]
+      )
       const response = await AddCoupon(payload)
       if (response?.success) {
         couponObject = Types.Classes.CCoupon.fromObject(response.data)
-        if ((couponObject?.minValue ?? 0) > subtotal) {
+        if ((couponObject?.minValue ?? 0) > subtotal()) {
           Stores.MessageAlert.instance?.show(
             `Este cupom é válido apenas para compras assim do ${Utils.Strings.currency(couponObject?.minValue ?? 0)}`
           )
@@ -301,24 +287,17 @@
     <div class="product">
       <header>
         <span class="quantity">{product.quantity}</span><span class="title">{product.title}</span><span class="price"
-          >{Utils.Strings.currency(
-            product.quantity *
-              (product.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType))
-          )}</span
+          >{Utils.Strings.currency(Utils.Numbers.calcProductPrice(product))}</span
         >
       </header>
       {#if (product.options?.length ?? 0) > 0}
         <div>
           {#each product.options ?? [] as option, optionIndex}
             <div class="option">
-              <span class="units">{option.units}</span><span class="name">{option.name}</span><span class="price"
-                >{Utils.Strings.currency(
-                  (product.quantity ?? 0) *
-                    (option.units ?? 0) *
-                    ((option.price ?? 0) -
-                      Logics.Finances.calcDiscount(option.price ?? 0, product.discount ?? 0, product.discountType))
-                )}</span
-              >
+              <span class="units">{option.units}</span><span class="name">{option.name}</span>
+              <!-- <span class="price"
+                >{Utils.Strings.currency((product.quantity ?? 0) * (option.units ?? 0) * (option.price ?? 0))}</span
+              > -->
             </div>
           {/each}
         </div>
@@ -334,7 +313,7 @@
   <tbody>
     <tr>
       <td class="resumeText">Subtotal</td>
-      <td class="resumeValue">{Utils.Strings.currency(subtotal)}</td>
+      <td class="resumeValue">{Utils.Strings.currency(subtotal())}</td>
     </tr>
     {#if discount !== 0}
       <tr>
@@ -505,53 +484,53 @@
   .product {
     font-family: RobotoLight;
     font-size: 0.9em;
-    margin-top: 16pt;
+    margin-top: 16px;
     margin-bottom: 0;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1pt solid #ccc;
-    border-left: 1pt solid #ccc;
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
     display: flex;
     flex-direction: column;
   }
   .product > small {
-    margin-left: 8pt;
+    margin-left: 8px;
   }
   .product > header > .quantity {
-    margin-right: 8pt;
+    margin-right: 8px;
     font-family: RobotoMedium;
     font-size: 1em;
     background: #ccc;
-    width: 24pt;
-    height: 24pt;
-    padding: 4pt;
+    width: 24px;
+    height: 24px;
+    padding: 4px;
     text-align: center;
     vertical-align: middle;
   }
   .product > header > .price {
-    margin-left: 8pt;
+    margin-left: 8px;
     font-family: RobotoMedium;
     font-size: 0.9em;
   }
   .product > div {
-    margin-left: 16pt;
-    margin-bottom: 8pt;
-    margin-top: 8pt;
+    margin-left: 16px;
+    margin-bottom: 8px;
+    margin-top: 8px;
     font-size: 0.9em;
   }
   .product > div > .option > .units {
-    margin-right: 8pt;
+    margin-right: 8px;
     font-family: RobotoMedium;
     font-size: 1em;
     background: rgba(204, 204, 204, 0.356);
-    width: 24pt;
-    height: 24pt;
-    padding: 0 4pt;
+    width: 24px;
+    height: 24px;
+    padding: 0 4px;
     text-align: center;
     vertical-align: middle;
   }
   .product > div > .option > .price {
-    margin-left: 8pt;
+    margin-left: 8px;
     font-family: RobotoMedium;
     font-size: 0.9em;
   }
@@ -559,7 +538,7 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    margin-top: 16pt;
+    margin-top: 16px;
   }
   .paymentCard > .content {
     display: flex;
@@ -572,21 +551,21 @@
     width: 100%;
   }
   .paymentCard > .content > .brand > :global(img) {
-    height: 16pt;
+    height: 16px;
     width: auto;
   }
   .paymentCard > .content > .brand {
     font-weight: lighter;
     font-size: 1em;
     width: 100%;
-    margin-top: 8pt;
+    margin-top: 8px;
   }
   .address {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1pt solid #ccc;
-    padding: 16pt 0;
+    border-bottom: 1px solid #ccc;
+    padding: 16px 0;
   }
   .address > .content {
     display: flex;
@@ -628,7 +607,7 @@
     font-size: 0.9em;
   }
   tr.total {
-    padding-top: 16pt;
+    padding-top: 16px;
   }
   .resumeValue.total {
     font-size: 1.1em;
@@ -639,6 +618,6 @@
   .businessHoursError {
     text-align: center;
     color: #4c0708;
-    margin-top: 24pt;
+    margin-top: 24px;
   }
 </style>
