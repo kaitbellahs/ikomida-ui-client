@@ -172,10 +172,7 @@
     <div class="product">
       <header>
         <span class="quantity">{product.quantity}</span><span class="title">{product.title}</span><span class="price"
-          >{Utils.Strings.currency(
-            product.quantity *
-              (product.price - Logics.Finances.calcDiscount(product.price, product.discount, product.discountType))
-          )}</span
+          >{Utils.Strings.currency(Utils.Numbers.calcProductPrice(product))}</span
         >
       </header>
       {#if (product.options?.length ?? 0) > 0}
@@ -183,9 +180,10 @@
           <!-- <h4>Opções do produto:</h4> -->
           {#each product.options ?? [] as option, optionIndex}
             <div class="option">
-              <span class="units">{option.units}</span><span class="name">{option.name}</span><span class="price"
+              <span class="units">{option.units}</span><span class="name">{option.name}</span>
+              <!-- <span class="price"
                 >{Utils.Strings.currency((product.quantity ?? 0) * (option.units ?? 0) * (option.price ?? 0))}</span
-              >
+              > -->
             </div>
           {/each}
         </div>
