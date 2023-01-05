@@ -184,12 +184,7 @@
           {#each product.options ?? [] as option, optionIndex}
             <div class="option">
               <span class="units">{option.units}</span><span class="name">{option.name}</span><span class="price"
-                >{Utils.Strings.currency(
-                  (product.quantity ?? 0) *
-                    (option.units ?? 0) *
-                    ((option.price ?? 0) -
-                      Logics.Finances.calcDiscount(option.price ?? 0, product.discount ?? 0, product.discountType))
-                )}</span
+                >{Utils.Strings.currency((product.quantity ?? 0) * (option.units ?? 0) * (option.price ?? 0))}</span
               >
             </div>
           {/each}
