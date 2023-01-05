@@ -16,6 +16,7 @@
   const Layout: Writable<Classes.CLayout | undefined> = Stores.Layout.instance?.store
 
   let itemsList: HTMLDivElement[] = []
+  let scrollItemsList: HTMLDivElement[] = []
   let userInfo: Types.Classes.CUser | undefined = undefined
   let categoriesAndProducts: Types.Classes.CCategoryProducts[] | undefined = undefined
   let orderType: Types.Types.TOrderType | undefined | null = null
@@ -39,12 +40,15 @@
       Stores.Loading.instance.start()
       resetTimeout()
       itemsList = []
+      categoriesAndProducts = []
       await tick()
       await cart.updateType()
       await cart.products()
       categoriesAndProducts = await all()
       Stores.Loading.instance.stop()
       working = false
+      await tick()
+      scrollItemsList = Object.assign([], itemsList)
     }
   }
 
@@ -99,7 +103,7 @@
 </jumbotron>
 <Views.Scroll
   tag="content"
-  {itemsList}
+  itemsList={scrollItemsList}
   bind:scrollTo
   animationIn={$Layout?.product.animation.in}
   animationOut={$Layout?.product.animation.out}
