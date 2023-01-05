@@ -3,6 +3,8 @@
   import { Views, Types, Utils, Stores } from '@ikomida/shared-frontend'
   import { GetPaymentMethods, UpdateCreditCard, DeleteCreditCard } from '../../network/Payment'
   import { onMount } from 'svelte'
+  import { Settings } from '../../stores/Setup'
+  import { GetSettings } from '../../network/User'
 
   let payments: Types.Classes.CPaymentMethod[]
 
@@ -44,7 +46,17 @@
   }
 
   onMount(async () => {
-    const response = await GetPaymentMethods()
+    let response = await GetSettings()
+    if (response?.success && response?.data) {
+      const settings: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject({
+        ...Settings.get().toJSON(),
+        ...response?.data
+      })
+      Settings.set(settings)
+    } else {
+      Stores.MessageAlert.instance.show(response?.data)
+    }
+    response = await GetPaymentMethods()
     if (response?.success) {
       const data: Types.Classes.CPaymentMethod[] = Types.Classes.CPaymentMethod.fromObject(response.data)
       payments = data.sort((i1, i2) => (i2.createdAt?.getTime() ?? 0) - (i1.createdAt?.getTime() ?? 0)) || []
@@ -57,7 +69,9 @@
   Stores.Title.instance.set('Meios de pagamento')
 </script>
 
-<Views.Button on:click={toggleNewCreditCard}>novo cartão</Views.Button>
+{#if $Settings?.paymentGateway?.integrated}
+  <Views.Button on:click={toggleNewCreditCard}>novo cartão</Views.Button>
+{/if}
 {#if !payments}
   <Views.LocalLoading size={2} />
 {:else if (payments?.length ?? 0) === 0}
