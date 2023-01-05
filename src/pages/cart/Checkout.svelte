@@ -176,6 +176,7 @@
       })
     } else {
       Stores.MessageAlert.instance.show(response?.data)
+      await updatePaymentMethods()
     }
   }
 
@@ -249,6 +250,16 @@
       return value >= total
     }
   }
+
+  async function updatePaymentMethods() {
+    const response = await GetPaymentMethods()
+    if (response?.success) {
+      const data: Types.Classes.CPaymentMethod[] = Types.Classes.CPaymentMethod.fromObject(response.data)
+      const payments = data.filter(paymentMethod => paymentMethod.selected)
+      payment = (payments?.length ?? 0) === 1 ? payments[0] : undefined
+    }
+  }
+
   onMount(async () => {
     try {
       orderType = await OrderType.get()
@@ -273,12 +284,7 @@
           address = null
         }
       }
-      response = await GetPaymentMethods()
-      if (response?.success) {
-        const data: Types.Classes.CPaymentMethod[] = Types.Classes.CPaymentMethod.fromObject(response.data)
-        const payments = data.filter(paymentMethod => paymentMethod.selected)
-        payment = (payments?.length ?? 0) === 1 ? payments[0] : undefined
-      }
+      await updatePaymentMethods()
       await requestGeoLocation()
     } catch (exception: any) {
       console.error(exception)
