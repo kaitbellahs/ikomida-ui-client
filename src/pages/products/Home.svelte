@@ -68,11 +68,13 @@
     orderType = await OrderType.get()
     let response = await GetSettings()
     if (response?.success && response?.data) {
+      try{
       const settings: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject({
         ...Settings.get().toJSON(),
         ...response?.data
       })
       Settings.set(settings)
+    }catch(_){}
     } else {
       Stores.MessageAlert.instance.show(response?.data)
     }
@@ -105,8 +107,8 @@
   tag="content"
   itemsList={scrollItemsList}
   bind:scrollTo
-  animationIn={$Layout?.product.animation.in}
-  animationOut={$Layout?.product.animation.out}
+  animationIn={$Layout?.product?.animation?.in}
+  animationOut={$Layout?.product?.animation?.out}
   backgroundImage={$Layout?.backgroundImage}
   showHeader={($mainScroll?.top ?? 0) > ($mainScroll?.offsetHeight ?? 0) / 4}
 >
