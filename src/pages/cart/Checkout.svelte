@@ -273,6 +273,7 @@
       await updatePaymentMethods()
       await requestGeoLocation()
     } catch (exception: any) {
+      //TODO: -- report errors
       console.error(exception)
     }
     Stores.Loading.instance.stop()
@@ -281,204 +282,207 @@
   Stores.Title.instance.set('Resumo e pagamento')
 </script>
 
-<h3 class="resumeHead">Resumo</h3>
-{#if $Products}
-  {#each $Products as product}
-    <div class="product">
-      <header>
-        <span class="quantity">{product.quantity}</span><span class="title">{product.title}</span><span class="price"
-          >{Utils.Strings.currency(Utils.Numbers.calcProductPrice(product))}</span
-        >
-      </header>
-      {#if (product.options?.length ?? 0) > 0}
-        <div>
-          {#each product.options ?? [] as option, optionIndex}
-            <div class="option">
-              <span class="units">{option.units}</span><span class="name">{option.name}</span>
-              <!-- <span class="price"
+<data>
+  <h3 class="resumeHead">Resumo</h3>
+  {#if $Products}
+    {#each $Products as product}
+      <div class="product">
+        <header>
+          <span class="quantity">{product.quantity}</span><span class="title">{product.title}</span><span class="price"
+            >{Utils.Strings.currency(Utils.Numbers.calcProductPrice(product))}</span
+          >
+        </header>
+        {#if (product.options?.length ?? 0) > 0}
+          <div>
+            {#each product.options ?? [] as option, optionIndex}
+              <div class="option">
+                <span class="units">{option.units}</span><span class="name">{option.name}</span>
+                <!-- <span class="price"
                 >{Utils.Strings.currency((product.quantity ?? 0) * (option.units ?? 0) * (option.price ?? 0))}</span
               > -->
-            </div>
-          {/each}
-        </div>
-      {/if}
-      {#if product.observation}
-        <small><b>Obs:</b> {product.observation}</small>
-      {/if}
-    </div>
-  {/each}
-  <Views.Divider />
-{/if}
-<table>
-  <tbody>
-    <tr>
-      <td class="resumeText">Subtotal</td>
-      <td class="resumeValue">{Utils.Strings.currency(subtotal())}</td>
-    </tr>
-    {#if discount !== 0}
+              </div>
+            {/each}
+          </div>
+        {/if}
+        {#if product.observation}
+          <small><b>Obs:</b> {product.observation}</small>
+        {/if}
+      </div>
+    {/each}
+    <Views.Divider />
+  {/if}
+  <table>
+    <tbody>
       <tr>
-        <td class="resumeText"
-          >cupom (- {couponObject?.valueType === Types.Types.TDiscount.PERCENT
-            ? Utils.Strings.percent(couponObject?.value)
-            : Utils.Strings.currency(couponObject?.value)})
-        </td>
-        <td class="resumeValue"><span class="deliveryFree">- {Utils.Strings.currency(discount)}</span></td>
+        <td class="resumeText">Subtotal</td>
+        <td class="resumeValue">{Utils.Strings.currency(subtotal())}</td>
       </tr>
-    {/if}
-    {#if orderType === Types.Types.TOrderType.DELIVERY}
-      {#if address}
+      {#if discount !== 0}
         <tr>
-          <td class="resumeText">Taxa de entrega</td>
-          <td class="resumeValue"
-            ><span class:deliveryFree={delivery == 0}
-              >{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
-            ></td
-          >
+          <td class="resumeText"
+            >cupom (- {couponObject?.valueType === Types.Types.TDiscount.PERCENT
+              ? Utils.Strings.percent(couponObject?.value)
+              : Utils.Strings.currency(couponObject?.value)})
+          </td>
+          <td class="resumeValue"><span class="deliveryFree">- {Utils.Strings.currency(discount)}</span></td>
         </tr>
       {/if}
-    {:else if orderType === Types.Types.TOrderType.LOCAL}
-      <tr>
-        <td class="resumeText">Gorjeta sugerida ({Utils.Strings.percent($Settings?.tip ?? 0)})</td>
-        <td class="resumeValue"><span class:deliveryFree={tip == 0}>{Utils.Strings.currency(tip ?? 0)}</span></td>
+      {#if orderType === Types.Types.TOrderType.DELIVERY}
+        {#if address}
+          <tr>
+            <td class="resumeText">Taxa de entrega</td>
+            <td class="resumeValue"
+              ><span class:deliveryFree={delivery == 0}
+                >{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
+              ></td
+            >
+          </tr>
+        {/if}
+      {:else if orderType === Types.Types.TOrderType.LOCAL}
+        <tr>
+          <td class="resumeText">Gorjeta sugerida ({Utils.Strings.percent($Settings?.tip ?? 0)})</td>
+          <td class="resumeValue"><span class:deliveryFree={tip == 0}>{Utils.Strings.currency(tip ?? 0)}</span></td>
+        </tr>
+      {/if}
+      <tr class="spacer" />
+      <tr class="total">
+        <td class="resumeText">Total</td>
+        <td class="resumeValue total">{Utils.Strings.currency(total)}</td>
       </tr>
+    </tbody>
+  </table>
+  {#if couponObject}
+    <Views.Button type={Types.TButton.TRANSPARENT} on:click={removeCoupon}>Remover o cupom</Views.Button>
+  {:else}
+    <Views.TextEdit
+      marginTop={16}
+      bind:value={coupon}
+      placeHolder="Adicionar cupom"
+      buttonName="Adicionar"
+      callback={addCoupon}
+      type={Types.TTextEdit.ALPHA_NUMERIC}
+      upper={true}
+    />
+  {/if}
+  <Views.Button type={Types.TButton.TRANSPARENT} on:click={addMoreItems}>Adicionar mais itens</Views.Button>
+
+  {#if ($Settings.delivery?.orderMinValue ?? 0) > total}
+    <Views.Divider height={8} />
+    <Views.Status type={Types.Status.WARNING}
+      >Para continuar adicione mais itens para atingir o valor mínimo do pedido.</Views.Status
+    >
+  {/if}
+
+  {#if orderType === Types.Types.TOrderType.DELIVERY}
+    <Views.Divider height={16} />
+    <Views.Button on:click={manageAddress}>trocar endereço</Views.Button>
+    {#if address === undefined}
+      <Views.LocalLoading size={2} />
+    {:else if address}
+      <div class="address">
+        <div class="content">
+          <span class="delivery">A entrega será realizada na</span>
+          <span>{address?.street}, {address?.number}{address?.complement ? ` - ${address?.complement}` : ''}</span>
+          <span class="neighborhood">{address?.neighborhood} </span>
+          <span class="city">{address?.city}/{address?.stat} CEP: {address?.postalCode}</span>
+        </div>
+      </div>
+    {:else}
+      <Views.Status type={Types.Status.WARNING}>Para continuar precisa selecionar ou adicionar um endereço</Views.Status
+      >
     {/if}
-    <tr class="spacer" />
-    <tr class="total">
-      <td class="resumeText">Total</td>
-      <td class="resumeValue total">{Utils.Strings.currency(total)}</td>
-    </tr>
-  </tbody>
-</table>
-{#if couponObject}
-  <Views.Button type={Types.TButton.TRANSPARENT} on:click={removeCoupon}>Remover o cupom</Views.Button>
-{:else}
-  <Views.TextEdit
-    marginTop={16}
-    bind:value={coupon}
-    placeHolder="Adicionar cupom"
-    buttonName="Adicionar"
-    callback={addCoupon}
-    type={Types.TTextEdit.ALPHA_NUMERIC}
-    upper={true}
-  />
-{/if}
-<Views.Button type={Types.TButton.TRANSPARENT} on:click={addMoreItems}>Adicionar mais itens</Views.Button>
-
-{#if ($Settings.delivery?.orderMinValue ?? 0) > total}
-  <Views.Divider height={8} />
-  <Views.Status type={Types.Status.WARNING}
-    >Para continuar adicione mais itens para atingir o valor mínimo do pedido.</Views.Status
-  >
-{/if}
-
-{#if orderType === Types.Types.TOrderType.DELIVERY}
+  {:else if orderType === Types.Types.TOrderType.LOCAL}
+    <Views.TextEdit
+      marginTop={16}
+      placeHolder="Símbolo da mesa"
+      bind:value={table}
+      initialValue={table}
+      type={Types.TTextEdit.ALPHA_NUMERIC}
+      min={1}
+      max={50}
+    />
+    {#if !table}
+      <Views.Divider height={8} />
+      <Views.Status type={Types.Status.WARNING}>Para continuar precisa digitar o símbolo da mesa.</Views.Status>
+    {/if}
+  {/if}
   <Views.Divider height={16} />
-  <Views.Button on:click={manageAddress}>trocar endereço</Views.Button>
-  {#if address === undefined}
+  <Views.Button on:click={manageCard}>Trocar meio de pagamento</Views.Button>
+  {#if payment === undefined}
     <Views.LocalLoading size={2} />
-  {:else if address}
-    <div class="address">
+  {:else if payment}
+    <div class="paymentCard">
       <div class="content">
-        <span class="delivery">A entrega será realizada na</span>
-        <span>{address?.street}, {address?.number}{address?.complement ? ` - ${address?.complement}` : ''}</span>
-        <span class="neighborhood">{address?.neighborhood} </span>
-        <span class="city">{address?.city}/{address?.stat} CEP: {address?.postalCode}</span>
+        <span class="payWith">A cobrança será realizada com</span>
+        <span class="paymentType">{Utils.Strings.capitalizeFirstLeter(payment.type?.name)}</span>
+        {payment?.type.description}
+        <span class="brand">
+          {#if payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
+            <Views.Image source="/assets/cardBrand/{payment?.brand}.svg" name={payment?.brand} />
+            **** {payment?.lastDigits}
+          {:else if payment?.type === Types.Types.TPaymentMethod.CASH_ON_DELIVERY}
+            <Views.TextEdit
+              placeHolder="Troco para quanto?"
+              bind:value={change}
+              initialValue={change}
+              type={Types.TTextEdit.CURRENCY}
+              validation={validateChange()}
+              error="O valor total das do pagamento deve ser maior ou igual ao valor do pedido."
+            />
+            <!-- //TODO: -- 'undefined' bug fix -->
+            {#if isNaN(Number(change)) || Number(change) <= 0}
+              <Views.Divider height={8} />
+              <Views.Status type={Types.Status.WARNING}
+                >Para continuar precisa digitar o valor total das notas ou cédulas que vai usar para o pagamento, para
+                que o garçom ou entregador já leva o seu troco.</Views.Status
+              >
+            {/if}
+          {/if}
+        </span>
       </div>
     </div>
   {:else}
-    <Views.Status type={Types.Status.WARNING}>Para continuar precisa selecionar ou adicionar um endereço</Views.Status>
+    <Views.Status type={Types.Status.WARNING}
+      >Para continuar precisa selecionar ou adicionar uma forma de pagamento.</Views.Status
+    >
   {/if}
-{:else if orderType === Types.Types.TOrderType.LOCAL}
-  <Views.TextEdit
-    marginTop={16}
-    placeHolder="Símbolo da mesa"
-    bind:value={table}
-    initialValue={table}
-    type={Types.TTextEdit.ALPHA_NUMERIC}
-    min={1}
-    max={50}
-  />
-  {#if !table}
-    <Views.Divider height={8} />
-    <Views.Status type={Types.Status.WARNING}>Para continuar precisa digitar o símbolo da mesa.</Views.Status>
+  {#if businessTime}
+    <Views.Button disabled={!validate} isFloat={true} on:click={canForward}>
+      <span
+        >Confirmar o {!payment?.type ||
+        [
+          Types.Types.TPaymentMethod.CASH_ON_DELIVERY,
+          Types.Types.TPaymentMethod.CREDIT_CARD_ON_DELIVERY,
+          Types.Types.TPaymentMethod.DEBT_CARD_ON_DELIVERY,
+          Types.Types.TPaymentMethod.PIX_ON_DELIVERY
+        ].includes(payment.type)
+          ? 'pedido'
+          : 'pagamento'}</span
+      ></Views.Button
+    >
+  {:else}
+    <h2 class="businessHoursError">Estámos fora do horario do funcionamento, confire os nossos horários</h2>
   {/if}
-{/if}
-<Views.Divider height={16} />
-<Views.Button on:click={manageCard}>Trocar meio de pagamento</Views.Button>
-{#if payment === undefined}
-  <Views.LocalLoading size={2} />
-{:else if payment}
-  <div class="paymentCard">
-    <div class="content">
-      <span class="payWith">A cobrança será realizada com</span>
-      <span class="paymentType">{Utils.Strings.capitalizeFirstLeter(payment.type?.name)}</span>
-      {payment?.type.description}
-      <span class="brand">
-        {#if payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
-          <Views.Image source="/assets/cardBrand/{payment?.brand}.svg" name={payment?.brand} />
-          **** {payment?.lastDigits}
-        {:else if payment?.type === Types.Types.TPaymentMethod.CASH_ON_DELIVERY}
-          <Views.TextEdit
-            placeHolder="Troco para quanto?"
-            bind:value={change}
-            initialValue={change}
-            type={Types.TTextEdit.CURRENCY}
-            validation={validateChange()}
-            error="O valor total das do pagamento deve ser maior ou igual ao valor do pedido."
-          />
-          <!-- //TODO: -- 'undefined' bug fix -->
-          {#if isNaN(Number(change)) || Number(change) <= 0}
-            <Views.Divider height={8} />
-            <Views.Status type={Types.Status.WARNING}
-              >Para continuar precisa digitar o valor total das notas ou cédulas que vai usar para o pagamento, para que
-              o garçom ou entregador já leva o seu troco.</Views.Status
-            >
-          {/if}
-        {/if}
-      </span>
-    </div>
-  </div>
-{:else}
-  <Views.Status type={Types.Status.WARNING}
-    >Para continuar precisa selecionar ou adicionar uma forma de pagamento.</Views.Status
-  >
-{/if}
-{#if businessTime}
-  <Views.Button disabled={!validate} isFloat={true} on:click={canForward}>
-    <span
-      >Confirmar o {!payment?.type ||
-      [
-        Types.Types.TPaymentMethod.CASH_ON_DELIVERY,
-        Types.Types.TPaymentMethod.CREDIT_CARD_ON_DELIVERY,
-        Types.Types.TPaymentMethod.DEBT_CARD_ON_DELIVERY,
-        Types.Types.TPaymentMethod.PIX_ON_DELIVERY
-      ].includes(payment.type)
-        ? 'pedido'
-        : 'pagamento'}</span
-    ></Views.Button
-  >
-{:else}
-  <h2 class="businessHoursError">Estámos fora do horario do funcionamento, confire os nossos horários</h2>
-{/if}
-<Views.GTerms />
-{#if showLocationAlertAlert}
-  <Views.Alert
-    title="Alerta"
-    message={`Você está longe do endereço da entrega cadastrado, verifique se o endereço da entrega está correto.`}
-    closeCallBack={toggleShowLocationAlertAlert}
-    buttons={[
-      {
-        name: 'Quero verificar',
-        callback: toggleShowLocationAlertAlert,
-        principal: true
-      },
-      {
-        name: 'Continuar',
-        callback: forward
-      }
-    ]}
-  />
-{/if}
+  <Views.GTerms />
+  {#if showLocationAlertAlert}
+    <Views.Alert
+      title="Alerta"
+      message={`Você está longe do endereço da entrega cadastrado, verifique se o endereço da entrega está correto.`}
+      closeCallBack={toggleShowLocationAlertAlert}
+      buttons={[
+        {
+          name: 'Quero verificar',
+          callback: toggleShowLocationAlertAlert,
+          principal: true
+        },
+        {
+          name: 'Continuar',
+          callback: forward
+        }
+      ]}
+    />
+  {/if}
+</data>
 
 <style>
   .product {

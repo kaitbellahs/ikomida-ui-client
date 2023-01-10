@@ -26,9 +26,7 @@
   $: canLogin = isValidPhone
 
   async function doSubscribe() {
-    console.log('$router?.route:', $router?.route)
     await LastRoute.set($router?.route)
-    console.log('await LastRoute.get():', await LastRoute.get())
     Stores.Navigation.instance.goTo(Routes.subscribe)
   }
 

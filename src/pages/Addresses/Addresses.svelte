@@ -51,35 +51,37 @@
   Stores.Title.instance.set('Endereços')
 </script>
 
-<Views.Button on:click={toggleNewAddress}>Novo endereço</Views.Button>
-{#if !addresses}
-  <Views.LocalLoading size={2} />
-{:else if (addresses?.length ?? 0) > 0}
-  <Views.Divider />
-  <h3>Selecione seu endereço principal</h3>
-  <small>Esse endereço será usado para entregar seus pedidos</small>
-  {#each addresses as address (address?.id)}
-    <div class="address">
-      <Views.FloatRemove callback={() => onRemoveClick(address?.id)} />
-      <div class="content">
-        <span class="street"
-          >{address?.street}, {address?.number}{address?.complement ? ` - ${address?.complement}` : ''}</span
-        >
-        <span class="neighborhood">{address?.neighborhood}</span>
-        <span class="city">{address?.city}/{address?.stat} CEP: {address?.postalCode}</span>
-        <small style="text-align:left;">{address.kind?.name ?? '-'}, {address.reference}</small>
+<data>
+  <Views.Button on:click={toggleNewAddress}>Novo endereço</Views.Button>
+  {#if !addresses}
+    <Views.LocalLoading size={2} />
+  {:else if (addresses?.length ?? 0) > 0}
+    <Views.Divider />
+    <h3>Selecione seu endereço principal</h3>
+    <small>Esse endereço será usado para entregar seus pedidos</small>
+    {#each addresses as address (address?.id)}
+      <div class="address">
+        <Views.FloatRemove callback={() => onRemoveClick(address?.id)} />
+        <div class="content">
+          <span class="street"
+            >{address?.street}, {address?.number}{address?.complement ? ` - ${address?.complement}` : ''}</span
+          >
+          <span class="neighborhood">{address?.neighborhood}</span>
+          <span class="city">{address?.city}/{address?.stat} CEP: {address?.postalCode}</span>
+          <small style="text-align:left;">{address.kind?.name ?? '-'}, {address.reference}</small>
+        </div>
+        <div class="checkbox" on:click={() => updateAddress(address.id)}>
+          <Views.Checkbox bind:checked={address.selected} />
+        </div>
       </div>
-      <div class="checkbox" on:click={() => updateAddress(address.id)}>
-        <Views.Checkbox bind:checked={address.selected} />
-      </div>
-    </div>
-  {/each}
-{:else}
-  <Views.CentredMessage
-    text="Não há endereços para exibir, aproveite e cadastre deu endereço pricipal agora
+    {/each}
+  {:else}
+    <Views.CentredMessage
+      text="Não há endereços para exibir, aproveite e cadastre deu endereço pricipal agora
 mesmo!"
-  />
-{/if}
+    />
+  {/if}
+</data>
 
 <style>
   .address {

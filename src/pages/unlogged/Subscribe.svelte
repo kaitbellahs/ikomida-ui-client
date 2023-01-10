@@ -48,47 +48,49 @@
   Stores.Title.instance.set('Criar conta')
 </script>
 
-<h2>Falta pouco para se tornar um usuário digital do nosso estabelecimento.</h2>
-<small>É só preencher todas as informações do formulário e depois clicar em <b>“continuar”</b>.</small>
-<Views.TextEdit
-  icon={faUser}
-  bind:value={subscribeObject.name}
-  initialValue={subscribeObject.name}
-  type={Types.TTextEdit.NAME}
-  placeHolder="Nome"
-/>
-<Views.TextEdit
-  icon={faUser}
-  bind:value={subscribeObject.lastName}
-  initialValue={subscribeObject.lastName}
-  type={Types.TTextEdit.NAME}
-  placeHolder="Sobrenome"
-/>
-<Views.TextEdit
-  bind:value={subscribeObject.identity}
-  type={Types.TTextEdit.CPF}
-  placeHolder="CPF"
-  bind:isValid={isValidCPF}
-/>
-<Views.TextEdit
-  type={Types.TTextEdit.EMAIL}
-  bind:value={subscribeObject.email}
-  placeHolder="E-mail"
-  bind:isValid={isValidEmail}
-/>
-<Views.TextEdit
-  type={Types.TTextEdit.PASSWORD}
-  bind:value={subscribeObject.password}
-  placeHolder="Senha"
-  bind:isValid={isValidPassword}
-  error="A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
+<data>
+  <h2>Falta pouco para se tornar um usuário digital do nosso estabelecimento.</h2>
+  <small>É só preencher todas as informações do formulário e depois clicar em <b>“continuar”</b>.</small>
+  <Views.TextEdit
+    icon={faUser}
+    bind:value={subscribeObject.name}
+    initialValue={subscribeObject.name}
+    type={Types.TTextEdit.NAME}
+    placeHolder="Nome"
+  />
+  <Views.TextEdit
+    icon={faUser}
+    bind:value={subscribeObject.lastName}
+    initialValue={subscribeObject.lastName}
+    type={Types.TTextEdit.NAME}
+    placeHolder="Sobrenome"
+  />
+  <Views.TextEdit
+    bind:value={subscribeObject.identity}
+    type={Types.TTextEdit.CPF}
+    placeHolder="CPF"
+    bind:isValid={isValidCPF}
+  />
+  <Views.TextEdit
+    type={Types.TTextEdit.EMAIL}
+    bind:value={subscribeObject.email}
+    placeHolder="E-mail"
+    bind:isValid={isValidEmail}
+  />
+  <Views.TextEdit
+    type={Types.TTextEdit.PASSWORD}
+    bind:value={subscribeObject.password}
+    placeHolder="Senha"
+    bind:isValid={isValidPassword}
+    error="A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
   uma letra maiúscula, uma letra minúscula, um número e um símbolo"
-/>
-<Views.Divider />
-<Views.Button disabled={!canContinue} on:click={doSubscribe}>Cadastrar</Views.Button>
+  />
+  <Views.Divider />
+  <Views.Button disabled={!canContinue} on:click={doSubscribe}>Cadastrar</Views.Button>
 
-<Views.Divider />
-<small
-  >Ao confirmar você concorda com <a href="#/" on:click={goToTAC}>termos de uso</a>
-  e nossa <a on:click={goToPP} href="#/">politica de privacidade</a></small
->
+  <Views.Divider />
+  <small
+    >Ao confirmar você concorda com <a href="#/" on:click={goToTAC}>termos de uso</a>
+    e nossa <a on:click={goToPP} href="#/">politica de privacidade</a></small
+  >
+</data>

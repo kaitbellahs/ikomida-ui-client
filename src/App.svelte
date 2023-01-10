@@ -316,7 +316,6 @@
     }
   ]
   menuHamburgerItems.forEach(page => Stores.MenuHamburger.instance.addItem(page))
-  $: console.log($Settings)
   onMount(async () => {
     await CartStore.createInstance()
     style = document.createElement('style')
@@ -373,7 +372,7 @@
   // });
   $: isPageList = [Routes.orders, Routes.pushNotifications].includes(route)
   $: styleParams = `padding: ${isPageList ? 0 : 16}px;margin-top:${styleHeight};padding-bottom: ${
-    showCart || route === Routes.checkout || route === Routes.cart || route === Routes.product ? '168px' : '64px'
+    showCart || route === Routes.checkout || route === Routes.cart || route === Routes.product ? '168px' : '112px'
   };background: ${$Layout?.background};`
 </script>
 

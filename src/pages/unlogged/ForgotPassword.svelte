@@ -108,70 +108,70 @@
   Stores.Title.instance.set('Recuperar senha')
 </script>
 
-<Views.Divider />
-<h2>Por favor informe seu número de telefone cadastrado</h2>
-<small>clique em "<b>Solicitar</b>" para solicitar o código de validação</small>
-<Views.TextEdit
-  type={Types.TTextEdit.PHONE}
-  bind:value={requestPasswordObject.phone}
-  buttonName="Solicitar"
-  callback={requestPhoneValidation}
-  buttonDisabled={!canRequestCode || !countdownCanRequestCode}
-  bind:isValid={canRequestCode}
-  placeHolder="Número de telefone"
-/>
-{#if !countdownCanRequestCode}
-  <small>Caso não receber o código, espera {countdown} segundos para solicitar um novo!</small>
-{/if}
-<Views.Divider />
-<Views.TextEdit
-  type={Types.TTextEdit.NUMBER}
-  bind:value={requestPasswordObject.phoneValidationCode}
-  mask="_ _ _ _"
-  buttonName="Confirmar"
-  callback={ValidatePhoneCode}
-  buttonDisabled={!isValidationValid}
-  disabled={!canDigitValidationCode}
-  bind:isValid={isValidationValid}
-  validation={validateValidationCode}
-  placeHolder="Código de validação"
-/>
-<Views.Divider />
-<Views.Divider />
-<Views.Button on:click={requestNewPassword} disabled={!canRequestPassword}>Solicitar nova senha</Views.Button>
-<Views.GTerms />
+<data>
+  <h2>Por favor informe seu número de telefone cadastrado</h2>
+  <small>clique em "<b>Solicitar</b>" para solicitar o código de validação</small>
+  <Views.TextEdit
+    type={Types.TTextEdit.PHONE}
+    bind:value={requestPasswordObject.phone}
+    buttonName="Solicitar"
+    callback={requestPhoneValidation}
+    buttonDisabled={!canRequestCode || !countdownCanRequestCode}
+    bind:isValid={canRequestCode}
+    placeHolder="Número de telefone"
+  />
+  {#if !countdownCanRequestCode}
+    <small>Caso não receber o código, espera {countdown} segundos para solicitar um novo!</small>
+  {/if}
+  <Views.TextEdit
+    type={Types.TTextEdit.NUMBER}
+    bind:value={requestPasswordObject.phoneValidationCode}
+    mask="_ _ _ _"
+    buttonName="Confirmar"
+    callback={ValidatePhoneCode}
+    buttonDisabled={!isValidationValid}
+    disabled={!canDigitValidationCode}
+    bind:isValid={isValidationValid}
+    validation={validateValidationCode}
+    placeHolder="Código de validação"
+  />
+  <Views.Divider />
+  <Views.Divider />
+  <Views.Button on:click={requestNewPassword} disabled={!canRequestPassword}>Solicitar nova senha</Views.Button>
+  <Views.GTerms />
 
-{#if showRequestValidatingCodeAlert}
-  <Views.Alert
-    title="Alerta"
-    message={`Verifica se seu número de telefone inserido ${Utils.Strings.formatAsPhone(
-      requestPasswordObject?.phone
-    )} está correto para prosseguir`}
-    closeCallBack={toggleshowRequestValidatingCodeAlert}
-    buttons={[
-      {
-        name: 'Quero corrigir',
-        callback: toggleshowRequestValidatingCodeAlert
-      },
-      {
-        name: 'Está correto',
-        callback: requestPhoneValidation,
-        principal: true
-      }
-    ]}
-  />
-{/if}
-{#if showPasswordRequistedAlert}
-  <Views.Alert
-    title="Alerta"
-    message={`Sua senha foi resetada e gerada uma nova senha aleatória e foi enviada para seu email cadastrado, em instantes você receberá o nosso email, verifica nas caixas de entrada e caixa spam.`}
-    closeCallBack={toggleshowPasswordRequistedAlert}
-    buttons={[
-      {
-        name: 'Fazer login',
-        callback: () => Stores.Navigation.instance.reset(Routes.login),
-        principal: true
-      }
-    ]}
-  />
-{/if}
+  {#if showRequestValidatingCodeAlert}
+    <Views.Alert
+      title="Alerta"
+      message={`Verifica se seu número de telefone inserido ${Utils.Strings.formatAsPhone(
+        requestPasswordObject?.phone
+      )} está correto para prosseguir`}
+      closeCallBack={toggleshowRequestValidatingCodeAlert}
+      buttons={[
+        {
+          name: 'Quero corrigir',
+          callback: toggleshowRequestValidatingCodeAlert
+        },
+        {
+          name: 'Está correto',
+          callback: requestPhoneValidation,
+          principal: true
+        }
+      ]}
+    />
+  {/if}
+  {#if showPasswordRequistedAlert}
+    <Views.Alert
+      title="Alerta"
+      message={`Sua senha foi resetada e gerada uma nova senha aleatória e foi enviada para seu email cadastrado, em instantes você receberá o nosso email, verifica nas caixas de entrada e caixa spam.`}
+      closeCallBack={toggleshowPasswordRequistedAlert}
+      buttons={[
+        {
+          name: 'Fazer login',
+          callback: () => Stores.Navigation.instance.reset(Routes.login),
+          principal: true
+        }
+      ]}
+    />
+  {/if}
+</data>

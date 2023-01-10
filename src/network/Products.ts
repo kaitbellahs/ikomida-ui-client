@@ -27,11 +27,11 @@ export async function all(): Promise<Types.Classes.CCategoryProducts[]> {
 }
 
 export async function search(query: string): Promise<Types.Classes.CCategoryProducts[]> {
-  return sortItems(
+  const data =
     (await all())
       .map(section => {
-        return {
-          title: section.title,
+        return Types.Classes.CCategoryProducts.fromObject({
+          ...section.toJSON(),
           products: section.products?.filter(item => {
             if (typeof item == 'object') {
               return (
@@ -42,10 +42,10 @@ export async function search(query: string): Promise<Types.Classes.CCategoryProd
               return true
             }
           })
-        } as Types.Classes.CCategoryProducts
+        })
       })
       .filter(item => (item.products?.length ?? 0) > 0)
-  )
+  return sortItems(data)
 }
 
 export async function getProduct(id?: string) {

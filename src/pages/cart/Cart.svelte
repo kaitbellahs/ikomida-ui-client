@@ -289,61 +289,63 @@
   })
 </script>
 
-{#if showAlert}
-  <Views.Alert
-    title="Alerta"
-    message="Você tem certeza que quer remover todos produtos do carrinho de compras?"
-    closeCallBack={toggleAlert}
-    buttons={[
-      { name: 'Não', callback: toggleAlert, principal: true },
-      { name: 'Sim', callback: resetCart }
-    ]}
-  />
-{/if}
-{#if $Settings.delivery?.orderMinValue}
-  <info class="shadow">
-    Pedido mínimo: <b>{Utils.Strings.currency($Settings.delivery?.orderMinValue ?? 0)}</b>
-  </info>
-{/if}
-{#each $Products ?? [] as product}
-  <Views.CartItem {addOptions} {onRemoveClick} {onPlusClick} {onMinosClick} {product} />
-{/each}
-<Views.Button type={Types.TButton.TRANSPARENT} on:click={addMoreProducts}>Adicionar mais itens</Views.Button>
-<table>
-  <thead>
-    <tr>
-      <th colspan="2" class="resumeHead">Resumo</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td class="resumeText">Subtotal</td>
-      <td class="resumeValue">{Utils.Strings.currency(subtotal())}</td>
-    </tr>
-    {#if orderType === Types.Types.TOrderType.DELIVERY}
-      {#if address}
+<data>
+  {#if showAlert}
+    <Views.Alert
+      title="Alerta"
+      message="Você tem certeza que quer remover todos produtos do carrinho de compras?"
+      closeCallBack={toggleAlert}
+      buttons={[
+        { name: 'Não', callback: toggleAlert, principal: true },
+        { name: 'Sim', callback: resetCart }
+      ]}
+    />
+  {/if}
+  {#if $Settings.delivery?.orderMinValue}
+    <info class="shadow">
+      Pedido mínimo: <b>{Utils.Strings.currency($Settings.delivery?.orderMinValue ?? 0)}</b>
+    </info>
+  {/if}
+  {#each $Products ?? [] as product}
+    <Views.CartItem {addOptions} {onRemoveClick} {onPlusClick} {onMinosClick} {product} />
+  {/each}
+  <Views.Button type={Types.TButton.TRANSPARENT} on:click={addMoreProducts}>Adicionar mais itens</Views.Button>
+  <table>
+    <thead>
+      <tr>
+        <th colspan="2" class="resumeHead">Resumo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="resumeText">Subtotal</td>
+        <td class="resumeValue">{Utils.Strings.currency(subtotal())}</td>
+      </tr>
+      {#if orderType === Types.Types.TOrderType.DELIVERY}
+        {#if address}
+          <tr>
+            <td class="resumeText">Taxa de entrega</td>
+            <td class="resumeValue"
+              ><span class:deliveryFree={delivery == 0}
+                >{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
+              ></td
+            >
+          </tr>
+        {/if}
+      {:else if orderType === Types.Types.TOrderType.LOCAL}
         <tr>
-          <td class="resumeText">Taxa de entrega</td>
-          <td class="resumeValue"
-            ><span class:deliveryFree={delivery == 0}
-              >{delivery == 0 ? 'Gratis' : Utils.Strings.currency(delivery)}</span
-            ></td
-          >
+          <td class="resumeText">Gorjeta sugerida ({Utils.Strings.percent($Settings?.tip ?? 0)})</td>
+          <td class="resumeValue"><span class:deliveryFree={tip == 0}>{Utils.Strings.currency(tip ?? 0)}</span></td>
         </tr>
       {/if}
-    {:else if orderType === Types.Types.TOrderType.LOCAL}
       <tr>
-        <td class="resumeText">Gorjeta sugerida ({Utils.Strings.percent($Settings?.tip ?? 0)})</td>
-        <td class="resumeValue"><span class:deliveryFree={tip == 0}>{Utils.Strings.currency(tip ?? 0)}</span></td>
+        <td class="resumeText">Total</td>
+        <td class="resumeValue">{Utils.Strings.currency(total)}</td>
       </tr>
-    {/if}
-    <tr>
-      <td class="resumeText">Total</td>
-      <td class="resumeValue">{Utils.Strings.currency(total)}</td>
-    </tr>
-  </tbody>
-</table>
-<Views.Button isFloat={true} on:click={forward}><span>Continuar</span></Views.Button>
+    </tbody>
+  </table>
+  <Views.Button isFloat={true} on:click={forward}><span>Continuar</span></Views.Button>
+</data>
 
 <style>
   table {

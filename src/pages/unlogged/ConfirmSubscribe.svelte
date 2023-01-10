@@ -63,7 +63,6 @@
           await registerPushNotificationToken($pushNotificationToken)
         }
         if (route) {
-          console.log('route:', route)
           if ([Routes.home, Routes.search, Routes.orders].includes(route)) {
             navigation.reset(route)
           } else {
@@ -139,41 +138,43 @@
   Stores.Title.instance.set('Cadastro')
 </script>
 
-<h2>Por favor informe seu número de telefone para o cadastrado</h2>
-<small>clique em "<b>Solicitar</b>" para solicitar o código de validação</small>
-<Views.TextEdit
-  type={Types.TTextEdit.PHONE}
-  bind:value={subscribeObject.phone}
-  buttonName="Solicitar"
-  callback={toggleshowRequestValidatingCodeAlert}
-  buttonDisabled={!canRequestCode || !countdownCanRequestCode}
-  bind:isValid={canRequestCode}
-  placeHolder="Número do telefone"
-/>
-{#if !countdownCanRequestCode}
-  <small>Caso não receber o código, espera {countdown} segundos para solicitar um novo!</small>
-{/if}
-<Views.TextEdit
-  type={Types.TTextEdit.NUMBER}
-  bind:value={subscribeObject.phoneValidationCode}
-  icon={faUnlock}
-  mask="_ _ _ _"
-  buttonName="Confirmar"
-  callback={ValidatePhoneCode}
-  buttonDisabled={!isValidationValid}
-  disabled={!canDigitValidationCode}
-  bind:isValid={isValidationValid}
-  validation={validateValidationCode}
-  placeHolder="Código de validação"
-/>
-<Views.Divider />
-<Views.Button on:click={doSubscribe} disabled={!canSubscribe}>Confirmar</Views.Button>
-<Views.Divider />
-<small
-  >Ao confirmar você concorda com <a href="#/" on:click={goToTAC}>termos de uso</a>
-  e nossa <a on:click={goToPP} href="#/">politica de privacidade</a></small
->
-<Views.GTerms />
+<data>
+  <h2>Por favor informe seu número de telefone para o cadastrado</h2>
+  <small>clique em "<b>Solicitar</b>" para solicitar o código de validação</small>
+  <Views.TextEdit
+    type={Types.TTextEdit.PHONE}
+    bind:value={subscribeObject.phone}
+    buttonName="Solicitar"
+    callback={toggleshowRequestValidatingCodeAlert}
+    buttonDisabled={!canRequestCode || !countdownCanRequestCode}
+    bind:isValid={canRequestCode}
+    placeHolder="Número do telefone"
+  />
+  {#if !countdownCanRequestCode}
+    <small>Caso não receber o código, espera {countdown} segundos para solicitar um novo!</small>
+  {/if}
+  <Views.TextEdit
+    type={Types.TTextEdit.NUMBER}
+    bind:value={subscribeObject.phoneValidationCode}
+    icon={faUnlock}
+    mask="_ _ _ _"
+    buttonName="Confirmar"
+    callback={ValidatePhoneCode}
+    buttonDisabled={!isValidationValid}
+    disabled={!canDigitValidationCode}
+    bind:isValid={isValidationValid}
+    validation={validateValidationCode}
+    placeHolder="Código de validação"
+  />
+  <Views.Divider />
+  <Views.Button on:click={doSubscribe} disabled={!canSubscribe}>Confirmar</Views.Button>
+  <Views.Divider />
+  <small
+    >Ao confirmar você concorda com <a href="#/" on:click={goToTAC}>termos de uso</a>
+    e nossa <a on:click={goToPP} href="#/">politica de privacidade</a></small
+  >
+  <Views.GTerms />
+</data>
 
 {#if showRequestValidatingCodeAlert}
   <Views.Alert

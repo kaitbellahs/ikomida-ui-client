@@ -69,39 +69,41 @@
   Stores.Title.instance.set('Meios de pagamento')
 </script>
 
-{#if $Settings?.paymentGateway?.integrated}
-  <Views.Button on:click={toggleNewCreditCard}>novo cartão</Views.Button>
-{/if}
-{#if !payments}
-  <Views.LocalLoading size={2} />
-{:else if (payments?.length ?? 0) === 0}
-  <Views.CentredMessage
-    text="Não há cartões de crédito cadastrados para exibir, cadastre agora uma para fazer seu pedido com segurança!"
-  />
-{:else}
-  <Views.Divider />
-  <h3>Selecione seu meio de pagamento principal</h3>
-  <small>Esse meio de pagamento será usado para realizar cobranças do seus pedidos</small>
-  {#each payments as { id, type, brand, lastDigits, selected } (id)}
-    <div class="paymentCard">
-      {#if type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
-        <Views.FloatRemove callback={() => onRemoveClick(id)} />
-      {/if}
-      <div class="content">
-        <span class="paymentType">{Utils.Strings.capitalizeFirstLeter(type.name)}</span>
-        Pagar {type.description}
-        <span class="brand">
-          {#if type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
-            <Views.Image source="/assets/cardBrand/{brand}.svg" name={brand} /> **** {lastDigits}
-          {/if}
-        </span>
+<data>
+  {#if $Settings?.paymentGateway?.integrated}
+    <Views.Button on:click={toggleNewCreditCard}>novo cartão</Views.Button>
+  {/if}
+  {#if !payments}
+    <Views.LocalLoading size={2} />
+  {:else if (payments?.length ?? 0) === 0}
+    <Views.CentredMessage
+      text="Não há cartões de crédito cadastrados para exibir, cadastre agora uma para fazer seu pedido com segurança!"
+    />
+  {:else}
+    <Views.Divider />
+    <h3>Selecione seu meio de pagamento principal</h3>
+    <small>Esse meio de pagamento será usado para realizar cobranças do seus pedidos</small>
+    {#each payments as { id, type, brand, lastDigits, selected } (id)}
+      <div class="paymentCard">
+        {#if type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
+          <Views.FloatRemove callback={() => onRemoveClick(id)} />
+        {/if}
+        <div class="content">
+          <span class="paymentType">{Utils.Strings.capitalizeFirstLeter(type.name)}</span>
+          Pagar {type.description}
+          <span class="brand">
+            {#if type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
+              <Views.Image source="/assets/cardBrand/{brand}.svg" name={brand} /> **** {lastDigits}
+            {/if}
+          </span>
+        </div>
+        <div class="checkbox" on:click={() => updateCreditCard(id)}>
+          <Views.Checkbox bind:checked={selected} />
+        </div>
       </div>
-      <div class="checkbox" on:click={() => updateCreditCard(id)}>
-        <Views.Checkbox bind:checked={selected} />
-      </div>
-    </div>
-  {/each}
-{/if}
+    {/each}
+  {/if}
+</data>
 
 <style>
   .paymentCard {

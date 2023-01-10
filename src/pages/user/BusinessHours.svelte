@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Views, Stores, Types, Utils } from '@ikomida/shared-frontend'
-  import { onDestroy, onMount } from 'svelte'
+  import { onMount } from 'svelte'
   import { Settings } from '../../stores/Setup'
   const Layout = Stores.Layout.instance.store
   const today = new Date().getDay()
@@ -75,6 +75,8 @@
               <span class="noExpedient">sem horário de expediente</span>
             {/if}
           </Views.ExpandableBox>
+        {:else}
+          <Views.CentredMessage text="Horário inválido!" />
         {/if}
       {/each}
     {/if}

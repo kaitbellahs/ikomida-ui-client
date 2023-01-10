@@ -94,82 +94,83 @@
   Stores.Title.instance.set('Novo cartão')
 </script>
 
-<Views.Divider />
-<h2>Preencha aqui os dados do seu cartão</h2>
-<Views.Divider />
-<Views.Selector
-  name="Tipo do endereço:"
-  options={Types.Types.TAddress.values()}
-  bind:selected={newAddressObject.kind}
-/>
-<Views.TextEdit
-  placeHolder="Referencia"
-  bind:value={newAddressObject.reference}
-  bind:this={newAddressObjectInputs.reference}
-  bind:isValid={newAddressObjectValidation.reference}
-  max={255}
-/>
-<Views.TextEdit
-  type={Types.TTextEdit.CEP}
-  callback={findAddress}
-  buttonIcon={faSearch}
-  bind:value={newAddressObject.postalCode}
-  bind:this={newAddressObjectInputs.postalCode}
-  bind:isValid={newAddressObjectValidation.postalCode}
-  placeHolder="CEP"
-/>
-<Views.TextEdit
-  disabled={true}
-  placeHolder="Endereço"
-  bind:value={newAddressObject.street}
-  bind:this={newAddressObjectInputs.street}
-  bind:isValid={newAddressObjectValidation.street}
-  min={2}
-  max={255}
-/>
-<Views.TextEdit
-  placeHolder="Número"
-  bind:value={newAddressObject.number}
-  bind:this={newAddressObjectInputs.number}
-  bind:isValid={newAddressObjectValidation.number}
-  min={1}
-  max={255}
-  empty={!newAddressObjectValidation.postalCode}
-/>
-<Views.TextEdit
-  placeHolder="Complemento"
-  bind:value={newAddressObject.complement}
-  bind:this={newAddressObjectInputs.complement}
-/>
-<Views.TextEdit
-  disabled={true}
-  placeHolder="Bairro"
-  bind:value={newAddressObject.neighborhood}
-  bind:isValid={newAddressObjectValidation.neighborhood}
-  bind:this={newAddressObjectInputs.neighborhood}
-  min={2}
-  max={255}
-/>
-<Views.TextEdit
-  disabled={true}
-  placeHolder="Cidade"
-  bind:value={newAddressObject.city}
-  bind:isValid={newAddressObjectValidation.city}
-  bind:this={newAddressObjectInputs.city}
-  min={2}
-  max={255}
-/>
-<Views.TextEdit
-  disabled={true}
-  placeHolder="UF"
-  bind:value={newAddressObject.stat}
-  bind:this={newAddressObjectInputs.stat}
-  bind:isValid={newAddressObjectValidation.stat}
-  min={2}
-  max={2}
-/>
-<Views.Divider />
-<Views.Button disabled={!canProceed} on:click={newAddress}>Adicionar</Views.Button>
+<data>
+  <h2>Preencha aqui os dados do seu cartão</h2>
+  <Views.Divider />
+  <Views.Selector
+    name="Tipo do endereço:"
+    options={Types.Types.TAddress.values()}
+    bind:selected={newAddressObject.kind}
+  />
+  <Views.TextEdit
+    placeHolder="Referencia"
+    bind:value={newAddressObject.reference}
+    bind:this={newAddressObjectInputs.reference}
+    bind:isValid={newAddressObjectValidation.reference}
+    max={255}
+  />
+  <Views.TextEdit
+    type={Types.TTextEdit.CEP}
+    callback={findAddress}
+    buttonIcon={faSearch}
+    bind:value={newAddressObject.postalCode}
+    bind:this={newAddressObjectInputs.postalCode}
+    bind:isValid={newAddressObjectValidation.postalCode}
+    placeHolder="CEP"
+  />
+  <Views.TextEdit
+    disabled={true}
+    placeHolder="Endereço"
+    bind:value={newAddressObject.street}
+    bind:this={newAddressObjectInputs.street}
+    bind:isValid={newAddressObjectValidation.street}
+    min={2}
+    max={255}
+  />
+  <Views.TextEdit
+    placeHolder="Número"
+    bind:value={newAddressObject.number}
+    bind:this={newAddressObjectInputs.number}
+    bind:isValid={newAddressObjectValidation.number}
+    min={1}
+    max={255}
+    empty={!newAddressObjectValidation.postalCode}
+  />
+  <Views.TextEdit
+    placeHolder="Complemento"
+    bind:value={newAddressObject.complement}
+    bind:this={newAddressObjectInputs.complement}
+  />
+  <Views.TextEdit
+    disabled={true}
+    placeHolder="Bairro"
+    bind:value={newAddressObject.neighborhood}
+    bind:isValid={newAddressObjectValidation.neighborhood}
+    bind:this={newAddressObjectInputs.neighborhood}
+    min={2}
+    max={255}
+  />
+  <Views.TextEdit
+    disabled={true}
+    placeHolder="Cidade"
+    bind:value={newAddressObject.city}
+    bind:isValid={newAddressObjectValidation.city}
+    bind:this={newAddressObjectInputs.city}
+    min={2}
+    max={255}
+  />
+  <Views.TextEdit
+    disabled={true}
+    placeHolder="UF"
+    bind:value={newAddressObject.stat}
+    bind:this={newAddressObjectInputs.stat}
+    bind:isValid={newAddressObjectValidation.stat}
+    min={2}
+    max={2}
+  />
+  <Views.Divider />
+  <Views.Button disabled={!canProceed} on:click={newAddress}>Adicionar</Views.Button>
+</data>
 
 <style>
   h2 {
