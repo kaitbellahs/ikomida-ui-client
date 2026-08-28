@@ -3,7 +3,7 @@
   "version": "${{version}}$",
   "private": true,
   "author": "Khalid Ait Bellahs",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "watch:prod": "rollup -c -w --environment ENV:production",
@@ -109,5 +109,9 @@
     "credit-card-type": "^9.1.0",
     "html2canvas": "^1.4.1",
     "uuid": "^9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaitbellahs/ikomida-ui-client.git"
   }
 }
